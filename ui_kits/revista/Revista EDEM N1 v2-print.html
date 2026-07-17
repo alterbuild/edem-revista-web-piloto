@@ -1,0 +1,401 @@
+<!-- @dsCard group="Revista" viewport="794x1123" name="EDEM Times Nº1 — v2 'Contracorriente'" subtitle="Dirección de arte editorial: tipografía brutal, sellos, radar, duotonos" -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EDEM Times Nº1 — Bienvenidos a EDEM</title>
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap">
+<style>
+  :root{--pw:794px;--ph:1123px;--teal:#008aad;--teal2:#b4dee9;--teal7:#006a85;--teal9:#06333f;--ink:#0c1e24;--ink5:#5a6e75;--paper:#fbfaf6;--coral:#e8502d;--indigo:#3b3a7a}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#141f24;font-family:'Archivo',sans-serif;color:var(--ink);padding:40px 0}
+  .disp{font-family:'Bodoni Moda',Georgia,serif;letter-spacing:-.02em}
+  .wide{font-family:'Archivo',sans-serif;font-stretch:125%;text-transform:uppercase;letter-spacing:.06em}
+  .cond{font-family:'Archivo',sans-serif;font-stretch:66%;text-transform:uppercase}
+  .deck{display:flex;flex-direction:column;align-items:center;gap:32px}
+  .page{width:var(--pw);height:var(--ph);background:var(--paper);position:relative;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.45)}
+  .pad{padding:56px 60px}
+  .over{font-size:11px;letter-spacing:.3em;text-transform:uppercase;font-weight:800}
+  .outline{-webkit-text-stroke:2px var(--teal);color:transparent}
+  .outline-w{-webkit-text-stroke:2px rgba(255,255,255,.85);color:transparent}
+  .vtext{writing-mode:vertical-rl;text-orientation:mixed}
+  .hl{background:linear-gradient(transparent 55%,var(--teal2) 55%)}
+  .strike{position:relative;white-space:nowrap}
+  .strike::after{content:'';position:absolute;left:-2%;right:-2%;top:52%;height:6px;background:var(--coral);transform:rotate(-2deg)}
+  .dotrule{border:0;border-top:3px dotted var(--teal);opacity:.7}
+  .body{font-size:12.5px;line-height:1.72;color:#33484f;hyphens:auto}
+  .imgfill{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .dropcap::first-letter{font-family:'Bodoni Moda',serif;float:left;font-size:5.2em;line-height:.7;padding:8px 12px 0 0;color:var(--teal);font-weight:700}
+  .ticker{position:absolute;left:0;right:0;bottom:0;background:var(--ink);color:var(--paper);font-size:10px;letter-spacing:.28em;text-transform:uppercase;font-weight:700;padding:10px 0;white-space:nowrap;overflow:hidden}
+  .stamp{animation:none}
+  .bignum{font-family:'Bodoni Moda',serif;font-weight:700;line-height:.8}
+  .cols3{column-count:3;column-gap:24px}
+  .marg{font-size:10.5px;line-height:1.5;color:var(--teal7);border-left:2px solid var(--teal);padding-left:10px;font-weight:600}
+  @page{size:A4;margin:0}
+  @media print{
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body{background:#fff;padding:0}
+    .deck{gap:0}
+    .page{box-shadow:none;break-after:page;page-break-after:always}
+    .page:last-child{break-after:auto}
+  }
+</style>
+</head>
+<body>
+<div class="deck">
+
+<!-- ============ P1 · PORTADA ============ -->
+<section class="page" data-screen-label="Portada" style="background:var(--paper)">
+  <!-- newspaper flag -->
+  <div style="padding:34px 60px 0">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:4px solid var(--ink);padding-bottom:14px">
+      <span class="cond" style="font-weight:900;font-size:15px">Unpopular Opinion incluida</span>
+      <span class="cond" style="font-weight:900;font-size:15px">Nº 1 · 2026 · Valencia</span>
+      <span class="cond" style="font-weight:900;font-size:15px">39.4623° N — 0.3262° W</span>
+    </div>
+  </div>
+  <!-- giant ghost number -->
+  <div class="bignum outline" style="position:absolute;right:-30px;top:70px;font-size:560px;opacity:.35;z-index:0">1</div>
+  <div style="padding:40px 60px 0;position:relative;z-index:1">
+    <img src="../../assets/edem-logo.png" alt="EDEM" style="width:340px;display:block">
+    <div class="wide" style="font-weight:900;font-size:17px;color:var(--teal);margin-top:10px;letter-spacing:.42em">TIMES</div>
+  </div>
+  <div style="position:absolute;left:60px;right:60px;bottom:120px;z-index:1">
+    <p class="cond" style="font-weight:900;font-size:22px;color:var(--coral);letter-spacing:.08em">★ Manual de supervivencia en la Marina</p>
+    <h1 class="disp" style="font-size:118px;line-height:.88;font-weight:700;margin-top:10px">Bienve-<br>nidos<br><span style="font-style:italic;color:var(--teal)">a EDEM</span></h1>
+    <div style="display:flex;gap:0;margin-top:34px;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink)">
+      <div style="flex:1;padding:12px 14px 12px 0;border-right:2px solid var(--ink)"><span class="cond" style="font-weight:900;font-size:13px;color:var(--teal)">P.05</span><p style="font-size:12px;font-weight:700;margin-top:2px">Sobrevivir al primer año</p></div>
+      <div style="flex:1;padding:12px 14px;border-right:2px solid var(--ink)"><span class="cond" style="font-weight:900;font-size:13px;color:var(--coral)">P.06</span><p style="font-size:12px;font-weight:700;margin-top:2px">Radar Lanzadera: 3 startups</p></div>
+      <div style="flex:1;padding:12px 0 12px 14px"><span class="cond" style="font-weight:900;font-size:13px;color:var(--indigo)">P.08</span><p style="font-size:12px;font-weight:700;margin-top:2px">Cómo piensa un inversor</p></div>
+    </div>
+  </div>
+  <!-- stamp -->
+  <svg viewBox="0 0 120 120" style="position:absolute;right:52px;bottom:150px;width:130px;height:130px;transform:rotate(-12deg);z-index:2">
+    <defs><path id="circ" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/></defs>
+    <circle cx="60" cy="60" r="56" fill="var(--teal)"/>
+    <circle cx="60" cy="60" r="44" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1"/>
+    <text style="font-family:Archivo;font-weight:800;font-size:10.5px;letter-spacing:.2em;fill:#fff"><textPath href="#circ">MARINA DE EMPRESAS · EDEM · LANZADERA · ANGELS · </textPath></text>
+    <text x="60" y="66" text-anchor="middle" style="font-family:'Bodoni Moda',serif;font-style:italic;font-size:17px;fill:#fff">rema ⚓</text>
+  </svg>
+  <div class="ticker"><span>SE APRENDE HACIENDO · EMPRESARIOS FORMANDO A EMPRESARIOS · SE APRENDE HACIENDO · EMPRESARIOS FORMANDO A EMPRESARIOS · SE APRENDE HACIENDO</span></div>
+</section>
+
+<!-- ============ P2 · SUMARIO ============ -->
+<section class="page" data-screen-label="Sumario">
+  <div class="vtext cond" style="position:absolute;left:18px;top:56px;font-size:96px;font-weight:900;color:var(--teal);opacity:.16;letter-spacing:.02em">SUMARIO</div>
+  <div class="pad" style="height:100%;display:flex;flex-direction:column;padding-left:130px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline">
+      <h2 class="cond" style="font-size:64px;font-weight:900;line-height:.9">A bordo<span style="color:var(--teal)">.</span></h2>
+      <span class="over" style="color:var(--teal)">Nº1 / 10 págs</span>
+    </div>
+    <hr class="dotrule" style="margin-top:18px">
+    <div style="display:flex;flex-direction:column;flex:1;margin-top:8px">
+      <!-- rows -->
+      <div style="display:flex;align-items:center;gap:22px;padding:20px 0;border-bottom:1px solid #e0dcd0">
+        <span class="bignum" style="font-size:64px;color:var(--teal)">03</span>
+        <div style="flex:1"><span class="over" style="color:var(--teal);font-size:9px">Carta del director</span><p class="disp" style="font-size:27px;margin-top:2px">La opción <s style="text-decoration-color:var(--coral);text-decoration-thickness:4px">fácil</s> difícil</p></div>
+        <span style="font-size:22px;color:var(--teal)">→</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:22px;padding:20px 0;border-bottom:1px solid #e0dcd0">
+        <span class="bignum" style="font-size:64px;color:var(--teal)">04</span>
+        <div style="flex:1"><span class="over" style="color:var(--teal);font-size:9px">Portafolio</span><p class="disp" style="font-size:27px;margin-top:2px">El campus donde ocurre todo</p></div>
+        <span style="font-size:22px;color:var(--teal)">→</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:22px;padding:20px 0;border-bottom:1px solid #e0dcd0">
+        <span class="bignum" style="font-size:64px;color:var(--teal)">05</span>
+        <div style="flex:1"><span class="over" style="color:var(--teal);font-size:9px">Manual de campo</span><p class="disp" style="font-size:27px;margin-top:2px">Sobrevivir al primer año</p></div>
+        <span style="font-size:22px;color:var(--teal)">→</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:22px;padding:20px 0;border-bottom:1px solid #e0dcd0;background:linear-gradient(90deg,transparent,rgba(232,80,45,.06))">
+        <span class="bignum" style="font-size:64px;color:var(--coral)">06</span>
+        <div style="flex:1"><span class="over" style="color:var(--coral);font-size:9px">Radar Lanzadera</span><p class="disp" style="font-size:27px;margin-top:2px">3 blips en el puerto de Valencia</p></div>
+        <span style="font-size:22px;color:var(--coral)">→</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:22px;padding:20px 0;border-bottom:1px solid #e0dcd0">
+        <span class="bignum" style="font-size:64px;color:var(--teal)">07</span>
+        <div style="flex:1"><span class="over" style="color:var(--teal);font-size:9px">En cifras</span><p class="disp" style="font-size:27px;margin-top:2px">EDEM en un vistazo</p></div>
+        <span style="font-size:22px;color:var(--teal)">→</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:22px;padding:20px 0;border-bottom:1px solid #e0dcd0;background:linear-gradient(90deg,transparent,rgba(59,58,122,.06))">
+        <span class="bignum" style="font-size:64px;color:var(--indigo)">08</span>
+        <div style="flex:1"><span class="over" style="color:var(--indigo);font-size:9px">Angels</span><p class="disp" style="font-size:27px;margin-top:2px">Cómo piensa un inversor</p></div>
+        <span style="font-size:22px;color:var(--indigo)">→</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:22px;padding:20px 0">
+        <span class="bignum" style="font-size:64px;color:var(--teal)">09</span>
+        <div style="flex:1"><span class="over" style="color:var(--teal);font-size:9px">A fondo · Alumni</span><p class="disp" style="font-size:27px;margin-top:2px">Sofía Raimundo</p></div>
+        <span style="font-size:22px;color:var(--teal)">→</span>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;border-top:4px solid var(--ink);padding-top:12px">
+      <span class="cond" style="font-weight:900;font-size:12px">Una publicación de EDEM Escuela de Empresarios</span>
+      <span class="cond" style="font-weight:900;font-size:12px;color:var(--teal)">02</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ P3 · CARTA DEL DIRECTOR ============ -->
+<section class="page" data-screen-label="Carta del director">
+  <div class="pad" style="height:100%;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span class="over" style="color:var(--teal)">Carta del director</span>
+      <span class="cond" style="font-weight:900;font-size:12px;border:2px solid var(--ink);padding:4px 10px">OPINIÓN IMPOPULAR ☑</span>
+    </div>
+    <h2 class="disp" style="font-size:88px;font-weight:700;line-height:.94;margin-top:26px">La opción<br><span class="strike" style="color:#b9c6ca">fácil</span> <span style="font-style:italic;color:var(--teal)">difícil</span></h2>
+    <div style="display:grid;grid-template-columns:1fr 1.5fr;gap:36px;margin-top:44px;flex:1">
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <p class="marg">☒ Buscar aplausos<br>☒ La corriente cómoda<br>☒ Estudiar el caso desde fuera</p>
+        <p class="marg" style="border-color:var(--coral);color:var(--coral)">☑ Buscar impacto<br>☑ Remar a contracorriente<br>☑ Estar dentro de la empresa</p>
+        <div style="margin-top:auto;background:var(--ink);color:var(--paper);padding:22px;transform:rotate(-1.5deg)">
+          <p class="disp" style="font-style:italic;font-size:21px;line-height:1.25">"Aquí ocurre todo antes de que ocurra fuera."</p>
+        </div>
+      </div>
+      <div>
+        <p class="body dropcap">Somos la opción incómoda: la de complicarse la vida y demostrarlo con hechos. No buscamos aplausos, buscamos impacto. Este primer número no es un folleto de bienvenida; es un mapa para quien acaba de atracar en la Marina y todavía no sabe dónde se ha metido.</p>
+        <p class="body" style="margin-top:14px">Elegir EDEM es elegir esfuerzo, crecimiento y ganas de transformar empresas y sociedad. <span class="hl" style="font-weight:700">No es para todos. Y aunque algunos lo pongan en duda, para ti es irresistible.</span> En estas páginas verás cómo un pasillo conecta un aula con una startup y con la mesa de un inversor.</p>
+        <p class="body" style="margin-top:14px">Lo llamamos remar a contracorriente. No por gusto al esfuerzo, sino porque la corriente cómoda no lleva a ningún puerto que merezca la pena. Bienvenido a bordo.</p>
+        <p class="disp" style="font-style:italic;font-size:26px;color:var(--teal7);margin-top:26px">— El equipo de EDEM</p>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;border-top:4px solid var(--ink);padding-top:12px;margin-top:20px">
+      <span class="cond" style="font-weight:900;font-size:12px;color:var(--teal)">03</span>
+      <span class="cond" style="font-weight:900;font-size:12px">La opción difícil</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ P4 · PORTAFOLIO duotono ============ -->
+<section class="page" data-screen-label="Portafolio" style="background:var(--teal9);color:#fff">
+  <img class="imgfill" src="https://edem.eu/wp-content/uploads/2026/04/EDEM_Home_Perfil_Grado_patio.jpg" onerror="this.style.display='none'" style="filter:grayscale(1) contrast(1.1);opacity:.55;mix-blend-mode:luminosity">
+  <div style="position:absolute;inset:0;background:linear-gradient(160deg,rgba(0,138,173,.55),rgba(6,51,63,.9))"></div>
+  <div class="vtext" style="position:absolute;right:26px;top:56px;font-size:12px;letter-spacing:.34em;text-transform:uppercase;font-weight:800;color:var(--teal2)">Portafolio · Marina de València · 39.4623° N</div>
+  <div class="pad" style="position:relative;height:100%;display:flex;flex-direction:column;justify-content:flex-end">
+    <div class="bignum outline-w" style="position:absolute;top:24px;left:44px;font-size:300px;opacity:.5">04</div>
+    <h2 class="disp" style="font-size:76px;font-weight:700;line-height:.94;max-width:9ch">El campus donde <span style="font-style:italic;color:var(--teal2)">ocurre todo</span></h2>
+    <hr class="dotrule" style="border-color:var(--teal2);margin:26px 0">
+    <div style="display:flex;gap:30px;font-size:13px;line-height:1.6;color:#dbeef3">
+      <p style="flex:1">En un mismo edificio conviven las aulas de EDEM, las startups de Lanzadera y la mesa de inversión de Angels.</p>
+      <p style="flex:1">La distancia entre una idea y un inversor se mide en pasos. Literalmente: cuarenta y dos.</p>
+      <span class="cond" style="font-weight:900;font-size:12px;align-self:flex-end;opacity:.7">FOT. EDEM ©</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ P5 · MANUAL DE CAMPO ============ -->
+<section class="page" data-screen-label="Manual de supervivencia">
+  <div class="pad" style="height:100%;display:flex;flex-direction:column">
+    <div style="border:3px solid var(--ink);padding:26px 28px;position:relative">
+      <span class="cond" style="position:absolute;top:-12px;left:22px;background:var(--paper);padding:0 10px;font-weight:900;font-size:14px;color:var(--coral)">MANUAL DE CAMPO — Nº1</span>
+      <h2 class="disp" style="font-size:56px;font-weight:700;line-height:.96">Sobrevivir al primer año</h2>
+      <p class="disp" style="font-style:italic;font-size:19px;color:var(--ink5);margin-top:6px">El primer curso no va de aprobar: va de aprender a moverte.</p>
+    </div>
+    <div class="cols3 body" style="margin-top:28px;flex:1">
+      <p class="dropcap">El campus es pequeño y a la vez infinito, porque cada pasillo conecta con una startup o con una reunión de Angels. Lo primero que descubres es que <span class="hl" style="font-weight:700">la persona sentada a tu lado probablemente monte tu próxima empresa.</span></p>
+      <p style="margin-top:12px">Aprende los nombres. Pregunta sin miedo. El talento raro se entrena en compañía, y la humildad de preguntar acelera más que cualquier apunte.</p>
+      <p style="margin-top:12px">Ve a los eventos aunque no entiendas la mitad. La segunda mitad la entenderás la próxima vez, y para entonces ya conocerás a media sala. La red se construye antes de necesitarla. Y cuando dudes, rema: a contracorriente, siempre.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:auto;border:3px solid var(--ink)">
+      <div style="padding:22px;border-right:3px solid var(--ink)">
+        <span class="cond" style="font-weight:900;font-size:11px;background:var(--teal);color:#fff;padding:3px 8px">REGLA 01</span>
+        <p class="disp" style="font-size:24px;margin-top:12px;line-height:1.05">Preséntate primero</p>
+        <p style="font-size:11.5px;color:var(--ink5);margin-top:8px;line-height:1.55">El networking no empieza en un evento: empieza en ti. Nadie recuerda al que esperó a ser presentado.</p>
+      </div>
+      <div style="padding:22px;border-right:3px solid var(--ink)">
+        <span class="cond" style="font-weight:900;font-size:11px;background:var(--teal);color:#fff;padding:3px 8px">REGLA 02</span>
+        <p class="disp" style="font-size:24px;margin-top:12px;line-height:1.05">Di sí a los retos</p>
+        <p style="font-size:11.5px;color:var(--ink5);margin-top:8px;line-height:1.55">Se aprende haciendo. El "todavía no estoy listo" es la forma educada de no llegar nunca.</p>
+      </div>
+      <div style="padding:22px">
+        <span class="cond" style="font-weight:900;font-size:11px;background:var(--teal);color:#fff;padding:3px 8px">REGLA 03</span>
+        <p class="disp" style="font-size:24px;margin-top:12px;line-height:1.05">Da antes de pedir</p>
+        <p style="font-size:11.5px;color:var(--ink5);margin-top:8px;line-height:1.55">El ecosistema funciona porque todos reman. Tu reputación es tu primer producto.</p>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;border-top:4px solid var(--ink);padding-top:12px;margin-top:22px">
+      <span class="cond" style="font-weight:900;font-size:12px">Pasillo EDEM</span>
+      <span class="cond" style="font-weight:900;font-size:12px;color:var(--teal)">05</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ P6 · RADAR LANZADERA ============ -->
+<section class="page" data-screen-label="Radar Lanzadera" style="background:#12100f;color:#fff">
+  <!-- radar rings -->
+  <div style="position:absolute;right:-180px;top:-180px;width:640px;height:640px;border-radius:50%;border:1.5px solid rgba(232,80,45,.5)"></div>
+  <div style="position:absolute;right:-100px;top:-100px;width:480px;height:480px;border-radius:50%;border:1.5px solid rgba(232,80,45,.35)"></div>
+  <div style="position:absolute;right:-20px;top:-20px;width:320px;height:320px;border-radius:50%;border:1.5px solid rgba(232,80,45,.25)"></div>
+  <div style="position:absolute;right:60px;top:60px;width:160px;height:160px;border-radius:50%;border:1.5px solid rgba(232,80,45,.2)"></div>
+  <div style="position:absolute;right:130px;top:214px;width:10px;height:10px;border-radius:50%;background:var(--coral);box-shadow:0 0 20px var(--coral)"></div>
+  <div style="position:absolute;right:250px;top:120px;width:8px;height:8px;border-radius:50%;background:var(--coral);opacity:.7"></div>
+  <div style="position:absolute;right:80px;top:100px;width:6px;height:6px;border-radius:50%;background:var(--coral);opacity:.5"></div>
+  <div class="pad" style="position:relative;height:100%;display:flex;flex-direction:column">
+    <span class="over" style="color:var(--coral)">Radar Lanzadera</span>
+    <h2 class="cond" style="font-size:92px;font-weight:900;line-height:.86;margin-top:16px">3 BLIPS<br>EN EL<br>PUERTO<span style="color:var(--coral)">.</span></h2>
+    <p class="disp" style="font-style:italic;font-size:19px;color:#c9beb9;margin-top:14px;max-width:40ch">Las startups del último cohorte que ya mueven el Mediterráneo, detectadas a tiempo real.</p>
+    <div style="display:flex;flex-direction:column;gap:0;margin-top:36px;flex:1">
+      <div style="display:flex;gap:20px;align-items:center;padding:20px 0;border-top:1.5px solid rgba(255,255,255,.18)">
+        <span class="bignum" style="font-size:56px;color:var(--coral)">1</span>
+        <div style="flex:1"><div style="display:flex;gap:10px;align-items:baseline"><p class="disp" style="font-size:30px">Portmar</p><span class="cond" style="font-weight:900;font-size:10px;color:var(--coral);border:1.5px solid var(--coral);padding:2px 8px">LOGÍSTICA</span></div><p style="font-size:12.5px;color:#c9beb9;line-height:1.6;margin-top:4px">Automatiza la operativa de atraque: –30% de tiempos muertos. Tres terminales del Mediterráneo y Génova a la vista.</p></div>
+        <span class="cond" style="font-weight:900;font-size:11px;color:var(--coral)">SEÑAL ●●●</span>
+      </div>
+      <div style="display:flex;gap:20px;align-items:center;padding:20px 0;border-top:1.5px solid rgba(255,255,255,.18)">
+        <span class="bignum" style="font-size:56px;color:var(--coral)">2</span>
+        <div style="flex:1"><div style="display:flex;gap:10px;align-items:baseline"><p class="disp" style="font-size:30px">Salinnova</p><span class="cond" style="font-weight:900;font-size:10px;color:var(--coral);border:1.5px solid var(--coral);padding:2px 8px">CLEANTECH</span></div><p style="font-size:12.5px;color:#c9beb9;line-height:1.6;margin-top:4px">Desalación modular de bajo consumo para la industria conservera. Agua de mar como recurso industrial.</p></div>
+        <span class="cond" style="font-weight:900;font-size:11px;color:var(--coral)">SEÑAL ●●○</span>
+      </div>
+      <div style="display:flex;gap:20px;align-items:center;padding:20px 0;border-top:1.5px solid rgba(255,255,255,.18);border-bottom:1.5px solid rgba(255,255,255,.18)">
+        <span class="bignum" style="font-size:56px;color:var(--coral)">3</span>
+        <div style="flex:1"><div style="display:flex;gap:10px;align-items:baseline"><p class="disp" style="font-size:30px">Marea AI</p><span class="cond" style="font-weight:900;font-size:10px;color:var(--coral);border:1.5px solid var(--coral);padding:2px 8px">IA</span></div><p style="font-size:12.5px;color:#c9beb9;line-height:1.6;margin-top:4px">Predicción de oleaje en tiempo real: ventanas seguras de carga con horas de adelanto.</p></div>
+        <span class="cond" style="font-weight:900;font-size:11px;color:var(--coral)">SEÑAL ●○○</span>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding-top:14px">
+      <span class="cond" style="font-weight:900;font-size:12px;color:var(--coral)">06</span>
+      <span class="cond" style="font-weight:900;font-size:12px;color:#c9beb9">LANZADERA · CENTRO DE ALTO RENDIMIENTO PARA STARTUPS</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ P7 · EN CIFRAS ============ -->
+<section class="page" data-screen-label="En cifras" style="background:var(--teal);color:#fff">
+  <div class="vtext cond" style="position:absolute;right:20px;top:56px;font-size:80px;font-weight:900;color:rgba(255,255,255,.14)">EN CIFRAS</div>
+  <div class="pad" style="height:100%;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:baseline">
+      <h2 class="cond" style="font-size:60px;font-weight:900;line-height:.9">SIN RODEOS<span style="color:var(--teal9)">.</span></h2>
+      <span class="over" style="color:#cdeef5">Curso 25/26</span>
+    </div>
+    <div style="display:flex;flex-direction:column;flex:1;margin-top:36px;gap:0">
+      <div style="border-top:3px solid rgba(255,255,255,.5);padding:26px 0;display:flex;align-items:baseline;gap:24px">
+        <span class="bignum" style="font-size:150px;letter-spacing:-.03em">+2.100</span>
+        <p style="font-size:15px;line-height:1.45;max-width:22ch;color:#e4f5f9">alumnos insertados en empresas del ecosistema</p>
+      </div>
+      <div style="border-top:3px solid rgba(255,255,255,.5);padding:26px 0;display:flex;align-items:baseline;gap:24px;justify-content:flex-end;text-align:right">
+        <p style="font-size:15px;line-height:1.45;max-width:22ch;color:#e4f5f9">empresas confían en EDEM para captar talento</p>
+        <span class="bignum outline-w" style="font-size:150px;letter-spacing:-.03em">+2.200</span>
+      </div>
+      <div style="border-top:3px solid rgba(255,255,255,.5);padding:26px 0;display:flex;align-items:baseline;gap:24px">
+        <span class="bignum" style="font-size:150px;letter-spacing:-.03em">1,5M€</span>
+        <p style="font-size:15px;line-height:1.45;max-width:22ch;color:#e4f5f9">destinados a becas para estudiantes este curso</p>
+      </div>
+      <div style="border-top:3px solid rgba(255,255,255,.5);border-bottom:3px solid rgba(255,255,255,.5);padding:20px 0;display:flex;align-items:center;justify-content:space-between">
+        <p class="disp" style="font-style:italic;font-size:24px">Que nada te frene.</p>
+        <span class="cond" style="font-weight:900;font-size:13px;background:var(--teal9);padding:8px 16px">BECAS → EDEM.EU/BECAS</span>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding-top:14px">
+      <span class="cond" style="font-weight:900;font-size:12px;color:#cdeef5">EDEM EN UN VISTAZO</span>
+      <span class="cond" style="font-weight:900;font-size:12px">07</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ P8 · ANGELS ============ -->
+<section class="page" data-screen-label="Angels">
+  <div class="bignum" style="position:absolute;right:-40px;bottom:-90px;font-size:560px;color:var(--indigo);opacity:.07;font-style:italic">?</div>
+  <div class="pad" style="height:100%;display:flex;flex-direction:column;position:relative">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span class="over" style="color:var(--indigo)">Angels · Inversión</span>
+      <span class="cond" style="font-weight:900;font-size:12px;color:var(--indigo)">⏱ 3 MIN PARA CONVENCER</span>
+    </div>
+    <h2 class="disp" style="font-size:74px;font-weight:700;line-height:.94;margin-top:22px">Cómo piensa<br><span style="font-style:italic;color:var(--indigo)">un inversor</span></h2>
+    <p class="body" style="margin-top:16px;max-width:52ch">En los tres primeros minutos un inversor decide si te escucha. No es magia: es patrón. Tres preguntas se repiten en cada mesa de Angels — llega con las tres respondidas.</p>
+    <div style="display:flex;flex-direction:column;gap:14px;margin-top:30px;flex:1">
+      <div style="display:grid;grid-template-columns:170px 1fr;gap:22px;background:#f1f0f7;padding:24px 26px;border-left:6px solid var(--indigo)">
+        <span class="disp" style="font-size:33px;color:var(--indigo);line-height:1">¿Por qué tú?</span>
+        <p class="body" style="font-size:12px">El equipo antes que la idea. Las ideas cambian tres veces antes de la serie A; la gente que las ejecuta, no. <b>Se invierte en quien sostiene el plan cuando el plan se rompe.</b></p>
+      </div>
+      <div style="display:grid;grid-template-columns:170px 1fr;gap:22px;background:#f1f0f7;padding:24px 26px;border-left:6px solid var(--indigo);margin-left:44px">
+        <span class="disp" style="font-size:33px;color:var(--indigo);line-height:1">¿Por qué ahora?</span>
+        <p class="body" style="font-size:12px">El momento lo es casi todo: un buen negocio a destiempo es un mal negocio. Demuestra por qué esta ventana se abre hoy — <b>y por qué se cierra si no la cruzas.</b></p>
+      </div>
+      <div style="display:grid;grid-template-columns:170px 1fr;gap:22px;background:#f1f0f7;padding:24px 26px;border-left:6px solid var(--indigo);margin-left:88px">
+        <span class="disp" style="font-size:33px;color:var(--indigo);line-height:1">¿Hasta dónde?</span>
+        <p class="body" style="font-size:12px">Techo de mercado, no de ego. El inversor quiere ver el tamaño del océano, no la altura de tu ambición. <b>Aterriza el TAM con datos y honestidad.</b></p>
+      </div>
+      <div style="background:var(--indigo);color:#fff;padding:26px 30px;margin-top:auto;transform:rotate(1deg)">
+        <p class="disp" style="font-style:italic;font-size:24px;line-height:1.2">"No financiamos ideas. Financiamos a quien es capaz de convertirlas en empresa."</p>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;border-top:4px solid var(--ink);padding-top:12px;margin-top:22px">
+      <span class="cond" style="font-weight:900;font-size:12px">Angels</span>
+      <span class="cond" style="font-weight:900;font-size:12px;color:var(--indigo)">08</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ P9 · A FONDO ============ -->
+<section class="page" data-screen-label="Entrevista" style="background:var(--ink);color:#fff">
+  <div style="position:absolute;inset:0;overflow:hidden">
+    <img class="imgfill" src="https://edem.eu/wp-content/uploads/2026/04/EDEM_Home_talento.jpg" onerror="this.style.display='none'" style="filter:grayscale(1);opacity:.35">
+    <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(12,30,36,.95) 30%,rgba(12,30,36,.55))"></div>
+  </div>
+  <div class="bignum outline-w" style="position:absolute;left:34px;top:20px;font-size:250px;opacity:.35">"</div>
+  <div class="pad" style="position:relative;height:100%;display:flex;flex-direction:column;justify-content:center">
+    <span class="over" style="color:#74c1d5">A fondo · Alumni</span>
+    <blockquote class="disp" style="font-size:47px;line-height:1.1;margin-top:26px;max-width:15ch">Gracias a EDEM entendí cómo se construye una marca <span style="font-style:italic;color:#74c1d5">desde cero</span> — y aprendí a remar cuando todo va en contra.</blockquote>
+    <div style="display:flex;align-items:center;gap:18px;margin-top:40px">
+      <div style="width:52px;height:52px;border-radius:50%;background:var(--teal);display:grid;place-items:center;font-weight:900;font-size:17px">SR</div>
+      <div>
+        <p style="font-size:17px;font-weight:800">Sofía Raimundo</p>
+        <p style="font-size:12.5px;color:#9fb6bd">Partnership &amp; Hospitality en Roig Arena · Máster de Marketing y Venta Digital</p>
+      </div>
+    </div>
+    <div style="display:flex;gap:34px;margin-top:44px;border-top:1.5px solid rgba(255,255,255,.2);padding-top:20px">
+      <div><span class="cond" style="font-weight:900;font-size:11px;color:#74c1d5">ANTES</span><p style="font-size:13px;margin-top:4px">Recién graduada, sin red</p></div>
+      <div style="align-self:center;font-size:20px;color:var(--teal)">→</div>
+      <div><span class="cond" style="font-weight:900;font-size:11px;color:#74c1d5">DESPUÉS</span><p style="font-size:13px;margin-top:4px">Construyendo marca en el Roig Arena</p></div>
+      <div style="margin-left:auto;align-self:center" class="cond"><span style="font-weight:900;font-size:12px;color:#74c1d5">09</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ P10 · CONTRAPORTADA BOGA ============ -->
+<section class="page" data-screen-label="Contraportada" style="background:var(--teal9);color:#fff">
+  <div class="vtext cond" style="position:absolute;left:30px;top:0;bottom:0;display:flex;align-items:center;font-size:150px;font-weight:900;color:rgba(255,255,255,.07)">CONTRACORRIENTE</div>
+  <!-- wave lines -->
+  <svg viewBox="0 0 794 90" style="position:absolute;left:0;right:0;top:290px;width:100%;opacity:.4">
+    <path d="M0,45 Q50,15 100,45 T200,45 T300,45 T400,45 T500,45 T600,45 T700,45 T800,45" fill="none" stroke="#008aad" stroke-width="2.5"/>
+    <path d="M0,65 Q50,35 100,65 T200,65 T300,65 T400,65 T500,65 T600,65 T700,65 T800,65" fill="none" stroke="#74c1d5" stroke-width="1.5"/>
+  </svg>
+  <div class="pad" style="position:relative;height:100%;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <img src="../../assets/edem-logo-white.png" alt="EDEM" style="width:130px">
+      <span class="over" style="color:#74c1d5">Último aviso</span>
+    </div>
+    <div style="margin-top:90px">
+      <span class="cond" style="font-weight:900;font-size:16px;background:var(--teal);padding:6px 14px">ÚNETE A</span>
+      <h2 class="cond" style="font-size:190px;font-weight:900;line-height:.82;margin-top:22px">BOGA<span style="color:var(--teal)">.</span></h2>
+      <p class="disp" style="font-style:italic;font-size:31px;color:#b4dee9;margin-top:16px">El mail que rema a contracorriente</p>
+    </div>
+    <div style="margin-top:44px;max-width:52ch">
+      <p style="font-size:14px;line-height:1.65;color:#dbeef3">Contenidos sobre empresa más allá de los libros: noticias, consejos y los eventos que ocurren en la Marina de Empresas — antes de que ocurran fuera.</p>
+      <div style="margin-top:24px;display:flex;border:2px solid rgba(255,255,255,.35)">
+        <span style="flex:1;padding:14px 18px;font-size:14px;color:#9fb6bd">tu@email.com</span>
+        <span class="cond" style="font-weight:900;font-size:13px;background:var(--teal);padding:14px 24px;display:flex;align-items:center">SUSCRIBIRME ⚓</span>
+      </div>
+    </div>
+    <div style="margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;border-top:1.5px solid rgba(255,255,255,.2);padding-top:16px">
+      <p style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:#7fa7b3">© 2026 EDEM · Escuela de Empresarios<br>Marina de Empresas ∞ Lanzadera · Angels</p>
+      <span class="cond" style="font-weight:900;font-size:12px;color:#74c1d5">EDEM.EU</span>
+    </div>
+  </div>
+</section>
+
+</div>
+<script>
+addEventListener('load', () => {
+  (async () => {
+    try { await document.fonts.ready; } catch (e) {}
+    const imgs = Array.from(document.images).filter((i) => !i.complete);
+    await Promise.race([
+      Promise.allSettled(imgs.map((i) => i.decode())),
+      new Promise((r) => setTimeout(r, 8000)),
+    ]);
+    setTimeout(() => window.print(), 500);
+  })();
+});
+</script>
+</body>
+</html>

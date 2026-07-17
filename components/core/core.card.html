@@ -1,0 +1,59 @@
+<!-- @dsCard group="Components" viewport="820x560" name="Core — Button · Badge · ArticleCard" subtitle="Buttons, ecosystem badges & the magazine article card" -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../../styles.css">
+<script src="../../_ds_bundle.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  body{margin:0;background:var(--surface-page);color:var(--text-body);font-family:var(--font-sans);padding:28px}
+  .row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:22px}
+  .lbl{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-faint);font-weight:700;width:100%;margin-bottom:2px}
+  .grid{display:grid;grid-template-columns:340px;gap:14px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { Button, Badge, ArticleCard } = window.EDEMRevistaDesignSystem_7d0987;
+function Demo(){
+  return (
+    <div>
+      <div className="row"><span className="lbl">Botones</span>
+        <Button variant="primary">Primary</Button>
+        <Button variant="secondary">Secondary</Button>
+        <Button variant="outline">Outline</Button>
+        <Button variant="ghost">Ghost</Button>
+        <Button variant="primary" disabled>Disabled</Button>
+      </div>
+      <div className="row"><span className="lbl">Tamaños</span>
+        <Button size="sm">Small</Button>
+        <Button size="md">Medium</Button>
+        <Button size="lg" iconRight={<span>→</span>}>Large</Button>
+      </div>
+      <div className="row"><span className="lbl">Badges — ecosistema</span>
+        <Badge tone="edem">Pasillo EDEM</Badge>
+        <Badge tone="lanzadera">Radar Lanzadera</Badge>
+        <Badge tone="angels">Angels</Badge>
+        <Badge tone="neutral">Editorial</Badge>
+        <Badge tone="teal" solid={false}>Outline</Badge>
+      </div>
+      <div className="row"><span className="lbl">Article Card</span></div>
+      <div className="grid">
+        <ArticleCard
+          tone="lanzadera" category="Radar Lanzadera"
+          title="3 startups que revolucionan el puerto de Valencia"
+          excerpt="Las apuestas del último cohorte de Lanzadera que ya mueven el Mediterráneo."
+          meta="6 min" />
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo/>);
+</script>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!-- @dsCard group="Revista" viewport="1440x900" name="Web piloto EDEM Times" subtitle="Sitio completo: home + kiosko + visor flipbook con las 3 revistas reales" -->
+<!-- @startingPoint section="Magazine" subtitle="Pilot magazine site with real-issue flipbook viewer" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EDEM Times — Web piloto</title>
+<meta name="ext-resource-dependency" content="Revista EDEM N2.html" data-resource-id="mag_n2" />
+<meta name="ext-resource-dependency" content="Revista EDEM N1 v2.html" data-resource-id="mag_n1v2" />
+<meta name="ext-resource-dependency" content="Revista EDEM N1.html" data-resource-id="mag_n1" />
+<meta name="ext-resource-dependency" content="../../assets/edem-logo-white.png" data-resource-id="logoW" />
+<meta name="ext-resource-dependency" content="../../assets/edem-logo.png" data-resource-id="logoD" />
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+:root{--teal:#008aad;--teal2:#b4dee9;--teal6:#007a99;--teal7:#006a85;--teal9:#06333f;--ink:#0c1e24;--ink5:#5a6e75;--ink4:#869aa0;--ink3:#b9c6ca;--ink2:#dce4e6;--ink1:#edf1f2;--paper:#fbfaf6;--paper2:#f2efe6;--coral:#e8502d;--indigo:#3b3a7a;--sh-soft:0 4px 12px rgba(6,51,63,.08),0 2px 4px rgba(6,51,63,.06);--sh-lift:0 18px 40px rgba(6,51,63,.14),0 6px 14px rgba(6,51,63,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--paper);font-family:'Archivo','Helvetica Neue',sans-serif;color:#2a3f47;font-size:16px}
+body.lock{overflow:hidden}
+a{color:var(--teal6);text-decoration:none}a:hover{color:var(--teal9)}
+img{display:block}
+.disp{font-family:'Bodoni Moda',Georgia,serif;font-weight:900;font-optical-sizing:none;font-variation-settings:'opsz' 14;letter-spacing:-.015em}
+.disp-i{font-family:'Bodoni Moda',Georgia,serif;font-style:italic;font-weight:600;letter-spacing:-.01em}
+.cond{font-family:'Archivo',sans-serif;font-stretch:66%;text-transform:uppercase}
+.over{font-size:11px;letter-spacing:.28em;text-transform:uppercase;font-weight:800}
+.wrap{max-width:1200px;margin:0 auto;padding:0 28px}
+.btn{display:inline-flex;align-items:center;gap:9px;padding:13px 24px;border-radius:4px;font:inherit;font-weight:600;font-size:15px;border:0;cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1)}
+.btn:active{transform:translateY(1px)}
+.btn.pri{background:var(--teal);color:#fff;box-shadow:var(--sh-soft)}.btn.pri:hover{background:var(--teal6);gap:12px}
+.btn.dark{background:var(--ink);color:var(--paper)}.btn.dark:hover{background:#183038}
+.btn.out{background:transparent;color:var(--teal7);border:1.5px solid var(--teal)}.btn.out:hover{background:#eef8fb}
+.btn.ghost{background:transparent;color:#2a3f47}.btn.ghost:hover{background:var(--ink1)}
+.btn .lu{width:17px;height:17px}
+/* ---------- header ---------- */
+header{position:sticky;top:0;z-index:60;background:rgba(251,250,246,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--ink2)}
+.hbar{height:68px;display:flex;align-items:center;gap:26px}
+.brand{display:flex;align-items:baseline;gap:8px}
+.brand img{height:22px;width:auto}
+.brand .t{font-family:'Bodoni Moda',serif;font-style:italic;font-weight:600;font-size:24px;color:var(--ink);line-height:1}
+nav.main{display:flex;gap:26px;font-size:14px;font-weight:600}
+nav.main a{color:#455a61;position:relative;padding:24px 0}
+nav.main a:hover{color:var(--teal)}
+.hbar .cta{margin-left:auto}
+/* ---------- hero ---------- */
+.hero{padding:64px 0 72px;position:relative;overflow:hidden}
+.hero .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
+.kicker{display:inline-flex;align-items:center;gap:10px;color:var(--teal7)}
+.kicker .dot{width:7px;height:7px;border-radius:50%;background:var(--coral)}
+.hero h1{font-size:clamp(64px,8vw,118px);line-height:.86;color:var(--ink);margin-top:20px}
+.hero h1 .pt{color:var(--teal)}
+.hero .sub{font-size:clamp(22px,2.4vw,30px);color:var(--teal7);margin-top:14px}
+.hero p.lead{font-size:17px;line-height:1.65;color:var(--ink5);max-width:520px;margin-top:20px}
+.hero .acts{display:flex;align-items:center;gap:14px;margin-top:32px;flex-wrap:wrap}
+.meta-chips{display:flex;gap:8px;margin-top:26px;flex-wrap:wrap}
+.chip{padding:6px 13px;border:1px solid var(--ink2);border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--ink5);background:#fff}
+.heroCover{position:relative;display:flex;justify-content:center}
+.heroCover .coverslot{width:min(370px,88%);cursor:pointer;transform:rotate(-2.2deg);transition:transform .4s cubic-bezier(.4,0,.2,1);box-shadow:0 34px 70px rgba(6,51,63,.32),0 10px 24px rgba(6,51,63,.18);border-radius:3px}
+.heroCover .coverslot:hover{transform:rotate(0deg) translateY(-6px)}
+.heroCover .ghost{position:absolute;inset:auto;width:min(370px,88%);aspect-ratio:794/1123;background:var(--paper2);border:1px solid var(--ink2);border-radius:3px;z-index:-1}
+.heroCover .g1{transform:rotate(3.5deg) translate(16px,10px)}
+.heroCover .g2{transform:rotate(-7deg) translate(-20px,16px)}
+.hero .bignum{position:absolute;right:-40px;top:-60px;font-family:'Bodoni Moda',serif;font-weight:900;font-size:420px;line-height:.8;color:transparent;-webkit-text-stroke:2px var(--teal2);opacity:.5;pointer-events:none;user-select:none}
+/* ---------- section heads ---------- */
+.shead{display:flex;align-items:baseline;gap:16px;border-top:3px solid var(--ink);padding-top:18px;margin-bottom:30px}
+.shead h2{font-size:clamp(30px,3.4vw,42px);color:var(--ink)}
+.shead .note{font-size:13px;color:var(--ink4);font-weight:600}
+.shead .more{margin-left:auto;font-size:13.5px;font-weight:700}
+/* ---------- kiosko ---------- */
+#kiosko{background:var(--paper2);border-top:1px solid var(--ink2);border-bottom:1px solid var(--ink2);padding:64px 0 72px}
+.kgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.kcard{background:#fff;border:1px solid var(--ink2);border-radius:14px;overflow:hidden;box-shadow:var(--sh-soft);transition:all .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+.kcard:hover{transform:translateY(-6px);box-shadow:var(--sh-lift)}
+.kcv{position:relative;background:var(--ink1);padding:26px 26px 0;display:flex;justify-content:center}
+.kcv .coverslot{width:100%;max-width:250px;box-shadow:0 16px 34px rgba(6,51,63,.25);cursor:pointer;border-radius:2px;transition:transform .3s}
+.kcard:hover .coverslot{transform:translateY(-3px)}
+.kbadge{position:absolute;top:14px;left:14px;z-index:3;padding:5px 12px;border-radius:999px;color:#fff;font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.kbody{padding:22px 24px 24px;display:flex;flex-direction:column;gap:8px;flex:1}
+.kbody .nr{font-size:11px;letter-spacing:.24em;font-weight:800;color:var(--teal7);text-transform:uppercase}
+.kbody h3{font-size:26px;color:var(--ink);line-height:1.05}
+.kbody p{font-size:14px;line-height:1.55;color:var(--ink5);flex:1}
+.kmeta{font-size:12.5px;color:var(--ink4);font-weight:600}
+.kacts{display:flex;gap:10px;margin-top:10px}
+.kacts .btn{padding:10px 16px;font-size:13.5px;flex:1;justify-content:center}
+/* ---------- article grid ---------- */
+#numero{padding:68px 0 76px}
+.agrid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.acard{background:#fff;border:1px solid var(--ink2);border-radius:14px;overflow:hidden;box-shadow:var(--sh-soft);display:flex;flex-direction:column;cursor:pointer;transition:all .3s cubic-bezier(.4,0,.2,1)}
+.acard:hover{transform:translateY(-6px);box-shadow:var(--sh-lift)}
+.acard .im{aspect-ratio:3/2;overflow:hidden;background:var(--teal9)}
+.acard .im img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.acard:hover .im img{transform:scale(1.05)}
+.abody{padding:24px;display:flex;flex-direction:column;gap:11px;flex:1}
+.abadge{align-self:flex-start;padding:5px 12px;border-radius:999px;color:#fff;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.abody h3{font-size:24px;line-height:1.12;color:var(--ink)}
+.abody p{font-size:14.5px;line-height:1.5;color:var(--ink5);flex:1}
+.afoot{border-top:1px solid var(--ink1);padding-top:12px;display:flex;align-items:center;font-size:13px}
+.afoot .go{color:var(--teal6);font-weight:700;display:inline-flex;align-items:center;gap:6px;transition:gap .25s}
+.acard:hover .afoot .go{gap:11px}
+.afoot .pg#{margin-left:auto}
+.afoot .pnum{margin-left:auto;color:var(--ink4);font-weight:600}
+/* ---------- BOGA ---------- */
+#boga{background:var(--teal9);color:var(--paper);padding:60px 0}
+#boga .in{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+#boga h2{font-size:40px;color:#fff}
+#boga .disp-i{color:var(--teal2)}
+#boga p{color:#b4c9cf;font-size:15px;line-height:1.6;margin-top:10px;max-width:440px}
+#boga form{display:flex;gap:10px}
+#boga input{flex:1;padding:14px 16px;border-radius:4px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#fff;font:inherit;font-size:14px}
+#boga input::placeholder{color:#7d97a0}
+#boga input:focus{outline:none;border-color:var(--teal2)}
+#sub-msg{font-size:13px;color:var(--teal2);margin-top:10px;min-height:18px}
+/* ---------- footer ---------- */
+footer{background:var(--ink);color:var(--ink3)}
+.fgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;padding-top:56px;padding-bottom:56px}
+footer img{height:22px}
+footer .tag{font-family:'Bodoni Moda',serif;font-style:italic;font-size:21px;color:#fff;margin-top:14px}
+footer .col p.h{font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:800;color:var(--ink4);margin-bottom:14px}
+footer .col a{display:block;color:var(--ink3);font-size:14.5px;padding:4px 0}
+footer .col a:hover{color:var(--teal2)}
+.soc{display:flex;gap:10px}
+.soc a{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.16);display:grid;place-items:center;color:var(--ink2);transition:all .25s}
+.soc a:hover{background:var(--teal);border-color:var(--teal);color:#fff}
+.fbase{border-top:1px solid rgba(255,255,255,.1)}
+.fbase .wrap{display:flex;justify-content:space-between;gap:18px;padding-top:18px;padding-bottom:20px;font-size:12px;color:var(--ink4);flex-wrap:wrap}
+/* ---------- cover slots (scaled live pages) ---------- */
+.coverslot{position:relative;aspect-ratio:794/1123;overflow:hidden;background:repeating-linear-gradient(45deg,#e6e2d5 0 14px,#efece1 14px 28px)}
+.coverslot .cslabel{position:absolute;inset:0;display:grid;place-items:center;font-family:monospace;font-size:11px;color:var(--ink5)}
+.pg{width:794px;height:1123px;overflow:hidden;background:#fff;position:relative}
+.coverslot .pg{position:absolute;top:0;left:0;transform-origin:0 0}
+.pg iframe{width:794px;height:1123px;border:0;display:block;pointer-events:none}
+/* ---------- visor ---------- */
+.visor{position:fixed;inset:0;z-index:100;background:radial-gradient(1200px 700px at 50% 30%,#12262e,#08141a 75%);display:flex;flex-direction:column}
+.visor[hidden]{display:none}
+.vbar{height:62px;display:flex;align-items:center;gap:18px;padding:0 20px;border-bottom:1px solid rgba(255,255,255,.09);flex-shrink:0}
+.vbrand{display:flex;align-items:center;gap:10px}
+.vbrand img{height:17px}
+.vbrand span{font-size:10px;letter-spacing:.26em;font-weight:800;color:#6f8b94}
+.vissues{display:flex;gap:6px;margin-left:8px}
+.vchip{padding:8px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:transparent;color:#c7d6da;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .25s;white-space:nowrap}
+.vchip:hover{border-color:var(--teal2);color:#fff}
+.vchip.on{background:var(--teal);border-color:var(--teal);color:#fff}
+.vright{margin-left:auto;display:flex;align-items:center;gap:8px}
+.vsel{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);color:#dbe6e9;font:inherit;font-size:12.5px;font-weight:600;padding:8px 10px;border-radius:4px;max-width:230px;cursor:pointer}
+.vsel option{color:var(--ink)}
+.vico{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:transparent;border:1px solid rgba(255,255,255,.16);color:#dbe6e9;cursor:pointer;transition:all .25s}
+.vico:hover{background:var(--teal);border-color:var(--teal);color:#fff}
+.vico .lu{width:17px;height:17px}
+.vstage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:24px 74px}
+.bookouter{position:relative}
+.book{position:absolute;top:0;left:0;width:1588px;height:1123px;perspective:2800px;transform-origin:0 0}
+.half{position:absolute;top:0;bottom:0;width:794px;background:transparent}
+.half.l{left:0}.half.r{right:0}
+.half:not(.void){box-shadow:0 30px 60px rgba(0,0,0,.5),0 10px 24px rgba(0,0,0,.35);cursor:pointer}
+.spine{position:absolute;top:0;bottom:0;left:50%;width:64px;transform:translateX(-50%);background:linear-gradient(90deg,rgba(6,20,26,0),rgba(6,20,26,.26),rgba(6,20,26,0));z-index:5;pointer-events:none;transition:opacity .4s}
+.spine.off{opacity:0}
+.host{position:absolute;inset:0;pointer-events:none;z-index:30}
+.leaf{position:absolute;top:0;bottom:0;width:50%;transform-style:preserve-3d;transition:transform .82s cubic-bezier(.4,0,.2,1)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;background:#fff}
+.face.back{transform:rotateY(180deg)}
+.face .shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,20,26,.16),rgba(6,20,26,0) 22%,rgba(6,20,26,0) 78%,rgba(6,20,26,.1));pointer-events:none}
+.varrow{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;background:#fff;color:var(--ink);border:0;display:grid;place-items:center;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.4);transition:all .25s;z-index:40}
+.varrow:hover{background:var(--teal);color:#fff}
+.varrow:disabled{opacity:.25;cursor:not-allowed}
+.varrow:disabled:hover{background:#fff;color:var(--ink)}
+.varrow.l{left:16px}.varrow.r{right:16px}
+.varrow .lu{width:22px;height:22px}
+.vfoot{flex-shrink:0;display:flex;align-items:center;gap:20px;padding:14px 24px 18px;color:#89a2aa}
+.vfoot #v-ind{font-size:13px;font-weight:700;color:#c7d6da;min-width:150px}
+.vdots{display:flex;gap:7px;flex:1;justify-content:center;flex-wrap:wrap}
+.vdot{width:8px;height:8px;border-radius:999px;background:rgba(255,255,255,.25);border:0;padding:0;cursor:pointer;transition:all .3s}
+.vdot:hover{background:rgba(255,255,255,.55)}
+.vdot.on{background:var(--teal2);width:24px}
+.vhint{font-size:12px;min-width:150px;text-align:right}
+.vload{position:absolute;inset:62px 0 0;display:flex;align-items:center;justify-content:center;gap:12px;color:#c7d6da;font-size:14px;font-weight:600;background:rgba(8,20,26,.72);z-index:50}
+.spin{width:22px;height:22px;border-radius:50%;border:3px solid rgba(255,255,255,.2);border-top-color:var(--teal2);animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.vload[hidden]{display:none!important}
+.soc svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:1020px){.hero .grid{grid-template-columns:1fr}.kgrid,.agrid{grid-template-columns:1fr 1fr}#boga .in{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr 1fr}}
+@media(max-width:680px){.kgrid,.agrid{grid-template-columns:1fr}nav.main{display:none}.vhint{display:none}.vsel{display:none}}
+</style>
+</head>
+<body>
+
+<header data-screen-label="Cabecera">
+  <div class="wrap hbar">
+    <div class="brand"><img src="../../assets/edem-logo.png" alt="EDEM"><span class="t">times</span></div>
+    <nav class="main">
+      <a href="#ultima">Última edición</a>
+      <a href="#kiosko">Kiosko</a>
+      <a href="#numero">En este número</a>
+      <a href="#boga">BOGA</a>
+    </nav>
+    <button class="btn pri cta" onclick="openVisor('n2')"><i data-lucide="book-open" class="lu"></i> Abrir el visor</button>
+  </div>
+</header>
+
+<main>
+<!-- HERO · última edición -->
+<section id="ultima" class="hero" data-screen-label="Hero última edición">
+  <div class="bignum">2</div>
+  <div class="wrap grid">
+    <div>
+      <span class="kicker over"><span class="dot"></span>Nº 2 · 2026 · Última edición</span>
+      <h1 class="disp">Trac&shy;ción<span class="pt">.</span></h1>
+      <p class="sub disp-i">El arte de hacer que las cosas funcionen</p>
+      <p class="lead">24 páginas a toda máquina: la crónica del Hackathon desde dentro, una entrevista cruzada alumno × CEO, el radar de Lanzadera, las métricas que mira Angels y pasatiempos para el trayecto de vuelta.</p>
+      <div class="acts">
+        <button class="btn pri" onclick="openVisor('n2')"><i data-lucide="book-open" class="lu"></i> Leer en el visor</button>
+        <a class="btn ghost" href="#kiosko"><i data-lucide="library" class="lu"></i> Ver el kiosko</a>
+      </div>
+      <div class="meta-chips">
+        <span class="chip">24 páginas</span><span class="chip">Edición física + digital</span><span class="chip">Marina de Empresas</span>
+      </div>
+    </div>
+    <div class="heroCover">
+      <div class="ghost g1"></div><div class="ghost g2"></div>
+      <div class="coverslot" data-mag="n2" onclick="openVisor('n2')" title="Leer Nº2 en el visor"><span class="cslabel">portada Nº2</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- KIOSKO -->
+<section id="kiosko" data-screen-label="Kiosko de ediciones">
+  <div class="wrap">
+    <div class="shead">
+      <h2 class="disp">El kiosko</h2>
+      <span class="note">todas las ediciones prototipadas · se abren en el visor con efecto papel</span>
+    </div>
+    <div class="kgrid" id="kgrid"></div>
+  </div>
+</section>
+
+<!-- EN ESTE NÚMERO -->
+<section id="numero" data-screen-label="En este número">
+  <div class="wrap">
+    <div class="shead">
+      <h2 class="disp">En este número</h2>
+      <span class="note">Nº 2 «Tracción» · cada artículo abre el visor por su página</span>
+      <a class="more" href="#" onclick="openVisor('n2');return false;">Leer completo →</a>
+    </div>
+    <div class="agrid" id="agrid"></div>
+  </div>
+</section>
+
+<!-- BOGA -->
+<section id="boga" data-screen-label="BOGA newsletter">
+  <div class="wrap in">
+    <div>
+      <p class="over" style="color:var(--teal2)">El boletín</p>
+      <h2 class="disp" style="margin-top:10px">Únete a <span class="disp-i">BOGA</span></h2>
+      <p>El mail que rema a contracorriente. Cada nueva edición de EDEM Times, avisos del kiosko y contenidos sobre empresa más allá de los libros, directo a tu bandeja.</p>
+    </div>
+    <div>
+      <form onsubmit="return subscribe(event)">
+        <input type="email" required placeholder="tu@email.com" aria-label="Tu email">
+        <button class="btn pri" type="submit">Suscribirme</button>
+      </form>
+      <p id="sub-msg"></p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer data-screen-label="Pie">
+  <div class="wrap fgrid">
+    <div class="col">
+      <img src="../../assets/edem-logo-white.png" alt="EDEM">
+      <p class="tag">Empresarios formando a empresarios</p>
+    </div>
+    <div class="col">
+      <p class="h">Ediciones</p>
+      <a href="#" onclick="openVisor('n2');return false;">Nº 2 · Tracción</a>
+      <a href="#" onclick="openVisor('n1v2');return false;">Nº 1 · v2 Contracorriente</a>
+      <a href="#" onclick="openVisor('n1');return false;">Nº 1 · Primera maqueta</a>
+    </div>
+    <div class="col">
+      <p class="h">Síguenos</p>
+      <div class="soc">
+        <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg></a>
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
+        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.94 2C5.12 20 12 20 12 20s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg></a>
+      </div>
+    </div>
+  </div>
+  <div class="fbase"><div class="wrap"><span>© 2026 EDEM · Escuela de Empresarios</span><span>Parte de Marina de Empresas ∞ Lanzadera · Angels</span></div></div>
+</footer>
+
+<!-- ============ VISOR (flipbook con las revistas reales) ============ -->
+<div id="visor" class="visor" role="dialog" aria-modal="true" aria-label="Visor de revistas" hidden data-screen-label="Visor flipbook">
+  <div class="vbar">
+    <div class="vbrand"><img src="../../assets/edem-logo-white.png" alt="EDEM"><span>TIMES · VISOR</span></div>
+    <div class="vissues" id="v-issues"></div>
+    <div class="vright">
+      <select id="v-goto" class="vsel" aria-label="Ir a página"></select>
+      <button id="v-close" class="vico" title="Cerrar (Esc)" onclick="closeVisor()"><i data-lucide="x" class="lu"></i></button>
+    </div>
+  </div>
+  <div class="vstage" id="v-stage">
+    <div class="bookouter" id="bookouter">
+      <div class="book" id="book">
+        <div class="half l void" id="half-l" title="Página anterior"></div>
+        <div class="half r void" id="half-r" title="Página siguiente"></div>
+        <div class="spine" id="spine"></div>
+        <div class="host" id="host"></div>
+      </div>
+    </div>
+    <button id="v-prev" class="varrow l" aria-label="Anterior"><i data-lucide="chevron-left" class="lu"></i></button>
+    <button id="v-next" class="varrow r" aria-label="Siguiente"><i data-lucide="chevron-right" class="lu"></i></button>
+    <div class="vload" id="v-load" hidden><span class="spin"></span> Cargando edición…</div>
+  </div>
+  <div class="vfoot">
+    <span id="v-ind"></span>
+    <div id="v-dots" class="vdots"></div>
+    <span class="vhint">← → pasar página · Esc cerrar</span>
+  </div>
+</div>
+
+<script src="pilot-app.js"></script>
+<template id="__bundler_thumbnail" data-bg-color="#008aad">
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg"><rect width="1200" height="800" fill="#008aad"/><rect x="450" y="188" width="300" height="424" rx="6" fill="#fbfaf6"/><rect x="484" y="228" width="232" height="12" fill="#06333f"/><text x="600" y="470" text-anchor="middle" font-family="Georgia,serif" font-weight="900" font-size="210" fill="#06333f">T</text><rect x="484" y="540" width="232" height="10" fill="#e8502d"/></svg>
+</template>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!-- @dsCard group="Type" viewport="820x560" name="Display alternatives — friendlier options" subtitle="Bodoni Moda (actual) vs. 3 caras con más cuerpo y calidez · elige una" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Spectral:ital,wght@0,400;0,600;0,700;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,500&family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:var(--font-sans);background:var(--surface-page);padding:24px 30px;color:var(--text-strong)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.opt{border:1px solid var(--border-hair);border-radius:14px;padding:18px 20px 16px;background:var(--surface-card,#fff);display:flex;flex-direction:column;gap:4px}
+.opt.cur{border-color:var(--edem-teal-600);border-width:1.5px}
+.name{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--text-faint);display:flex;justify-content:space-between;align-items:baseline}
+.name b{color:var(--edem-teal-600)}
+.h{margin:6px 0 0;line-height:1.02;letter-spacing:-0.02em}
+.sub{margin:2px 0 0;line-height:1.1;font-style:italic;opacity:.72}
+.note{margin:10px 0 0;font-size:12.5px;line-height:1.5;color:var(--text-body);font-family:var(--font-sans)}
+.f-bodoni .h,.f-bodoni .sub{font-family:'Bodoni Moda',serif}
+.f-bric .h,.f-bric .sub{font-family:'Bricolage Grotesque',sans-serif}
+.f-spec .h,.f-spec .sub{font-family:'Spectral',serif}
+.f-news .h,.f-news .sub{font-family:'Newsreader',serif}
+.f-bodoni .h{font-weight:700}.f-bodoni .sub{font-weight:400}
+.f-bric .h{font-weight:700}.f-bric .sub{font-weight:500;font-style:normal;opacity:.6}
+.f-spec .h{font-weight:700}.f-spec .sub{font-weight:600}
+.f-news .h{font-weight:600}.f-news .sub{font-weight:500}
+.h.big{font-size:40px}
+</style></head><body>
+<div class="grid">
+  <div class="opt cur f-bodoni">
+    <div class="name"><span>Actual · Bodoni Moda</span><b>Didone · fina</b></div>
+    <p class="h big">Bienvenidos a EDEM</p>
+    <p class="sub" style="font-size:22px">Manual de la Marina</p>
+    <p class="note">Alto contraste, hairlines muy finos. Elegante pero fría a tamaños medios.</p>
+  </div>
+  <div class="opt f-bric">
+    <div class="name"><span>A · Bricolage Grotesque</span><b>Sans display · cálida</b></div>
+    <p class="h big">Bienvenidos a EDEM</p>
+    <p class="sub" style="font-size:22px">Manual de la Marina</p>
+    <p class="note">Grotesca contemporánea con carácter. Trazo uniforme y grueso: la más amigable y actual.</p>
+  </div>
+  <div class="opt f-spec">
+    <div class="name"><span>B · Spectral</span><b>Serif humanista</b></div>
+    <p class="h big">Bienvenidos a EDEM</p>
+    <p class="sub" style="font-size:22px">Manual de la Marina</p>
+    <p class="note">Serif de contraste bajo, robusta y legible. Mantiene el tono editorial con más cuerpo.</p>
+  </div>
+  <div class="opt f-news">
+    <div class="name"><span>C · Newsreader</span><b>Serif editorial suave</b></div>
+    <p class="h big">Bienvenidos a EDEM</p>
+    <p class="sub" style="font-size:22px">Manual de la Marina</p>
+    <p class="note">Serif de revista, cálida y redondeada. Contraste medio: seria pero cercana.</p>
+  </div>
+</div>
+</body></html>

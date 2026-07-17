@@ -1,0 +1,71 @@
+/* EDEM — Color tokens
+   Primary teal #008AAD extracted pixel-exact from the official EDEM wordmark.
+   Neutrals are a cool "petrol ink" family derived from the primary (OKLCH-harmonized).
+   Lanzadera / Angels accents are PLACEHOLDERS pending official assets — see readme.md. */
+:root{
+  /* ---- Primary: EDEM teal / petrol (base 500 = real brand color) ---- */
+  --edem-teal-50:#eef8fb;
+  --edem-teal-100:#dcf0f5;
+  --edem-teal-200:#b4dee9;
+  --edem-teal-300:#74c1d5;
+  --edem-teal-400:#34a3c0;
+  --edem-teal-500:#008aad;   /* ★ official EDEM primary */
+  --edem-teal-600:#007a99;
+  --edem-teal-700:#006a85;
+  --edem-teal-800:#0a4a5c;
+  --edem-teal-900:#06333f;
+
+  /* ---- Ink / neutrals (cool slate, faint teal cast) ---- */
+  --ink-900:#0c1e24;
+  --ink-800:#183038;
+  --ink-700:#2a3f47;
+  --ink-600:#455a61;
+  --ink-500:#5a6e75;
+  --ink-400:#869aa0;
+  --ink-300:#b9c6ca;
+  --ink-200:#dce4e6;
+  --ink-100:#edf1f2;
+  --ink-50:#f6f9f9;
+
+  /* ---- Paper (warm off-white, magazine stock) ---- */
+  --paper:#fbfaf6;
+  --paper-deep:#f2efe6;
+  --white:#ffffff;
+  --black:#04141a;
+
+  /* ---- Ecosystem accents (Marina de Empresas) ----
+     EDEM is real; the other two are placeholders — confirm official hex. */
+  --edem:#008aad;
+  --lanzadera:#e8502d;   /* placeholder coral */
+  --angels:#3b3a7a;      /* placeholder indigo */
+
+  /* ---- Semantic ---- */
+  --success:#2e8b6f;
+  --warning:#d8912e;
+  --danger:#c7452e;
+  --info:#008aad;
+
+  /* ---- Semantic aliases (use these in product) ---- */
+  --color-primary:var(--edem-teal-500);
+  --color-primary-hover:var(--edem-teal-600);
+  --color-primary-press:var(--edem-teal-700);
+  --color-primary-soft:var(--edem-teal-50);
+  --color-on-primary:var(--white);
+
+  --text-strong:var(--ink-900);
+  --text-body:var(--ink-700);
+  --text-muted:var(--ink-500);
+  --text-faint:var(--ink-400);
+  --text-on-dark:var(--paper);
+  --text-link:var(--edem-teal-600);
+  --text-link-hover:var(--edem-teal-800);
+
+  --surface-page:var(--paper);
+  --surface-card:var(--white);
+  --surface-sunk:var(--ink-50);
+  --surface-dark:var(--edem-teal-900);
+
+  --border-hair:var(--ink-200);
+  --border-strong:var(--ink-300);
+  --border-on-dark:rgba(255,255,255,.16);
+}
