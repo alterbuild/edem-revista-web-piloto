@@ -137,7 +137,11 @@ nav.main a:hover::after{transform:scaleX(1)}
 .heroBg .b1{width:540px;height:540px;left:-140px;top:-170px;background:radial-gradient(circle,var(--edem-teal-200),transparent 70%)}
 .heroBg .b2{width:460px;height:460px;right:-120px;top:24%;background:radial-gradient(circle,var(--edem-teal-100,#dcf0f5),transparent 70%);animation-duration:24s;animation-delay:-7s}
 .heroBg .b3{width:330px;height:330px;left:34%;bottom:-160px;background:radial-gradient(circle,rgba(232,80,45,.16),transparent 70%);animation-duration:16s;animation-delay:-3s}
-@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(64px,42px) scale(1.14)}}
+/* Sin scale(): escalar una capa con filter:blur(72px) obliga a rerasterizar el
+   desenfoque en CADA frame (en Safari iOS es lo que más caro sale de todo el
+   hero). Solo con traslación el compositor mueve la capa ya rasterizada y las
+   olas recuperan los frames. El recorrido se alarga un poco para compensar. */
+@keyframes drift{from{transform:translate3d(0,0,0)}to{transform:translate3d(76px,50px,0)}}
 .heroBg .halft{position:absolute;left:2%;bottom:150px;width:min(40vw,440px);height:240px;background-image:radial-gradient(var(--edem-teal-200) 1.5px,transparent 1.6px);background-size:17px 17px;opacity:.45;-webkit-mask-image:radial-gradient(closest-side,#000,transparent);mask-image:radial-gradient(closest-side,#000,transparent)}
 .heroBg .ring{position:absolute;right:-2%;top:4%;width:min(44vw,560px);aspect-ratio:1;border:1.5px dashed var(--edem-teal-200);border-radius:50%;opacity:.65;animation:ringspin 80s linear infinite}
 @keyframes ringspin{to{transform:rotate(360deg)}}
@@ -169,7 +173,11 @@ nav.main a:hover::after{transform:scaleX(1)}
    #91cede, así que no se ve ninguna costura. Encima de esa línea .sea es
    transparente: solo se ven las crestas recortadas.
    Solo se animan tres tiras de --sea-fill de alto (no capas de 1800px): 60fps. */
-.hero .sea{position:absolute;left:0;right:0;bottom:0;z-index:3;overflow:hidden;pointer-events:none;
+/* sin overflow:hidden aquí a propósito: .hero ya recorta (es sticky, o sea el
+   bloque contenedor de .sea) y este elemento cambia de transform en cada frame
+   del scroll — un clip que se mueve encima de tres capas animadas obligaba a
+   Safari a recomponer el grupo entero. El recorte de .hero hace lo mismo gratis. */
+.hero .sea{position:absolute;left:0;right:0;bottom:0;z-index:3;pointer-events:none;
   --sea-fill:210px;--o1:0px;--o2:46px;--o3:90px;
   /* alto = una pantalla + margen arriba y abajo, para poder subir del todo.
      Recorrido: de dejar asomar solo la cresta (--sea-fill) a taparlo todo. */
@@ -238,6 +246,16 @@ nav.main a:hover::after{transform:scaleX(1)}
 .beat-cta .acts{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:34px;pointer-events:auto}
 .btn.ghost.lt{color:#fff;border:1.5px solid rgba(255,255,255,.34)}
 .btn.ghost.lt:hover{background:rgba(255,255,255,.14);color:#fff}
+
+/* ---------- apagado de las capas que no se ven ----------
+   js/app.js marca el hero según el tramo de la inmersión en el que estemos.
+   `visibility:hidden` no es cosmético aquí: saca la capa del pipeline, así que
+   Safari deja de rasterizar los blur y de componer las animaciones que quedan
+   detrás del agua. Antes seguían corriendo a la vez que las olas —tres blur de
+   los rayos, las burbujas, los blobs, los aros, el destello, las motas— y en un
+   iPhone eso es justo lo que dejaba las olas a cuatro frames. */
+.hero.dry .deep{visibility:hidden}            /* todavía en la superficie: rayos y burbujas apagados */
+.hero.sunk .heroBg,.hero.sunk .wave{visibility:hidden}  /* ya bajo el agua: fondo y crestas fuera de plano */
 
 /* sin «pin» si el usuario pide menos movimiento o la ventana es muy baja
    (móvil en horizontal): el hero vuelve a ser una sección normal.
@@ -699,6 +717,13 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   .hero p.lead,.hero .meta-chips{display:none}
   .hero .acts{margin-top:22px}
   .hero .sea{--sea-fill:176px;--o2:28px;--o3:56px}
+  /* En un móvil el coste de rasterizar estos desenfoques compite directamente
+     con las olas. El blob YA es un radial-gradient que se apaga en transparent
+     70%: el blur encima apenas se nota, así que fuera (se sube un pelín la
+     opacidad para compensar el borde algo menos difuso). El destello es un
+     barrido lento que a este tamaño de pantalla no se aprecia. */
+  .heroBg .blob{filter:none;opacity:.6}
+  .heroBg .sheen{display:none}
   .beat .kicker{margin-bottom:14px}
   .heroBg .halft{bottom:110px}
   .hero .bignum{font-size:260px;right:-30px;top:-40px;opacity:.35}

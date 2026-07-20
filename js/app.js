@@ -398,18 +398,36 @@ function observeReveals() {
     return val;
   }
 
+  // classList solo cuando cambia de verdad: tocarlo en cada frame invalidaría
+  // el estilo del hero y nos comeríamos lo que acabamos de ahorrar.
+  const flags = {};
+  function flag(name, on) {
+    if (flags[name] === on) return;
+    flags[name] = on;
+    hero.classList.toggle(name, on);
+  }
+
   function update() {
     ticking = false;
     if (!enabled) {
       root.style.setProperty('--seaP', '0');
       root.style.setProperty('--deepP', '0');
+      flag('dry', false); flag('sunk', false);
       return;
     }
     const s = window.scrollY - pinTop;              // px recorridos dentro del pin
     if (s < -vh || s > range + vh) return;          // fuera de pantalla: nada que hacer
 
-    prevSea = write('--seaP', clamp01(s / waveEnd), prevSea);
-    prevDeep = write('--deepP', step(waveEnd * 0.55, waveEnd * 0.98, s), prevDeep);
+    const seaP = clamp01(s / waveEnd);
+    const deepP = step(waveEnd * 0.55, waveEnd * 0.98, s);
+    prevSea = write('--seaP', seaP, prevSea);
+    prevDeep = write('--deepP', deepP, prevDeep);
+
+    // apagamos de verdad lo que la opacidad ya hacía invisible (ver site.css):
+    // mientras se ven las olas, el relato de debajo no tiene por qué estar
+    // animándose, y una vez bajo el agua el fondo y las crestas tampoco.
+    flag('dry', deepP < 0.002);
+    flag('sunk', seaP > 0.995);
 
     for (let i = 0; i < N; i++) {
       const u = (s - waveEnd - i * seg) / seg;      // 0→1 dentro de la ventana del beat
