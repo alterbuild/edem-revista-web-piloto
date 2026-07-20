@@ -1,5 +1,6 @@
 /* EDEM Times — Design tokens (bundle de tokens/colors.css + typography.css + spacing.css del design system) */
-@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&family=Archivo:ital,wght@0,300..800;1,400..700&display=swap');
+/* Las webfonts (Bodoni Moda + Archivo) se cargan con <link> desde cada HTML:
+   un @import aquí encadenaba la petición detrás de este CSS y retrasaba el primer render. */
 /* EDEM — Color tokens
    Primary teal #008AAD extracted pixel-exact from the official EDEM wordmark.
    Neutrals are a cool "petrol ink" family derived from the primary (OKLCH-harmonized).

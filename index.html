@@ -17,9 +17,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="css/tokens.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&display=swap">
 <link rel="stylesheet" href="css/site.css">
-<script src="https://unpkg.com/lucide@0.525.0/dist/umd/lucide.min.js" defer></script>
+<script src="js/icons.js" defer></script>
 </head>
 <body>
 
@@ -120,6 +120,7 @@
       </div>
     </div>
   </div>
+  <a class="deepcue" href="#kiosko" aria-label="Seguir bajando"><i data-lucide="chevron-down" class="lu"></i></a>
 </section>
 </div>
 
@@ -365,6 +366,7 @@
     <div class="vissues" id="v-issues" role="tablist" aria-label="Ediciones"></div>
     <div class="vright">
       <select id="v-goto" class="vsel" aria-label="Ir a página"></select>
+      <button id="v-fs" class="vico" title="Pantalla completa (F)" aria-label="Pantalla completa"><i data-lucide="maximize" class="lu"></i></button>
       <a id="v-print" class="vico" target="_blank" rel="noopener" title="Versión A4 imprimible" aria-label="Versión A4 imprimible"><i data-lucide="printer" class="lu"></i></a>
       <button id="v-close" class="vico" title="Cerrar (Esc)" aria-label="Cerrar visor" onclick="closeVisor()"><i data-lucide="x" class="lu"></i></button>
     </div>
@@ -383,7 +385,7 @@
     <div class="vload" id="v-load" hidden><span class="spin"></span> Cargando edición…</div>
   </div>
   <div class="vfoot">
-    <span id="v-ind"></span>
+    <span id="v-ind" aria-live="polite"></span>
     <div id="v-dots" class="vdots"></div>
     <span class="vhint">← → pasar página · Esc cerrar</span>
   </div>

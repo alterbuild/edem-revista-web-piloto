@@ -188,7 +188,7 @@ function renderArticles() {
   // el primero va destacado, como la apertura de un sumario de revista
   $('agrid').innerHTML = C.articles.map((a, i) =>
     '<article class="acard rv' + (i === 0 ? ' feat' : '') + '" data-art="' + i + '" role="button" tabindex="0" aria-label="Leer «' + esc(a.title) + '» en el visor">' +
-    '<div class="im"><span class="imfall"><i data-lucide="anchor" class="lu"></i></span><img src="' + esc(a.img) + '" loading="lazy" onerror="this.remove()" alt=""></div>' +
+    '<div class="im"><span class="imfall"><i data-lucide="anchor" class="lu"></i></span><img src="' + esc(a.img) + '" loading="lazy" decoding="async" onerror="this.remove()" alt=""></div>' +
     '<div class="abody"><span class="apg" aria-hidden="true">' + String(a.page).padStart(2, '0') + '</span>' +
     '<span class="abadge" style="background:' + color(a.color) + '">' + esc(a.cat) + '</span>' +
     '<h3 class="disp">' + esc(a.title) + '</h3><p>' + esc(a.excerpt) + '</p>' +
@@ -375,7 +375,7 @@ function observeReveals() {
   const step = (a, b, v) => { const t = clamp01((v - a) / (b - a)); return t * t * (3 - 2 * t); };
 
   let pinTop = 0, range = 0, vh = 0, waveEnd = 0, seg = 0, enabled = true;
-  let ticking = false, prevSea = -1, prevDeep = -1;
+  let ticking = false, prevSea = -1, prevDeep = -1, prevCue = -1;
   const prevPh = new Array(N).fill(null), prevOp = new Array(N).fill(null);
 
   function measure() {
@@ -412,6 +412,7 @@ function observeReveals() {
     if (!enabled) {
       root.style.setProperty('--seaP', '0');
       root.style.setProperty('--deepP', '0');
+      root.style.setProperty('--cueP', '0');
       flag('dry', false); flag('sunk', false);
       return;
     }
@@ -422,6 +423,12 @@ function observeReveals() {
     const deepP = step(waveEnd * 0.55, waveEnd * 0.98, s);
     prevSea = write('--seaP', seaP, prevSea);
     prevDeep = write('--deepP', deepP, prevDeep);
+
+    // la flecha se apaga con el mismo tramo de salida del último beat, así
+    // desaparece justo cuando se suelta el pin y aparece el kiosko debajo.
+    const uLast = (s - waveEnd - (N - 1) * seg) / seg;
+    const cueP = deepP * (1 - step(.9, 1, uLast));
+    prevCue = write('--cueP', cueP, prevCue);
 
     // apagamos de verdad lo que la opacidad ya hacía invisible (ver site.css):
     // mientras se ven las olas, el relato de debajo no tiene por qué estar
@@ -463,6 +470,16 @@ function observeReveals() {
     scatter($('bubbles'), small ? 10 : 18, 3, 12, 9, 21);
     scatter($('motes'), small ? 7 : 12, 3, 7, 16, 30);
   }
+
+  // la flecha bajo el agua no salta al kiosko: solo empuja un beat más.
+  const deepcue = hero.querySelector('.deepcue');
+  if (deepcue) deepcue.addEventListener('click', e => {
+    e.preventDefault();
+    const s = window.scrollY - pinTop;
+    const idx = s < waveEnd ? 0 : Math.floor((s - waveEnd) / seg) + 1;
+    const target = idx >= N ? pinTop + range + vh + 1 : pinTop + waveEnd + idx * seg + seg / 2;
+    window.scrollTo({ top: target, behavior: 'smooth' });
+  });
 
   let rz, lastW = window.innerWidth;
   addEventListener('scroll', onScroll, { passive: true });
@@ -536,11 +553,20 @@ async function loadIssue(m) {
       '<style>html,body{margin:0!important;padding:0!important;background:#fff!important;overflow:hidden!important}section.page{box-shadow:none!important}</style>';
     m.data = { pages, labels, head, n: pages.length };
     const imgs = [...new Set((pages.join('').match(/src="([^"]+)"/g) || []).map(x => x.slice(5, -1)))];
-    imgs.forEach(u => { const im = new Image(); im.src = new URL(u, base).href; });
+    m.imgs = imgs.map(u => new URL(u, base).href);
     return m.data;
   })();
   m.loading.catch(() => { m.loading = null; });
   return m.loading;
+}
+/* Precalienta las imágenes de una edición para que pasar página sea instantáneo.
+   Antes se hacía dentro de loadIssue, o sea en el arranque para TODAS las
+   ediciones a la vez, compitiendo con el primer render y el scroll; ahora se
+   lanza al abrir el visor y, para el resto, en huecos libres del navegador. */
+function warmIssueImages(m) {
+  if (!m.imgs || m.warmed) return;
+  m.warmed = true;
+  m.imgs.forEach(u => { const im = new Image(); im.src = u; });
 }
 function pageDoc(m, i) { return '<!DOCTYPE html><html lang="es"><head>' + m.data.head + '</head><body>' + m.data.pages[i] + '</body></html>'; }
 function mkPage(m, i) {
@@ -589,10 +615,11 @@ async function mountCovers() {
       if (rest.length) pending.push([m, rest]);
     } catch (e) { console.warn('No se pudo cargar', m.file, e); }
   }
-  // el resto, repartido en huecos libres para no competir con el scroll
+  // el resto, repartido en huecos libres para no competir con el scroll;
+  // al terminar, las imágenes interiores de cada edición, también en huecos
   (function next() {
     const job = pending.shift();
-    if (!job) return;
+    if (!job) { MAGS.forEach(m => idle(() => warmIssueImages(m))); return; }
     idle(() => { mountSlots(job[0], job[1]); next(); });
   })();
 }
@@ -643,7 +670,9 @@ function bookW() { return mode === 'single' ? 794 : 1588; }
 
 function fitBook() {
   const r = stage.getBoundingClientRect();
-  scale = Math.min((r.width - (mode === 'single' ? 90 : 150)) / bookW(), (r.height - 40) / 1123, 1.05);
+  // en una sola página (móvil) la revista aprovecha casi todo el ancho: las
+  // flechas flotan sobre el margen y además se navega con toque y deslizamiento
+  scale = Math.min((r.width - (mode === 'single' ? 44 : 150)) / bookW(), (r.height - 40) / 1123, 1.05);
   bookouter.style.width = bookW() * scale + 'px';
   bookouter.style.height = 1123 * scale + 'px';
   book.style.transform = 'scale(' + scale + ') translateX(' + curOffset() + 'px)';
@@ -657,14 +686,18 @@ function updateChrome() {
   } else {
     $('v-ind').textContent = cur === 0 ? 'Portada · ' + n + ' págs' : (r == null ? 'Contraportada' : 'Págs. ' + (l + 1) + '–' + (r + 1) + ' de ' + n);
   }
-  $('v-prev').disabled = cur === 0 || animating;
-  $('v-next').disabled = cur === SP.length - 1 || animating;
+  // solo se desactivan en los extremos: durante la animación turn() encola el
+  // siguiente paso, así pasar páginas rápido no pierde ningún clic
+  $('v-prev').disabled = cur === 0;
+  $('v-next').disabled = cur === SP.length - 1;
   $('v-dots').innerHTML = SP.map((_, i) => '<button class="vdot' + (i === cur ? ' on' : '') + '" aria-label="Ir al pliego ' + (i + 1) + '" data-dot="' + i + '"></button>').join('');
   $('v-goto').value = String(curPageIndex());
   fitBook();
 }
 
 function render() {
+  turnSeq++;                       // un giro en vuelo ya no debe tocar nada
+  book.classList.remove('turning');
   const [l, r] = SP[cur];
   book.classList.toggle('single', mode === 'single');
   if (mode === 'single') {
@@ -679,42 +712,112 @@ function render() {
   host.replaceChildren(); updateChrome();
 }
 
-function jump(s) { if (animating || s === cur || !M) return; cur = Math.max(0, Math.min(s, SP.length - 1)); render(); }
+function jump(s) { if (animating || s === cur || !M) return; queuedTurn = 0; cur = Math.max(0, Math.min(s, SP.length - 1)); render(); }
 
+/* si llega un paso mientras la hoja aún gira, se guarda y se ejecuta al
+   terminar: hojear rápido responde a cada pulsación en vez de ignorarlas */
+let queuedTurn = 0;
+
+/* cada render() externo (cambio de edición, de modo, salto) invalida cualquier
+   giro en vuelo: el turn viejo comprueba este token tras cada espera y, si ya
+   no es el suyo, se retira sin tocar las mitades recién reconstruidas */
+let turnSeq = 0;
+
+const twoFrames = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+/* fin de giro por transitionend (exacto aunque un frame se retrase o la
+   pestaña pierda el foco a mitad de giro), con red de seguridad temporal */
+function leafDone(leaf) {
+  return new Promise(res => {
+    let done = false;
+    const ok = () => { if (!done) { done = true; res(); } };
+    leaf.addEventListener('transitionend', e => { if (e.target === leaf && e.propertyName === 'transform') ok(); });
+    setTimeout(ok, 1150);
+  });
+}
+
+/* Anatomía del giro, pensada para que nunca se vea un blanco ni un salto:
+   1) La página que quedará al descubierto se apila DEBAJO de la actual y la
+      hoja se monta oculta: mientras los iframes cargan, el pliego no cambia.
+   2) Con todo cargado, en un mismo frame: se retira la página vieja (la cara
+      frontal de la hoja es idéntica, nadie lo nota), se muestra la hoja y
+      arrancan a la vez el giro y el recentrado del libro (.turning), que en
+      portada/contraportada se desliza con la misma curva en vez de saltar.
+   3) La página de aterrizaje también se apila debajo mientras la hoja aún la
+      tapa; solo cuando está lista se retiran hoja y página vieja de golpe. */
 async function turn(dir) {
-  if (animating || !M) return;
+  if (!M) return;
+  if (animating) { queuedTurn = dir; return; }
   const t = cur + dir; if (t < 0 || t >= SP.length) return;
   if (mode === 'single' || REDUCED.matches) { cur = t; render(); return; }
-  animating = true; updateChrome();
+  animating = true;
+  const seq = turnSeq;
   const fw = dir > 0, [cl, cr] = SP[cur], [tl, tr] = SP[t];
+  const underHalf = fw ? halfR : halfL, landHalf = fw ? halfL : halfR;
+
   const under = mkPage(M, fw ? tr : tl);
-  setHalf(fw ? halfR : halfL, under);
+  const oldUnder = underHalf.firstElementChild;
+  underHalf.prepend(under.el);
+
   const front = mkPage(M, fw ? cr : cl), back = mkPage(M, fw ? tl : tr);
   const leaf = document.createElement('div'); leaf.className = 'leaf';
-  leaf.style.cssText = (fw ? 'right:0;' : 'left:0;') + 'transform-origin:' + (fw ? 'left' : 'right') + ' center;transform:rotateY(0deg);';
-  const f1 = document.createElement('div'); f1.className = 'face'; f1.appendChild(front.el); f1.insertAdjacentHTML('beforeend', '<div class="shade"></div>');
-  const f2 = document.createElement('div'); f2.className = 'face back'; f2.appendChild(back.el); f2.insertAdjacentHTML('beforeend', '<div class="shade"></div>');
+  leaf.style.cssText = (fw ? 'right:0;' : 'left:0;') + 'transform-origin:' + (fw ? 'left' : 'right') + ' center;transform:rotateY(0deg);visibility:hidden;';
+  const f1 = document.createElement('div'); f1.className = 'face'; f1.appendChild(front.el);
+  f1.insertAdjacentHTML('beforeend', '<div class="shade" style="opacity:0"></div>');
+  const f2 = document.createElement('div'); f2.className = 'face back'; f2.appendChild(back.el);
+  f2.insertAdjacentHTML('beforeend', '<div class="shade" style="opacity:.55"></div>');
   leaf.append(f1, f2); host.appendChild(leaf);
-  spine.classList.toggle('off', tl == null || tr == null);
+
+  const abort = () => { leaf.remove(); under.el.remove(); book.classList.remove('turning'); animating = false; };
+
   await Promise.all([under.ready, front.ready, back.ready]);
-  cur = t; fitBook();
-  requestAnimationFrame(() => requestAnimationFrame(() => { leaf.style.transform = 'rotateY(' + (fw ? -180 : 180) + 'deg)'; }));
-  await new Promise(res => setTimeout(res, 850));
+  if (seq !== turnSeq) { abort(); return; }
+  await twoFrames();
+  if (seq !== turnSeq) { abort(); return; }
+
+  cur = t;
+  if (oldUnder) oldUnder.remove();
+  underHalf.classList.toggle('void', under.el.classList.contains('void'));
+  spine.classList.toggle('off', tl == null || tr == null);
+  leaf.style.visibility = '';
+  book.classList.add('turning');
+  updateChrome();                                    // marcador y puntos ya al empezar el giro
+  leaf.style.transform = 'rotateY(' + (fw ? -180 : 180) + 'deg)';
+  // barrido de luz: la cara que se levanta se sombrea y la que aterriza se aclara
+  f1.lastElementChild.style.opacity = '.5';
+  f2.lastElementChild.style.opacity = '0';
+
+  await leafDone(leaf);
+  book.classList.remove('turning');
+  if (seq !== turnSeq) { abort(); return; }
+
   const land = mkPage(M, fw ? tl : tr);
-  setHalf(fw ? halfL : halfR, land);
+  const oldLand = landHalf.firstElementChild;
+  landHalf.prepend(land.el);
   await land.ready;
+  if (seq !== turnSeq) { land.el.remove(); abort(); return; }
+
+  if (oldLand) oldLand.remove();
+  landHalf.classList.toggle('void', land.el.classList.contains('void'));
   host.replaceChildren(); animating = false; updateChrome();
+  if (queuedTurn) { const d = queuedTurn; queuedTurn = 0; turn(d); }
 }
 
 async function setIssue(id, pageIdx = 0) {
   const m = MAGS.find(x => x.id === id); if (!m) return;
-  document.querySelectorAll('.vchip').forEach(c => c.classList.toggle('on', c.dataset.id === id));
+  queuedTurn = 0;
+  document.querySelectorAll('.vchip').forEach(c => {
+    const on = c.dataset.id === id;
+    c.classList.toggle('on', on);
+    c.setAttribute('aria-selected', String(on));
+  });
   $('v-print').href = encodeURI(m.print || m.file);
   const load = $('v-load');
   if (!m.data) { load.hidden = false; }
   try { await loadIssue(m); }
   catch (e) { load.hidden = true; $('v-ind').textContent = 'No se pudo cargar la edición'; return; }
   load.hidden = true;
+  warmIssueImages(m);
   mode = computeMode();
   M = m; SP = buildSpreads(m.data.n); cur = indexToSpread(Math.min(pageIdx, m.data.n - 1));
   $('v-goto').innerHTML = m.data.labels.map((lb, i) => '<option value="' + i + '">' + String(i + 1).padStart(2, '0') + ' · ' + esc(lb) + '</option>').join('');
@@ -730,6 +833,7 @@ window.openVisor = function (id, pageIdx = 0) {
   $('v-close').focus();
 };
 window.closeVisor = function () {
+  if (fsEl()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
   visor.hidden = true; document.body.classList.remove('lock');
   if (vReturnFocus) vReturnFocus.focus();
 };
@@ -749,7 +853,56 @@ $('v-prev').addEventListener('click', () => turn(-1));
 $('v-goto').addEventListener('change', e => jump(indexToSpread(+e.target.value)));
 $('v-dots').addEventListener('click', e => { const d = e.target.closest('[data-dot]'); if (d) jump(+d.dataset.dot); });
 halfR.addEventListener('click', () => turn(1));
-halfL.addEventListener('click', () => { turn(mode === 'single' ? 1 : -1); });
+halfL.addEventListener('click', e => {
+  if (mode !== 'single') { turn(-1); return; }
+  // con una sola página, el tercio izquierdo retrocede y el resto avanza
+  const r = halfL.getBoundingClientRect();
+  turn(e.clientX - r.left < r.width * .34 ? -1 : 1);
+});
+
+/* trackpad / rueda horizontal: el gesto natural de hojear en escritorio.
+   Umbral alto y periodo de gracia para que un desplazamiento diagonal
+   o el rebote inercial no pasen varias páginas de golpe. */
+let wheelT = 0;
+stage.addEventListener('wheel', e => {
+  if (Math.abs(e.deltaX) < 28 || Math.abs(e.deltaX) < Math.abs(e.deltaY) * 1.2) return;
+  const now = Date.now();
+  if (now - wheelT < 550) return;
+  wheelT = now;
+  turn(e.deltaX > 0 ? 1 : -1);
+}, { passive: true });
+
+/* ---- pantalla completa ---- */
+const vfs = $('v-fs');
+const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
+// iOS Safari (iPhone) no permite fullscreen de elementos: el botón desaparece
+if (!visor.requestFullscreen && !visor.webkitRequestFullscreen) vfs.hidden = true;
+vfs.addEventListener('click', () => {
+  if (fsEl()) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
+  const p = (visor.requestFullscreen || visor.webkitRequestFullscreen).call(visor);
+  // si el entorno lo deniega (p. ej. un iframe sin allowfullscreen), el botón
+  // no puede hacer nada útil: mejor quitarlo que dejarlo mudo
+  if (p && p.catch) p.catch(() => { vfs.hidden = true; });
+});
+function fsSync() {
+  const on = !!fsEl();
+  vfs.title = on ? 'Salir de pantalla completa (F)' : 'Pantalla completa (F)';
+  vfs.setAttribute('aria-label', vfs.title);
+  vfs.innerHTML = '<i data-lucide="' + (on ? 'minimize' : 'maximize') + '" class="lu"></i>';
+  if (window.lucide) lucide.createIcons();
+}
+document.addEventListener('fullscreenchange', fsSync);
+document.addEventListener('webkitfullscreenchange', fsSync);
+
+/* el foco no se escapa del diálogo: Tab circula por los controles del visor */
+function trapFocus(e) {
+  const els = [...visor.querySelectorAll('button:not([disabled]):not([hidden]),select,a[href]')]
+    .filter(el => el.offsetParent !== null);
+  if (!els.length) return;
+  const first = els[0], last = els[els.length - 1], a = document.activeElement;
+  if (e.shiftKey && (a === first || !visor.contains(a))) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && (a === last || !visor.contains(a))) { e.preventDefault(); first.focus(); }
+}
 
 /* gestos táctiles */
 let tX = null, tY = null;
@@ -764,11 +917,17 @@ stage.addEventListener('touchend', e => {
 document.addEventListener('keydown', e => {
   if (!$('ds').hidden) { if (e.key === 'Escape') closeDS(); return; }
   if (visor.hidden) { if (e.key === 'Escape') closeMenu(); return; }
+  if (e.key === 'Tab') { trapFocus(e); return; }
+  // dentro del selector de páginas las flechas son suyas; Esc sí pasa
+  if (e.key !== 'Escape' && e.target.matches('select,input,textarea')) return;
   if (e.key === 'ArrowRight') turn(1);
   else if (e.key === 'ArrowLeft') turn(-1);
   else if (e.key === 'Home') jump(0);
   else if (e.key === 'End') jump(SP.length - 1);
-  else if (e.key === 'Escape') closeVisor();
+  else if (e.key === 'f' || e.key === 'F') { if (!vfs.hidden) vfs.click(); }
+  // en pantalla completa, Esc primero sale de ella (lo hace el navegador);
+  // el visor solo se cierra con el siguiente Esc
+  else if (e.key === 'Escape') { if (!fsEl()) closeVisor(); }
 });
 
 new ResizeObserver(() => { if (!visor.hidden) applyMode(); }).observe(stage);

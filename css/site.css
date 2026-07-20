@@ -269,6 +269,7 @@ nav.main a:hover::after{transform:scaleX(1)}
   .hero .grid{transform:none}
   .hero .sea{height:var(--sea-fill);transform:none}   /* solo la banda de crestas, quieta abajo */
   .deep{display:none}
+  .deepcue{display:none}
 }
 
 .hero .bignum{position:absolute;right:-40px;top:-60px;font-family:var(--font-display);font-weight:900;font-size:420px;line-height:.8;color:transparent;-webkit-text-stroke:2px var(--edem-teal-200);opacity:.5;pointer-events:none;user-select:none;transition:opacity .35s var(--ease-standard);animation:numdrift 15s ease-in-out infinite alternate}
@@ -307,6 +308,17 @@ nav.main a:hover::after{transform:scaleX(1)}
 .scrollcue:hover{background:var(--edem-teal-500);color:#fff}
 .scrollcue .lu{width:20px;height:20px}
 @keyframes cuebob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(9px)}}
+
+/* señal de scroll durante los beats de la inmersión: sigue a --deepP, así que
+   solo aparece mientras el relato está en pantalla y se apaga con él. */
+.deepcue{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:6;
+  opacity:var(--cueP);width:38px;height:38px;border-radius:50%;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.32);
+  display:grid;place-items:center;color:#fff;animation:cuebob 2.2s ease-in-out infinite;
+  transition:background .3s var(--ease-standard)}
+.deepcue:hover{background:rgba(255,255,255,.26)}
+.deepcue .lu{width:17px;height:17px}
+.hero.dry .deepcue{visibility:hidden}
 
 /* ---------- cabeceras de sección ---------- */
 .shead{display:flex;align-items:baseline;gap:16px;border-top:3px solid var(--ink-900);padding-top:18px;margin-bottom:30px;flex-wrap:wrap}
@@ -795,3 +807,63 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   .dshero h1{font-size:clamp(44px,13vw,72px)}
   .brandslab{grid-template-columns:1fr}
 }
+
+/* ---------- visor: pulido de interfaz ----------
+   Va al final a propósito: refina reglas anteriores y debe ganar en cascada. */
+
+/* .vico pone display:grid, que le ganaría al [hidden] del navegador
+   (el botón de pantalla completa se oculta en iPhone, que no la soporta) */
+.vico[hidden]{display:none}
+
+/* navegación por teclado visible sobre el fondo petróleo */
+.visor :focus-visible{outline:2px solid var(--edem-teal-200);outline-offset:2px}
+
+/* respuesta táctil de las flechas */
+.varrow:active{transform:translateY(-50%) scale(.92)}
+.varrow{-webkit-tap-highlight-color:transparent}
+
+/* pantallas con notch / barra de gestos (iOS): nada queda tapado */
+.vbar{padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right))}
+.vfoot{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
+
+@media(max-width:680px){
+  .vbar{padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}
+  .vfoot{padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+  /* la marca cede el sitio a los chips de ediciones, que son los que navegan */
+  .vbrand span{display:none}
+  .vbrand img{height:15px}
+  .vissues{flex:1 1 auto;min-width:0}
+  .vico{width:34px;height:34px}
+  .vchip{padding:7px 12px;font-size:12px}
+  /* los puntos de pliego se convierten en una barra de progreso segmentada:
+     24 puntos de 8px no caben en un móvil y quedaban en dos filas.
+     El fondo se pinta solo en la caja de contenido (background-clip) para que
+     la banda visible sea fina pero la zona de toque mida 21px de alto. */
+  .vdots{gap:2px;flex-wrap:nowrap}
+  .vdot,.vdot.on{width:auto;flex:1 1 auto;min-width:0;height:21px;padding:8px 0;border-radius:2px;background-clip:content-box}
+  .vdot{background-color:rgba(255,255,255,.22)}
+  .vdot:hover{background-color:rgba(255,255,255,.45)}
+  .vdot.on{background-color:var(--edem-teal-200)}
+}
+
+/* móviles apaisados y ventanas muy bajas: barras compactas para
+   que la página conserve el máximo alto posible */
+@media(max-height:520px){
+  .vbar{height:48px}
+  .vload{inset:48px 0 0}
+  .vstage{padding:8px 64px}
+  .vfoot{padding:5px 16px calc(7px + env(safe-area-inset-bottom));gap:12px}
+  .vhint{display:none}
+  .varrow{width:40px;height:40px}
+}
+
+/* ---------- visor: paso de página sin costuras ---------- */
+/* las páginas de una mitad se apilan en capas: la nueva se carga DEBAJO de la
+   visible y solo se retira la vieja cuando la de abajo está lista */
+.half .pg{position:absolute;top:0;left:0}
+/* en portada y contraportada el libro se recentra deslizándose con la misma
+   curva y duración que el giro de la hoja, en vez de saltar de golpe */
+.book.turning{transition:transform .82s var(--ease-standard)}
+/* barrido de luz durante el giro: la cara que se levanta se sombrea
+   y la que aterriza llega sombreada y se aclara al posarse */
+.leaf .face .shade{transition:opacity .82s var(--ease-standard)}
