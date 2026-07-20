@@ -1,10 +1,394 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-<meta http-equiv="refresh" content="0; url=ui_kits/revista/Web%20Piloto%20EDEM%20Times.html">
-<title>Redirecting...</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EDEM Times — La revista de EDEM Escuela de Empresarios</title>
+<meta name="description" content="EDEM Times, la revista de EDEM Escuela de Empresarios en Marina de Empresas. Lee todas las ediciones en el visor digital con efecto papel, descubre el kiosko y suscríbete a las novedades.">
+<meta name="theme-color" content="#008aad">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="EDEM Times">
+<meta property="og:title" content="EDEM Times — La revista de EDEM Escuela de Empresarios">
+<meta property="og:description" content="La revista de EDEM, en papel y en digital. Empresarios formando a empresarios.">
+<meta property="og:image" content="assets/img/campus-talento.jpg">
+<meta property="og:locale" content="es_ES">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/edem-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap">
+<link rel="stylesheet" href="css/site.css">
+<script src="https://unpkg.com/lucide@0.525.0/dist/umd/lucide.min.js" defer></script>
 </head>
 <body>
-<p>If you are not redirected, <a href="ui_kits/revista/Web%20Piloto%20EDEM%20Times.html">click here</a>.</p>
+
+<a class="skip" href="#ultima">Saltar al contenido</a>
+
+<header class="site">
+  <div class="wrap hbar">
+    <a class="brand" href="#ultima" aria-label="EDEM Times — inicio"><img src="assets/edem-logo.png" alt="EDEM"><span class="t">times</span></a>
+    <nav class="main" aria-label="Principal">
+      <a href="#ultima">Última edición</a>
+      <a href="#kiosko">Kiosko</a>
+      <a href="#numero">En este número</a>
+      <a href="#ecosistema">Ecosistema</a>
+      <a href="#suscribete">Suscríbete</a>
+    </nav>
+    <button class="btn pri cta" data-open-visor><i data-lucide="book-open" class="lu"></i> Abrir el visor</button>
+    <button class="menubtn" id="menubtn" aria-label="Abrir menú" aria-expanded="false" aria-controls="mnav"><i data-lucide="menu" class="lu"></i></button>
+  </div>
+  <nav class="mnav" id="mnav" aria-label="Menú móvil">
+    <a href="#ultima"><i data-lucide="newspaper" class="lu ic"></i><span>Última edición</span><i data-lucide="chevron-right" class="lu ch"></i></a>
+    <a href="#kiosko"><i data-lucide="library" class="lu ic"></i><span>Kiosko</span><i data-lucide="chevron-right" class="lu ch"></i></a>
+    <a href="#numero"><i data-lucide="list" class="lu ic"></i><span>En este número</span><i data-lucide="chevron-right" class="lu ch"></i></a>
+    <a href="#ecosistema"><i data-lucide="waypoints" class="lu ic"></i><span>Ecosistema</span><i data-lucide="chevron-right" class="lu ch"></i></a>
+    <a href="#suscribete"><i data-lucide="mail" class="lu ic"></i><span>Suscríbete</span><i data-lucide="chevron-right" class="lu ch"></i></a>
+    <button class="btn pri mcta" data-open-visor><i data-lucide="book-open" class="lu"></i> Abrir el visor</button>
+  </nav>
+</header>
+<div class="mscrim" id="mscrim" hidden></div>
+
+<main>
+<!-- HERO · última edición (fijo mientras el mar sube con el scroll) -->
+<div class="heroPin" id="heroPin">
+<section id="ultima" class="hero">
+  <div class="heroBg" aria-hidden="true">
+    <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+    <span class="halft"></span>
+    <span class="ring"></span>
+    <span class="ring r2"></span>
+    <span class="sheen"></span>
+    <div class="motes" id="motes"></div>
+  </div>
+  <div class="bignum" id="hero-num" aria-hidden="true">2</div>
+  <div class="wrap grid">
+    <div class="heroCopy">
+      <span class="kicker over"><span class="dot"></span><span id="hero-kicker">Nº 2 · 2026 · Última edición</span></span>
+      <h1 class="disp" id="hero-title">Trac&shy;ción<span class="pt">.</span></h1>
+      <p class="sub disp-i" id="hero-sub">El arte de hacer que las cosas funcionen</p>
+      <p class="lead" id="hero-lead">24 páginas a toda máquina: la crónica del Hackathon desde dentro, una entrevista cruzada alumno × CEO, el radar de Lanzadera, las métricas que mira Angels y pasatiempos para el trayecto de vuelta.</p>
+      <div class="acts">
+        <button class="btn pri" data-open-visor><i data-lucide="book-open" class="lu"></i> Leer en el visor</button>
+        <a class="btn ghost" href="#kiosko"><i data-lucide="library" class="lu"></i> Ver el kiosko</a>
+      </div>
+      <div class="meta-chips" id="hero-chips">
+        <span class="chip">24 páginas</span><span class="chip">Edición física + digital</span><span class="chip">Marina de Empresas</span>
+      </div>
+    </div>
+    <div class="heroDeck" id="hero-deck-wrap">
+      <div class="deck" id="hero-deck" aria-label="Portadas de EDEM Times"></div>
+      <div class="deckui">
+        <div class="deckcap" id="deck-cap"></div>
+        <div class="deckdots" id="deck-dots" aria-label="Elegir portada"></div>
+      </div>
+    </div>
+  </div>
+  <a class="scrollcue" href="#kiosko" aria-label="Seguir bajando al kiosko"><i data-lucide="chevron-down" class="lu"></i></a>
+  <div class="sea" aria-hidden="true"><div class="wave w1"></div><div class="wave w2"></div><div class="wave w3"></div></div>
+
+  <!-- inmersión: el relato que aparece una vez el mar ha cubierto la pantalla.
+       Decorativo para lectores de pantalla: todo lo que dice está en el resto de la página. -->
+  <div class="deep" id="deep" aria-hidden="true">
+    <div class="deepTint"></div>
+    <div class="rays"><span></span><span></span><span></span></div>
+    <div class="bubbles" id="bubbles"></div>
+
+    <div class="beat" data-beat>
+      <span class="kicker over dk">Bajo la superficie</span>
+      <p class="bl disp">Todo lo que no cabe<br>en un titular<span class="pt">.</span></p>
+      <p class="bs">Lo que de verdad pasa en las aulas, contado por quien las llena.</p>
+    </div>
+
+    <div class="beat" data-beat>
+      <span class="kicker over dk">Quién la hace</span>
+      <p class="bl disp">Escrito por<br>alumnos<span class="pt">.</span></p>
+      <p class="bs">Y la editan alumnos. Para los que vienen detrás.</p>
+    </div>
+
+    <div class="beat" data-beat>
+      <p class="bl disp big">Se aprende<br>haciendo<span class="pt">.</span></p>
+      <p class="bs">Esta revista también.</p>
+    </div>
+
+    <div class="beat beat-cta" data-beat>
+      <p class="bl disp">Ahora te toca a ti<span class="pt">.</span></p>
+      <span class="brand ctabrand" aria-label="EDEM Times"><img src="assets/edem-logo-white.png" alt="EDEM"><span class="t">times</span></span>
+      <div class="acts">
+        <button class="btn pri" data-open-visor tabindex="-1"><i data-lucide="book-open" class="lu"></i> Abrir el visor</button>
+        <a class="btn ghost lt" href="#kiosko" tabindex="-1"><i data-lucide="library" class="lu"></i> Ver el kiosko</a>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- KIOSKO -->
+<section id="kiosko">
+  <div class="kbg" aria-hidden="true"><span class="kglow g1"></span><span class="kglow g2"></span><span class="kdots"></span><span class="kring"></span></div>
+  <div class="wrap kwrap">
+    <div class="ksticky">
+      <div class="shead rv">
+        <h2 class="disp">El kiosko</h2>
+      </div>
+      <p class="knote">Todas las ediciones, de la primera a la última.<br>Se abren en el visor con efecto papel.</p>
+      <span class="kcount" id="kcount"></span>
+    </div>
+    <div class="kgrid" id="kgrid"></div>
+  </div>
+</section>
+
+<!-- EN ESTE NÚMERO -->
+<section id="numero">
+  <div class="nbg" aria-hidden="true"><span class="nghost" id="nghost">02</span><span class="nrules"></span></div>
+  <div class="wrap">
+    <div class="shead rv">
+      <span class="skick over">Sumario</span>
+      <h2 class="disp">En este número</h2>
+      <span class="note" id="numero-note">cada artículo abre el visor por su página</span>
+      <a class="more" href="#" data-open-visor>Leer completo →</a>
+    </div>
+    <div class="agrid" id="agrid"></div>
+  </div>
+</section>
+
+<!-- ECOSISTEMA -->
+<section id="ecosistema">
+  <div class="ebg" aria-hidden="true"><span class="egrid-lines"></span><span class="eglow"></span></div>
+  <div class="wrap ecowrap">
+    <!-- raíl fijo: mientras las tres fichas pasan por delante, el titular y el
+         índice se quedan clavados y solo cambia la iniciativa activa. -->
+    <aside class="ecorail">
+      <div class="shead rv">
+        <span class="skick over">El ecosistema</span>
+        <h2 class="disp">Marina de Empresas</h2>
+      </div>
+      <p class="ecointro rv">Formar, acelerar e invertir: tres iniciativas de Juan Roig en la Marina de València con una misma misión — impulsar a los que eligen la opción difícil. Cada sección de la revista lleva el color de su barrio.</p>
+      <ol class="econav rv" id="econav"></ol>
+    </aside>
+    <div class="ecostack" id="egrid"></div>
+  </div>
+</section>
+
+<!-- SUSCRÍBETE -->
+<section id="suscribete">
+  <div class="wrap in">
+    <div class="rv">
+      <p class="over" style="color:var(--edem-teal-200)">Novedades</p>
+      <h2 class="disp" style="margin-top:10px">Suscríbete a las novedades de <span class="disp-i">EDEM Times</span></h2>
+      <p class="desc">Sé el primero en enterarte: cada nueva edición de la revista, avisos del kiosko y contenidos sobre empresa más allá de los libros, directo a tu bandeja.</p>
+    </div>
+    <div class="rv">
+      <form id="sub-form" novalidate>
+        <label class="hp" aria-hidden="true">No rellenes este campo<input type="text" name="empresa" tabindex="-1" autocomplete="off"></label>
+        <input type="email" name="email" required placeholder="tu@email.com" aria-label="Tu email" autocomplete="email">
+        <button class="btn pri" type="submit">Suscribirme</button>
+      </form>
+      <p id="sub-msg" role="status" aria-live="polite"></p>
+      <p class="legal">Al suscribirte aceptas la <a href="https://edem.eu/privacidad/" target="_blank" rel="noopener">política de privacidad</a> de EDEM.</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site">
+  <div class="wrap fgrid">
+    <div class="col">
+      <img class="flogo" src="assets/edem-logo-white.png" alt="EDEM">
+      <p class="tag">Empresarios formando a empresarios</p>
+      <div class="soc" id="soc"></div>
+    </div>
+    <div class="col">
+      <p class="h">Ediciones</p>
+      <div id="foot-ediciones"></div>
+    </div>
+    <div class="col">
+      <p class="h">Marina de Empresas</p>
+      <a href="https://edem.eu/" target="_blank" rel="noopener">EDEM Escuela de Empresarios</a>
+      <a href="https://lanzadera.es/" target="_blank" rel="noopener">Lanzadera</a>
+      <a href="https://www.angelscapital.es/" target="_blank" rel="noopener">Angels</a>
+      <a href="https://marinadeempresas.es/" target="_blank" rel="noopener">Marina de Empresas</a>
+    </div>
+    <div class="col">
+      <p class="h">Recursos</p>
+      <a href="#suscribete">Suscríbete a las novedades</a>
+      <button class="aslink" onclick="openDS()">Sistema de diseño</button>
+      <a href="mailto:comunicacion@edem.es">Contacto</a>
+    </div>
+  </div>
+  <div class="fbase"><div class="wrap">
+    <span>© 2026 EDEM · Escuela de Empresarios</span>
+    <span><a href="https://edem.eu/aviso-legal/" target="_blank" rel="noopener">Aviso legal</a> · <a href="https://edem.eu/privacidad/" target="_blank" rel="noopener">Privacidad</a> · <a href="https://edem.eu/politica-de-cookies/" target="_blank" rel="noopener">Cookies</a></span>
+    <span>Parte de Marina de Empresas · Lanzadera · Angels</span>
+  </div></div>
+</footer>
+
+<!-- ============ SISTEMA DE DISEÑO ============ -->
+<div id="ds" class="dspage" role="dialog" aria-modal="true" aria-label="Sistema de diseño" hidden>
+  <div class="dsbar">
+    <div class="wrap">
+      <span class="brand"><img src="assets/edem-logo.png" alt="EDEM"><span class="t">times</span></span>
+      <span class="over" style="color:var(--text-faint)">Sistema de diseño</span>
+      <button class="dsclose" id="ds-close" onclick="closeDS()" title="Volver (Esc)" aria-label="Cerrar sistema de diseño"><i data-lucide="x" class="lu"></i></button>
+    </div>
+  </div>
+
+  <section class="dshero wrap">
+    <span class="kicker over"><span class="dot"></span>Design System · v1</span>
+    <h1 class="disp">El sistema<span class="pt">.</span></h1>
+    <p class="sub disp-i">Los materiales con los que se maqueta EDEM Times</p>
+    <p class="lead">Color, tipografía y componentes de la revista de EDEM Escuela de Empresarios, dentro del ecosistema Marina de Empresas. El primario teal · petróleo <b style="font-family:monospace;color:var(--edem-teal-700)">#008AAD</b> es el color oficial extraído del logotipo; el resto de la paleta se deriva de él de forma armónica.</p>
+  </section>
+
+  <section class="dssec wrap">
+    <div class="shead"><h2 class="disp">Color</h2><span class="note">primario real #008AAD · escala y neutrales derivados</span></div>
+    <div class="dslabel">Primario · EDEM teal / petróleo</div>
+    <div class="scale" id="ds-teal"></div>
+    <div class="dslabel">Neutrales · petrol ink</div>
+    <div class="scale" id="ds-ink"></div>
+    <div class="dslabel">Papel &amp; acentos de ecosistema</div>
+    <div class="ecogrid" id="ds-eco"></div>
+    <div class="dslabel">Colores semánticos</div>
+    <div class="ecogrid" id="ds-sem"></div>
+  </section>
+
+  <section class="dssec wrap">
+    <div class="shead"><h2 class="disp">Marca</h2><span class="note">logotipo EDEM · teal sobre papel &amp; blanco sobre petróleo</span></div>
+    <div class="brandslab">
+      <div class="brandbox"><img src="assets/edem-logo.png" alt="EDEM sobre fondo claro"><span class="cap">sobre fondo claro</span></div>
+      <div class="brandbox dark"><img src="assets/edem-logo-white.png" alt="EDEM sobre fondo oscuro"><span class="cap">sobre fondo petróleo</span></div>
+    </div>
+    <p class="disp-i" style="font-size:28px;color:var(--edem-teal-700);margin-top:24px">Empresarios formando a empresarios</p>
+    <p style="font-size:15px;line-height:1.6;color:var(--text-muted);max-width:620px;margin-top:8px">Motivo náutico recurrente — remar, contracorriente, puerto, ancla. Único wordmark oficial aportado; no se ha redibujado ningún mark.</p>
+  </section>
+
+  <section class="dssec wrap">
+    <div class="shead"><h2 class="disp">Tipografía</h2><span class="note">Bodoni Moda Black — display · Archivo — cuerpo &amp; UI</span></div>
+    <div class="specrow">
+      <div class="dslabel">Display · Bodoni Moda 900 · opsz 14</div>
+      <p class="disp" style="font-size:clamp(40px,7vw,80px);line-height:.9;color:var(--text-strong)">La opción difícil</p>
+    </div>
+    <div class="specrow">
+      <div class="dslabel">Display italic · Bodoni Moda 600</div>
+      <p class="disp-i" style="font-size:clamp(28px,4vw,44px);color:var(--edem-teal-700)">Empresarios formando a empresarios</p>
+    </div>
+    <div class="specrow">
+      <div class="dslabel">Cuerpo · Archivo</div>
+      <p style="font-size:17px;line-height:1.65;color:var(--text-muted);max-width:660px">EDEM Times tiene edición física en papel; la web replica la experiencia de lectura de un PDF maquetado. El cuerpo se compone en Archivo, una grotesca limpia con personalidad editorial, sobre fondo papel cálido.</p>
+    </div>
+    <div class="specrow">
+      <div class="dslabel">Overline · Archivo 800 · tracking amplio</div>
+      <p class="over" style="color:var(--edem-teal-700)">Número 2 · Marina de Empresas</p>
+    </div>
+    <div class="tscale">
+      <div class="r"><span class="nm">Display</span><span class="disp sm" style="font-size:44px">Aa</span><span class="px">clamp 48–88px</span></div>
+      <div class="r"><span class="nm">H1</span><span class="disp sm" style="font-size:34px">Aa</span><span class="px">clamp 36–60px</span></div>
+      <div class="r"><span class="nm">H2</span><span class="disp sm" style="font-size:26px">Aa</span><span class="px">clamp 28–40px</span></div>
+      <div class="r"><span class="nm">Lead</span><span class="sm" style="font-size:21px">Aa</span><span class="px">21px</span></div>
+      <div class="r"><span class="nm">Body</span><span class="sm" style="font-size:17px">Aa</span><span class="px">17px</span></div>
+      <div class="r"><span class="nm">Caption</span><span class="sm" style="font-size:13px">Aa</span><span class="px">13px</span></div>
+    </div>
+  </section>
+
+  <section class="dssec wrap">
+    <div class="shead"><h2 class="disp">Componentes</h2><span class="note">botones, badges de ecosistema y tarjeta de artículo</span></div>
+    <div class="dslabel">Botones</div>
+    <div class="dsrow">
+      <button class="btn pri"><i data-lucide="book-open" class="lu"></i> Primario</button>
+      <button class="btn sec">Secundario</button>
+      <button class="btn out">Outline</button>
+      <button class="btn ghost">Ghost</button>
+      <button class="btn dark">Oscuro</button>
+      <button class="btn pri" disabled>Desactivado</button>
+    </div>
+    <div class="dsrow" style="margin-top:14px">
+      <button class="btn pri sm">Pequeño</button>
+      <button class="btn pri">Mediano</button>
+      <button class="btn pri lg">Grande</button>
+    </div>
+    <div class="dslabel">Badges de categoría</div>
+    <div class="dsrow">
+      <span class="pill" style="background:var(--edem)">EDEM</span>
+      <span class="pill" style="background:var(--lanzadera)">Lanzadera</span>
+      <span class="pill" style="background:var(--angels)">Angels</span>
+      <span class="pill" style="background:#fff;color:var(--text-muted);border:1px solid var(--border-strong)">Neutral</span>
+    </div>
+    <div class="dsrow" style="margin-top:12px">
+      <span class="pill out" style="color:var(--edem-teal-700)">EDEM</span>
+      <span class="pill out" style="color:var(--lanzadera)">Lanzadera</span>
+      <span class="pill out" style="color:var(--angels)">Angels</span>
+      <span class="pill out" style="color:var(--text-muted)">Neutral</span>
+    </div>
+    <div class="dslabel">Tarjeta de artículo</div>
+    <div class="dscardwrap">
+      <article class="acard" style="cursor:default">
+        <div class="dscard-ph">foto de campus · 3:2</div>
+        <div class="abody"><span class="abadge" style="background:var(--edem)">Pasillo EDEM</span>
+        <h3 class="disp">Titular serif del artículo</h3>
+        <p>Extracto en Archivo con el arranque del texto que invita a seguir leyendo en el visor.</p>
+        <div class="afoot"><span class="go">Leer en el visor <i data-lucide="arrow-right" class="lu" style="width:15px;height:15px"></i></span><span class="pnum">pág. 04</span></div></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="dssec wrap">
+    <div class="shead"><h2 class="disp">Fundamentos</h2><span class="note">esquinas contenidas · sombras frías · iconos Lucide</span></div>
+    <div class="foundgrid">
+      <div class="foundcard">
+        <div class="dslabel">Sombras</div>
+        <div class="shrow"><div class="shbox" style="box-shadow:var(--shadow-md)">soft</div><div class="shbox" style="box-shadow:var(--shadow-lg)">lift</div></div>
+      </div>
+      <div class="foundcard">
+        <div class="dslabel">Iconografía · Lucide</div>
+        <div class="icorow"><i data-lucide="anchor" class="lu"></i><i data-lucide="book-open" class="lu"></i><i data-lucide="book-marked" class="lu"></i><i data-lucide="arrow-right" class="lu"></i><i data-lucide="quote" class="lu"></i><i data-lucide="library" class="lu"></i></div>
+      </div>
+      <div class="foundcard">
+        <div class="dslabel">Radios</div>
+        <div class="radii">
+          <div><div class="rbox" style="border-radius:2px"></div>2px · xs</div>
+          <div><div class="rbox" style="border-radius:4px"></div>4px · sm</div>
+          <div><div class="rbox" style="border-radius:8px"></div>8px · md</div>
+          <div><div class="rbox" style="border-radius:14px"></div>14px · lg</div>
+          <div><div class="rbox" style="border-radius:999px"></div>pill</div>
+        </div>
+      </div>
+    </div>
+    <div class="dslabel">Espaciado · escala 4→128</div>
+    <div class="spacescale" id="ds-space"></div>
+  </section>
+</div>
+
+<!-- ============ VISOR (flipbook con las revistas reales) ============ -->
+<div id="visor" class="visor" role="dialog" aria-modal="true" aria-label="Visor de revistas" hidden>
+  <div class="vbar">
+    <div class="vbrand"><img src="assets/edem-logo-white.png" alt="EDEM"><span>TIMES · VISOR</span></div>
+    <div class="vissues" id="v-issues" role="tablist" aria-label="Ediciones"></div>
+    <div class="vright">
+      <select id="v-goto" class="vsel" aria-label="Ir a página"></select>
+      <a id="v-print" class="vico" target="_blank" rel="noopener" title="Versión A4 imprimible" aria-label="Versión A4 imprimible"><i data-lucide="printer" class="lu"></i></a>
+      <button id="v-close" class="vico" title="Cerrar (Esc)" aria-label="Cerrar visor" onclick="closeVisor()"><i data-lucide="x" class="lu"></i></button>
+    </div>
+  </div>
+  <div class="vstage" id="v-stage">
+    <div class="bookouter" id="bookouter">
+      <div class="book" id="book">
+        <div class="half l void" id="half-l" title="Página anterior"></div>
+        <div class="half r void" id="half-r" title="Página siguiente"></div>
+        <div class="spine" id="spine"></div>
+        <div class="host" id="host"></div>
+      </div>
+    </div>
+    <button id="v-prev" class="varrow l" aria-label="Página anterior"><i data-lucide="chevron-left" class="lu"></i></button>
+    <button id="v-next" class="varrow r" aria-label="Página siguiente"><i data-lucide="chevron-right" class="lu"></i></button>
+    <div class="vload" id="v-load" hidden><span class="spin"></span> Cargando edición…</div>
+  </div>
+  <div class="vfoot">
+    <span id="v-ind"></span>
+    <div id="v-dots" class="vdots"></div>
+    <span class="vhint">← → pasar página · Esc cerrar</span>
+  </div>
+</div>
+
+<script src="js/app.js" defer></script>
 </body>
 </html>

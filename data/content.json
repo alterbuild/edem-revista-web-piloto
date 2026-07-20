@@ -1,0 +1,120 @@
+{
+  "_ayuda": "Este archivo controla todo el contenido de la home de EDEM Times. Edítalo (o genera uno igual desde tu CMS) y la web se actualiza sin tocar código. Campos de color permitidos: edem, lanzadera, angels, neutral.",
+  "site": { "latest": "n2" },
+  "newsletter": {
+    "_ayuda": "Deja endpoint vacío para el modo demo (guarda el email en el navegador). Pon aquí la URL de tu servicio (Mailchimp, Brevo, API propia…) para suscripciones reales: recibirá un POST JSON {email, list}.",
+    "endpoint": ""
+  },
+  "issues": [
+    {
+      "id": "n2",
+      "file": "revistas/n2.html",
+      "print": "revistas/n2.html",
+      "nr": "Nº 2 · 2026",
+      "title": "Tracción",
+      "chip": "Nº 2 · Tracción",
+      "badge": "Última edición",
+      "badgeColor": "lanzadera",
+      "desc": "Crónica del Hackathon, entrevista cruzada alumno × CEO, radar Lanzadera, métricas de Angels y pasatiempos.",
+      "meta": "24 páginas · edición física + digital · 2026",
+      "hero": {
+        "kicker": "Nº 2 · 2026 · Última edición",
+        "titleHtml": "Trac&shy;ción<span class=\"pt\">.</span>",
+        "num": "2",
+        "sub": "El arte de hacer que las cosas funcionen",
+        "lead": "24 páginas a toda máquina: la crónica del Hackathon desde dentro, una entrevista cruzada alumno × CEO, el radar de Lanzadera, las métricas que mira Angels y pasatiempos para el trayecto de vuelta.",
+        "chips": ["24 páginas", "Edición física + digital", "Marina de Empresas"]
+      }
+    },
+    {
+      "id": "n1v2",
+      "file": "revistas/n1-v2.html",
+      "print": "revistas/n1-v2-print.html",
+      "nr": "Nº 1 · 2026",
+      "title": "Bienvenidos a EDEM",
+      "chip": "Nº 1 · Contracorriente",
+      "badge": "Contracorriente",
+      "badgeColor": "edem",
+      "desc": "El número fundacional: el manual de supervivencia en la Marina, tipografía brutal, sellos, radar Lanzadera y duotonos.",
+      "meta": "10 páginas · edición física + digital · 2026"
+    },
+    {
+      "id": "n1",
+      "file": "revistas/n1.html",
+      "print": "revistas/n1-print.html",
+      "nr": "Nº 1 · maqueta",
+      "title": "Bienvenidos a EDEM",
+      "chip": "Nº 1 · maqueta",
+      "badge": "Archivo",
+      "badgeColor": "angels",
+      "desc": "La primera maqueta del piloto: el origen de EDEM Times, de portada a contraportada.",
+      "meta": "10 páginas · maqueta inicial"
+    }
+  ],
+  "articles": [
+    {
+      "issue": "n2",
+      "color": "edem",
+      "cat": "Pasillo EDEM",
+      "title": "El Hackathon desde dentro: 48 horas a toda máquina",
+      "excerpt": "Crónica en primera persona del fin de semana en el que 120 alumnos convirtieron café y post-its en cinco empresas reales.",
+      "page": 4,
+      "img": "assets/img/perfil-ee.jpg"
+    },
+    {
+      "issue": "n2",
+      "color": "lanzadera",
+      "cat": "Radar Lanzadera",
+      "title": "3 startups de Lanzadera rompiendo moldes",
+      "excerpt": "Del muelle al mercado global: las apuestas del último cohorte que ya mueven el Mediterráneo.",
+      "page": 12,
+      "img": "assets/img/intro-grados.jpg"
+    },
+    {
+      "issue": "n2",
+      "color": "angels",
+      "cat": "Angels",
+      "title": "Los secretos de Angels para medir el éxito",
+      "excerpt": "Las métricas que un inversor mira antes que cualquier promesa — y las que ignora por completo.",
+      "page": 14,
+      "img": "assets/img/campus-talento.jpg"
+    }
+  ],
+  "ecosystem": [
+    {
+      "name": "EDEM",
+      "role": "Formar",
+      "color": "edem",
+      "url": "https://edem.eu/",
+      "desc": "Escuela de empresarios y directivos en Valencia. Grados, másteres y alta dirección con una regla: se aprende haciendo.",
+      "img": "assets/img/eco-edem.jpg",
+      "alt": "Fachada de EDEM en la Marina de València, con la grúa del puerto al lado",
+      "meta": "Aquí se hace esta revista"
+    },
+    {
+      "name": "Lanzadera",
+      "role": "Acelerar",
+      "color": "lanzadera",
+      "url": "https://lanzadera.es/",
+      "desc": "La aceleradora que empuja startups desde el muelle de la Marina hasta el mercado. Su radar llena páginas de esta revista.",
+      "img": "assets/img/eco-lanzadera.jpg",
+      "alt": "Equipo de una startup trabajando en las oficinas de Lanzadera",
+      "meta": "Sección «Radar Lanzadera»"
+    },
+    {
+      "name": "Angels",
+      "role": "Invertir",
+      "color": "angels",
+      "url": "https://www.angelscapital.es/",
+      "desc": "La sociedad de inversión de Juan Roig. Capital y criterio para los líderes que eligen la opción difícil.",
+      "img": "assets/img/eco-angels.jpg",
+      "alt": "Público de inversores en el Investors Day de Angels",
+      "meta": "Sección «Angels»"
+    }
+  ],
+  "social": [
+    { "id": "linkedin", "label": "LinkedIn", "url": "https://www.linkedin.com/school/edem-escuela-de-empresarios/" },
+    { "id": "instagram", "label": "Instagram", "url": "https://www.instagram.com/edemempresarios/" },
+    { "id": "youtube", "label": "YouTube", "url": "https://www.youtube.com/user/EDEMEmpresariosEs" }
+  ]
+}

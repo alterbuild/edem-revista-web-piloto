@@ -1,0 +1,765 @@
+/* ============================================================
+   EDEM Times — estilos del sitio
+   Basado en el design system «EDEM Revista» (css/tokens.css).
+   ============================================================ */
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--surface-page);
+  font-family:var(--font-body);
+  color:var(--text-body);
+  font-size:16px;
+  -webkit-font-smoothing:antialiased;
+}
+body.lock{overflow:hidden}
+a{color:var(--text-link);text-decoration:none}
+a:hover{color:var(--text-link-hover)}
+img{display:block}
+button{font:inherit}
+
+:focus-visible{outline:3px solid var(--edem-teal-400);outline-offset:2px;border-radius:2px}
+
+/* Tipografía editorial */
+.disp{font-family:var(--font-display);font-weight:900;font-optical-sizing:none;font-variation-settings:'opsz' 14;letter-spacing:-.015em}
+.disp-i{font-family:var(--font-display);font-style:italic;font-weight:600;letter-spacing:-.01em}
+.over{font-size:11px;letter-spacing:.28em;text-transform:uppercase;font-weight:800}
+.wrap{max-width:var(--container);margin:0 auto;padding:0 28px}
+
+/* Skip link */
+.skip{position:absolute;left:-9999px;top:0;z-index:200;background:var(--edem-teal-500);color:#fff;padding:12px 20px;font-weight:700;border-radius:0 0 var(--radius-sm) 0}
+.skip:focus{left:0;color:#fff}
+
+/* Aparición al hacer scroll */
+.rv{opacity:0;transform:translateY(22px);transition:opacity .7s var(--ease-out),transform .7s var(--ease-out)}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .rv{opacity:1;transform:none;transition:none}
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+
+/* ---------- botones ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:13px 24px;border-radius:var(--radius-sm);font-weight:600;font-size:15px;border:0;cursor:pointer;transition:all var(--dur) var(--ease-standard)}
+.btn:active{transform:translateY(1px)}
+.btn.pri{background:var(--color-primary);color:var(--color-on-primary);box-shadow:var(--shadow-md)}
+.btn.pri:hover{background:var(--color-primary-hover);gap:12px}
+.btn.dark{background:var(--ink-900);color:var(--paper)}.btn.dark:hover{background:var(--ink-800)}
+.btn.out{background:transparent;color:var(--edem-teal-700);border:1.5px solid var(--edem-teal-500)}.btn.out:hover{background:var(--edem-teal-50)}
+.btn.ghost{background:transparent;color:var(--text-body)}.btn.ghost:hover{background:var(--ink-100)}
+.btn.sec{background:var(--edem-teal-50);color:var(--edem-teal-700);box-shadow:none}.btn.sec:hover{background:var(--edem-teal-200)}
+.btn.sm{padding:9px 16px;font-size:13px}
+.btn.lg{padding:16px 30px;font-size:16px}
+.btn:disabled{opacity:.42;cursor:not-allowed;pointer-events:none}
+.btn .lu{width:17px;height:17px;flex-shrink:0}
+
+/* ---------- cabecera ---------- */
+header.site{position:sticky;top:0;z-index:60;background:rgba(251,250,246,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--border-hair)}
+.hbar{height:68px;display:flex;align-items:center;gap:26px}
+.brand{display:flex;align-items:baseline;gap:8px;flex-shrink:0}
+.brand img{height:22px;width:auto}
+.brand .t{font-family:var(--font-display);font-style:italic;font-weight:600;font-size:24px;color:var(--text-strong);line-height:1}
+nav.main{display:flex;gap:26px;font-size:14px;font-weight:600}
+nav.main a{color:var(--ink-600);position:relative;padding:24px 0}
+nav.main a::after{content:'';position:absolute;left:0;right:0;bottom:16px;height:2px;background:var(--edem-teal-500);transform:scaleX(0);transform-origin:left;transition:transform var(--dur) var(--ease-standard)}
+nav.main a:hover{color:var(--edem-teal-600)}
+nav.main a:hover::after{transform:scaleX(1)}
+.hbar .cta{margin-left:auto}
+.menubtn{display:none;margin-left:auto;width:44px;height:44px;border-radius:var(--radius-sm);border:1px solid var(--border-hair);background:#fff;color:var(--text-strong);place-items:center;cursor:pointer}
+.menubtn .lu{width:20px;height:20px}
+/* menú móvil: panel que se despliega sobre la página, con velo detrás */
+.mnav{position:absolute;left:0;right:0;top:100%;display:block;padding:8px 0 max(16px,env(safe-area-inset-bottom));
+  border-top:1px solid var(--border-hair);background:var(--surface-page);box-shadow:var(--shadow-lg);
+  max-height:calc(100svh - 68px);overflow-y:auto;overscroll-behavior:contain;
+  opacity:0;visibility:hidden;transform:translate3d(0,-10px,0);
+  transition:opacity .22s var(--ease-out),transform .28s var(--ease-out),visibility 0s .3s}
+.mnav.open{opacity:1;visibility:visible;transform:none;transition-delay:0s,0s,0s}
+.mnav a,.mnav button{display:flex;align-items:center;gap:14px;width:100%;text-align:left;
+  padding:15px 24px;font-size:16.5px;font-weight:600;color:var(--text-body);background:none;border:0;cursor:pointer;
+  opacity:0;transform:translate3d(0,-6px,0);transition:opacity .3s var(--ease-out),transform .3s var(--ease-out),background .18s}
+.mnav.open a,.mnav.open button{opacity:1;transform:none}
+/* entrada escalonada de cada línea */
+.mnav.open a:nth-child(1){transition-delay:.04s}
+.mnav.open a:nth-child(2){transition-delay:.08s}
+.mnav.open a:nth-child(3){transition-delay:.12s}
+.mnav.open a:nth-child(4){transition-delay:.16s}
+.mnav.open a:nth-child(5){transition-delay:.2s}
+.mnav.open .mcta{transition-delay:.24s}
+.mnav a .ic{width:19px;height:19px;flex-shrink:0;color:var(--edem-teal-500)}
+.mnav a .ch{width:17px;height:17px;margin-left:auto;color:var(--ink-300,#c3cdd2);transition:transform .2s var(--ease-out)}
+.mnav a:active{background:var(--edem-teal-50)}
+.mnav a:hover{background:var(--ink-50);color:var(--edem-teal-600)}
+.mnav a:hover .ch{transform:translateX(3px)}
+.mnav .mcta{justify-content:center;margin:12px 24px 6px;width:calc(100% - 48px);border-radius:var(--radius-sm);
+  padding:15px 20px;color:var(--color-on-primary)}
+.mnav .mcta:hover{background:var(--color-primary-hover);color:var(--color-on-primary)}
+/* velo */
+.mscrim{position:fixed;inset:0;z-index:55;background:rgba(6,51,63,.4);backdrop-filter:blur(2px);
+  opacity:0;transition:opacity .26s var(--ease-out)}
+.mscrim.on{opacity:1}
+.menubtn[aria-expanded="true"]{background:var(--edem-teal-50);border-color:var(--edem-teal-200);color:var(--edem-teal-700)}
+
+/* ---------- hero ---------- */
+/* El hero se «clava» mientras dura .heroPin; el mar sube con --seaP (0→1, lo fija js/app.js). */
+:root{--seaP:0;--deepP:0}
+.heroPin{position:relative;height:760vh}
+/* --heroH: alto real de la pantalla, reutilizado por el mar para su recorrido */
+.hero{--heroH:100vh;padding:92px 0 150px;position:sticky;top:0;overflow:hidden;height:var(--heroH);display:flex;align-items:center}
+@supports (height:100svh){.hero{--heroH:100svh}}
+.hero .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center;position:relative;z-index:1;width:100%;transform:translateY(calc(var(--seaP) * -48px))}
+.kicker{display:inline-flex;align-items:center;gap:10px;color:var(--edem-teal-700)}
+.kicker .dot{width:7px;height:7px;border-radius:50%;background:var(--lanzadera);animation:kpulse 2.6s ease-in-out infinite}
+@keyframes kpulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.55);opacity:.5}}
+.hero h1{font-size:clamp(58px,8vw,118px);line-height:.86;color:var(--text-strong);margin-top:20px}
+.hero h1 .pt{color:var(--edem-teal-500)}
+.hero .sub{font-size:clamp(22px,2.4vw,30px);color:var(--edem-teal-700);margin-top:14px}
+.hero p.lead{font-size:17px;line-height:1.65;color:var(--text-muted);max-width:520px;margin-top:20px}
+.hero .acts{display:flex;align-items:center;gap:14px;margin-top:32px;flex-wrap:wrap}
+.meta-chips{display:flex;gap:8px;margin-top:26px;flex-wrap:wrap}
+.chip{padding:6px 13px;border:1px solid var(--border-hair);border-radius:var(--radius-pill);font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--text-muted);background:var(--surface-card)}
+
+/* entrada escalonada del texto */
+@keyframes heroRise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+.heroCopy>*{animation:heroRise .8s var(--ease-out) both}
+.heroCopy>*:nth-child(2){animation-delay:.08s}
+.heroCopy>*:nth-child(3){animation-delay:.16s}
+.heroCopy>*:nth-child(4){animation-delay:.24s}
+.heroCopy>*:nth-child(5){animation-delay:.32s}
+.heroCopy>*:nth-child(6){animation-delay:.4s}
+.heroDeck{animation:heroRise .9s .2s var(--ease-out) both}
+
+/* fondo animado */
+.heroBg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.heroBg .blob{position:absolute;border-radius:50%;filter:blur(72px);opacity:.5;animation:drift 19s ease-in-out infinite alternate}
+.heroBg .b1{width:540px;height:540px;left:-140px;top:-170px;background:radial-gradient(circle,var(--edem-teal-200),transparent 70%)}
+.heroBg .b2{width:460px;height:460px;right:-120px;top:24%;background:radial-gradient(circle,var(--edem-teal-100,#dcf0f5),transparent 70%);animation-duration:24s;animation-delay:-7s}
+.heroBg .b3{width:330px;height:330px;left:34%;bottom:-160px;background:radial-gradient(circle,rgba(232,80,45,.16),transparent 70%);animation-duration:16s;animation-delay:-3s}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(64px,42px) scale(1.14)}}
+.heroBg .halft{position:absolute;left:2%;bottom:150px;width:min(40vw,440px);height:240px;background-image:radial-gradient(var(--edem-teal-200) 1.5px,transparent 1.6px);background-size:17px 17px;opacity:.45;-webkit-mask-image:radial-gradient(closest-side,#000,transparent);mask-image:radial-gradient(closest-side,#000,transparent)}
+.heroBg .ring{position:absolute;right:-2%;top:4%;width:min(44vw,560px);aspect-ratio:1;border:1.5px dashed var(--edem-teal-200);border-radius:50%;opacity:.65;animation:ringspin 80s linear infinite}
+@keyframes ringspin{to{transform:rotate(360deg)}}
+/* segundo anillo, más pequeño y en sentido contrario: da profundidad */
+.heroBg .ring.r2{right:6%;top:16%;width:min(26vw,320px);border-style:dotted;border-color:var(--edem-teal-300,#a9d9e6);opacity:.5;
+  animation:ringspin 54s linear infinite reverse}
+/* destello lento que barre el fondo, como luz sobre el agua */
+.heroBg .sheen{position:absolute;top:-30%;left:-40%;width:55%;height:170%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.55) 45%,rgba(190,228,238,.35) 60%,transparent);
+  transform:rotate(14deg);animation:sheen 17s ease-in-out infinite}
+@keyframes sheen{0%{transform:rotate(14deg) translate3d(0,0,0);opacity:0}
+  12%{opacity:.85}70%{opacity:.5}100%{transform:rotate(14deg) translate3d(230%,0,0);opacity:0}}
+/* motas que suben flotando (las genera js/app.js) */
+.heroBg .motes{position:absolute;inset:0;overflow:hidden}
+.heroBg .motes span{position:absolute;bottom:-6%;border-radius:50%;background:var(--edem-teal-400,#63b6cd);
+  will-change:transform,opacity;animation:mote linear infinite}
+@keyframes mote{
+  0%{transform:translate3d(0,0,0) scale(.6);opacity:0}
+  15%{opacity:.5}
+  80%{opacity:.35}
+  100%{transform:translate3d(var(--dx,20px),-108vh,0) scale(1);opacity:0}
+}
+
+/* el mar: tres capas de olas en bucle sin costuras.
+   Con el scroll (--seaP) el bloque de agua sube hasta cubrir el hero.
+   Se mueve con translate3d (compositor) en vez de con height: cero layout por frame. */
+/* El agua profunda es el fondo de .sea y empieza justo donde acaba la cresta más
+   baja (--sea-fill). Ahí las tres capas ya son opacas y su mezcla es exactamente
+   #91cede, así que no se ve ninguna costura. Encima de esa línea .sea es
+   transparente: solo se ven las crestas recortadas.
+   Solo se animan tres tiras de --sea-fill de alto (no capas de 1800px): 60fps. */
+.hero .sea{position:absolute;left:0;right:0;bottom:0;z-index:3;overflow:hidden;pointer-events:none;
+  --sea-fill:210px;--o1:0px;--o2:46px;--o3:90px;
+  /* alto = una pantalla + margen arriba y abajo, para poder subir del todo.
+     Recorrido: de dejar asomar solo la cresta (--sea-fill) a taparlo todo. */
+  height:calc(var(--heroH) + 2 * var(--sea-fill));will-change:transform;
+  background-image:linear-gradient(#91cede,#6fb4cb);
+  background-repeat:no-repeat;
+  background-position:left var(--sea-fill);
+  background-size:100% calc(100% - var(--sea-fill));
+  transform:translate3d(0,calc(var(--heroH) + var(--sea-fill) - var(--seaP) * var(--heroH)),0)}
+/* cada capa: su cresta (120px) desplazada --o, y debajo su color hasta --sea-fill */
+.hero .wave{position:absolute;left:0;top:0;height:var(--sea-fill);width:calc(100% + 1200px);
+  background-repeat:repeat-x,repeat-x;
+  background-position:left var(--o),left bottom;
+  background-size:1200px 120px,100% calc(var(--sea-fill) - var(--o) - 118px);
+  will-change:transform;animation:waveX linear infinite}
+@keyframes waveX{to{transform:translate3d(-1200px,0,0)}}
+.hero .w1{--o:var(--o1);animation-duration:38s;
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201200%20120'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0,60%20C300,20%20300,100%20600,60%20C900,20%20900,100%201200,60%20L1200,120%20L0,120%20Z'%20fill='%23dcf0f5'/%3E%3C/svg%3E"),linear-gradient(#dcf0f5,#dcf0f5)}
+.hero .w2{--o:var(--o2);animation-duration:26s;
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201200%20120'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0,50%20C300,110%20300,10%20600,50%20C900,110%20900,10%201200,50%20L1200,120%20L0,120%20Z'%20fill='%23b4dee9'/%3E%3C/svg%3E"),linear-gradient(#b4dee9,#b4dee9)}
+.hero .w3{--o:var(--o3);animation-duration:18s;opacity:.55;
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201200%20120'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0,70%20C300,30%20300,105%20600,70%20C900,30%20900,105%201200,70%20L1200,120%20L0,120%20Z'%20fill='%2374c1d5'/%3E%3C/svg%3E"),linear-gradient(#74c1d5,#74c1d5)}
+
+/* ---------- inmersión (el relato bajo el agua) ----------
+   Cada «beat» recibe --ph de js/app.js: -1 = aún no ha entrado, 0 = centrado,
+   1 = ya ha salido. Solo se animan transform y opacity. */
+.deep{position:absolute;inset:0;z-index:5;overflow:hidden;pointer-events:none;display:grid;opacity:var(--deepP)}
+.deepTint{position:absolute;inset:-12%;background:
+  radial-gradient(120% 88% at 50% -12%,rgba(146,214,232,.5),rgba(13,74,96,.93) 52%,rgba(5,38,53,.99) 100%)}
+
+/* haces de luz que entran desde la superficie */
+.rays{position:absolute;inset:0;overflow:hidden;opacity:.5}
+.rays span{position:absolute;top:-30%;height:150%;width:min(22vw,240px);
+  background:linear-gradient(rgba(255,255,255,.22),rgba(255,255,255,0) 72%);
+  filter:blur(22px);transform:rotate(14deg);transform-origin:top center;animation:sway 13s ease-in-out infinite alternate}
+.rays span:nth-child(1){left:8%}
+.rays span:nth-child(2){left:44%;animation-duration:17s;animation-delay:-5s;opacity:.7}
+.rays span:nth-child(3){left:74%;animation-duration:21s;animation-delay:-9s;opacity:.55}
+@keyframes sway{from{transform:rotate(11deg) translate3d(-14px,0,0)}to{transform:rotate(17deg) translate3d(16px,0,0)}}
+
+/* burbujas (las genera js/app.js) */
+.bubbles{position:absolute;inset:0;overflow:hidden}
+.bubbles span{position:absolute;bottom:-8vh;border-radius:50%;
+  border:1px solid rgba(255,255,255,.26);
+  background:radial-gradient(circle at 30% 26%,rgba(255,255,255,.55) 0 14%,rgba(255,255,255,.05) 46%,rgba(255,255,255,0) 66%);
+  will-change:transform,opacity;animation:bub linear infinite}
+@keyframes bub{
+  0%{transform:translate3d(0,0,0) scale(.65);opacity:0}
+  12%{opacity:.75}
+  85%{opacity:.5}
+  100%{transform:translate3d(var(--dx,18px),-118vh,0) scale(1.15);opacity:0}
+}
+
+.beat{grid-area:1/1;align-self:center;justify-self:center;width:100%;
+  max-width:min(940px,92vw);padding:0 24px;text-align:center;opacity:0;
+  transform:translate3d(0,calc(var(--ph,1) * -70px),0);will-change:transform,opacity}
+.beat .kicker{justify-content:center;color:var(--edem-teal-200);margin-bottom:20px}
+.beat .bl{font-family:var(--font-display);font-weight:900;letter-spacing:-.02em;line-height:1.02;
+  color:#fff;font-size:clamp(36px,6.2vw,86px)}
+.beat .bl.big{font-size:clamp(44px,8.4vw,118px)}
+.beat .bl .pt{color:var(--edem-teal-300,#7fd3e6)}
+.beat .bs{margin:22px auto 0;max-width:620px;font-size:clamp(15px,1.7vw,20px);line-height:1.6;color:rgba(255,255,255,.74)}
+.beat-cta .ctabrand{display:inline-flex;justify-content:center;margin-top:clamp(18px,2.4vw,34px);gap:clamp(8px,1vw,16px)}
+.beat-cta .ctabrand img{height:clamp(26px,3.4vw,50px)}
+.beat-cta .ctabrand .t{color:#fff;font-size:clamp(28px,3.7vw,54px)}
+.beat-cta .acts{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:34px;pointer-events:auto}
+.btn.ghost.lt{color:#fff;border:1.5px solid rgba(255,255,255,.34)}
+.btn.ghost.lt:hover{background:rgba(255,255,255,.14);color:#fff}
+
+/* sin «pin» si el usuario pide menos movimiento o la ventana es muy baja
+   (móvil en horizontal): el hero vuelve a ser una sección normal. */
+@media (prefers-reduced-motion:reduce),(max-height:700px){
+  .heroPin{height:auto}
+  .hero{position:static;height:auto;min-height:calc(100vh - 68px);min-height:calc(100svh - 68px);padding:24px 0 150px}
+  .hero .grid{transform:none}
+  .hero .sea{height:var(--sea-fill);transform:none}   /* solo la banda de crestas, quieta abajo */
+  .deep{display:none}
+}
+
+.hero .bignum{position:absolute;right:-40px;top:-60px;font-family:var(--font-display);font-weight:900;font-size:420px;line-height:.8;color:transparent;-webkit-text-stroke:2px var(--edem-teal-200);opacity:.5;pointer-events:none;user-select:none;transition:opacity .35s var(--ease-standard);animation:numdrift 15s ease-in-out infinite alternate}
+.hero .bignum.swap{opacity:0}
+@keyframes numdrift{from{transform:translateY(0)}to{transform:translateY(22px)}}
+
+/* pila de portadas rotatoria */
+.heroDeck{position:relative;display:flex;flex-direction:column;align-items:center;gap:22px}
+.deck{position:relative;width:min(350px,82%);aspect-ratio:794/1123}
+.deckcard{position:absolute;inset:0;cursor:pointer;border-radius:3px;transition:transform 1.05s cubic-bezier(.25,.8,.25,1),opacity .6s;will-change:transform;backface-visibility:hidden}
+.deckcard .coverslot{position:absolute;inset:0;border-radius:3px;box-shadow:0 30px 62px rgba(6,51,63,.3),0 8px 20px rgba(6,51,63,.16);transition:box-shadow 1.05s var(--ease-standard)}
+.deckcard::after{content:'';position:absolute;inset:0;border-radius:3px;background:#06333f;opacity:0;transition:opacity 1.05s var(--ease-standard);pointer-events:none;z-index:2}
+.deckcard.p0{transform:translateZ(0) rotate(-2deg)}
+.deckcard.p0 .coverslot{animation:deckbob 6.5s ease-in-out infinite}
+.deckcard.p0:hover{transform:translateZ(0) rotate(-.4deg) translateY(-5px)}
+.deckcard.p1{transform:translateZ(0) rotate(4.5deg) translate(9%,3%) scale(.95)}
+.deckcard.p1::after{opacity:.08}
+.deckcard.p2{transform:translateZ(0) rotate(-7deg) translate(-9%,5%) scale(.9)}
+.deckcard.p2::after{opacity:.17}
+.deckcard.p1 .coverslot,.deckcard.p2 .coverslot{box-shadow:0 18px 40px rgba(6,51,63,.2)}
+.deckcard.fly{transform:translateZ(0) rotate(9deg) translate(30%,-5%) scale(1.02)}
+.deckcard.fly::after{opacity:0}
+@keyframes deckbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.deckui{display:flex;flex-direction:column;align-items:center;gap:12px}
+.deckcap{display:flex;align-items:baseline;gap:10px;min-height:26px;opacity:0;transform:translateY(6px);transition:opacity .45s var(--ease-out),transform .45s var(--ease-out)}
+.deckcap.on{opacity:1;transform:none}
+.deckcap .cnr{font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:800;color:var(--edem-teal-700)}
+.deckcap .ct{font-family:var(--font-display);font-style:italic;font-weight:600;font-size:19px;color:var(--text-strong)}
+.deckdots{display:flex;gap:8px}
+.ddot{width:9px;height:9px;border-radius:var(--radius-pill);border:0;padding:0;background:var(--edem-teal-200);cursor:pointer;transition:all .35s var(--ease-standard)}
+.ddot:hover{background:var(--edem-teal-400)}
+.ddot.on{width:26px;background:var(--edem-teal-500)}
+
+/* señal de scroll sobre las olas */
+.scrollcue{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);z-index:2;opacity:clamp(0,calc(1 - var(--seaP) * 4),1);width:46px;height:46px;border-radius:50%;background:#fff;box-shadow:var(--shadow-md);display:grid;place-items:center;color:var(--edem-teal-700);animation:cuebob 2.2s ease-in-out infinite}
+.scrollcue:hover{background:var(--edem-teal-500);color:#fff}
+.scrollcue .lu{width:20px;height:20px}
+@keyframes cuebob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(9px)}}
+
+/* ---------- cabeceras de sección ---------- */
+.shead{display:flex;align-items:baseline;gap:16px;border-top:3px solid var(--ink-900);padding-top:18px;margin-bottom:30px;flex-wrap:wrap}
+.shead h2{font-size:clamp(30px,3.4vw,42px);color:var(--text-strong)}
+.shead .note{font-size:13px;color:var(--text-faint);font-weight:600}
+.shead .more{margin-left:auto;font-size:13.5px;font-weight:700;white-space:nowrap}
+
+/* ---------- kiosko ----------
+   Sale del agua: fondo profundo con luz, y la cabecera se queda clavada
+   mientras las portadas desfilan al lado. */
+/* ojo: nada de overflow:hidden aquí — anularía el sticky de .ksticky.
+   El recorte de los adornos lo hace .kbg. */
+/* #062737 es exactamente el color del borde inferior de la pantalla al final de
+   la inmersión (fondo del mar + .deepTint). Arrancando ahí, la junta entre los
+   beats y el kiosko no se ve: el fondo parece uno solo y sigue abriéndose. */
+#kiosko{position:relative;padding:96px 0 110px;
+  background:linear-gradient(180deg,#062737 0,#083447 14%,#0f5266 52%,#17708a 100%)}
+#kiosko .kbg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.kglow{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55}
+.kglow.g1{width:620px;height:620px;left:-160px;top:8%;background:radial-gradient(circle,#3fa6c4,transparent 68%)}
+/* franja superior intacta: garantiza que el primer tramo es exactamente el color
+   de la junta, sin que ningún halo lo aclare */
+#kiosko .kbg::after{content:'';position:absolute;left:0;right:0;top:0;height:200px;
+  background:linear-gradient(#062737,rgba(6,39,55,0))}
+.kglow.g2{width:520px;height:520px;right:-140px;bottom:-200px;background:radial-gradient(circle,rgba(232,80,45,.5),transparent 68%)}
+.kdots{position:absolute;right:4%;top:12%;width:min(30vw,340px);height:300px;
+  background-image:radial-gradient(rgba(255,255,255,.35) 1.4px,transparent 1.5px);background-size:18px 18px;opacity:.5;
+  -webkit-mask-image:radial-gradient(closest-side,#000,transparent);mask-image:radial-gradient(closest-side,#000,transparent)}
+.kring{position:absolute;left:-6%;bottom:-18%;width:min(46vw,540px);aspect-ratio:1;
+  border:1.5px dashed rgba(255,255,255,.22);border-radius:50%;animation:ringspin 90s linear infinite}
+
+#kiosko .kwrap{position:relative;z-index:1;display:grid;grid-template-columns:minmax(230px,300px) 1fr;gap:56px;align-items:start}
+.ksticky{position:sticky;top:104px}
+#kiosko .shead{border-top-color:rgba(255,255,255,.28);margin-bottom:18px}
+#kiosko .shead h2{color:#fff}
+.knote{font-size:15.5px;line-height:1.6;color:rgba(255,255,255,.72)}
+.kcount{display:inline-block;margin-top:20px;padding:7px 14px;border-radius:var(--radius-pill);
+  border:1px solid rgba(255,255,255,.28);color:#fff;font-size:11.5px;font-weight:800;letter-spacing:.18em;text-transform:uppercase}
+/* Las fichas del kiosko: la portada manda.
+   Nada de passe-partout gris ni de hoja blanca flotando — eso peleaba con el
+   arte de la cubierta. La portada va a sangre, con su propia geometría recta,
+   y debajo cuelga una ficha de vidrio oscuro que pertenece al fondo marino. */
+.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:30px 24px}
+.kcard{position:relative;display:flex;flex-direction:column;
+  background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.045));
+  -webkit-backdrop-filter:blur(14px) saturate(150%);backdrop-filter:blur(14px) saturate(150%);
+  border:1px solid rgba(255,255,255,.16);border-radius:3px;   /* recto, como el papel */
+  box-shadow:0 22px 48px rgba(3,26,36,.42);
+  transition:transform var(--dur) var(--ease-standard),box-shadow var(--dur) var(--ease-standard),border-color var(--dur) var(--ease-standard)}
+.kcard:hover{transform:translateY(-8px);border-color:rgba(255,255,255,.34);
+  box-shadow:0 40px 84px rgba(3,26,36,.6)}
+/* La cubierta ocupa todo el ancho de la ficha, sin marco ni margen. Sin velos
+   encima (ensuciaban las portadas claras): solo un filo fino que marca dónde
+   acaba el papel y empieza la ficha. */
+.kcv{position:relative;overflow:hidden;background:var(--ink-900);
+  border-bottom:1px solid rgba(255,255,255,.16)}
+.kcv .coverslot{width:100%;max-width:none;border-radius:0;box-shadow:none;cursor:pointer;
+  transition:transform .5s var(--ease-standard)}
+.kcard:hover .coverslot{transform:scale(1.035)}
+/* el distintivo, como una pegatina sobre la revista */
+.kbadge{position:absolute;top:0;left:0;z-index:3;padding:6px 12px;border-radius:0 0 3px 0;
+  color:#fff;font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  box-shadow:0 6px 16px rgba(3,26,36,.35)}
+.kbody{padding:20px 20px 22px;display:flex;flex-direction:column;gap:7px;flex:1}
+.kbody .nr{font-size:10.5px;letter-spacing:.24em;font-weight:800;color:var(--edem-teal-200);text-transform:uppercase}
+.kbody h3{font-size:25px;color:#fff;line-height:1.05}
+.kbody p{font-size:13.5px;line-height:1.55;color:rgba(255,255,255,.68);flex:1}
+.kmeta{font-size:12px;color:rgba(255,255,255,.46);font-weight:600;
+  padding-top:12px;border-top:1px solid rgba(255,255,255,.14)}
+.kacts{display:flex;gap:9px;margin-top:12px}
+.kacts .btn{padding:10px 14px;font-size:13.5px;flex:1;border-radius:2px}
+/* sobre el fondo profundo el botón secundario se dibuja en claro */
+#kiosko .kacts .btn.out{color:#fff;border-color:rgba(255,255,255,.34);background:transparent}
+#kiosko .kacts .btn.out:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.6)}
+
+/* ---------- rejilla de artículos ---------- */
+/* Sumario: se lee como el índice de la revista — apertura destacada,
+   foliado grande y el número de la edición en fantasma detrás. */
+#numero{position:relative;padding:82px 0 88px;overflow:hidden}
+#numero .nbg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.nghost{position:absolute;right:-3%;top:-6%;font-family:var(--font-display);font-weight:900;
+  font-size:clamp(280px,34vw,520px);line-height:.78;color:transparent;
+  -webkit-text-stroke:1.5px var(--edem-teal-200);opacity:.4;user-select:none}
+.nrules{position:absolute;left:0;right:0;bottom:0;height:56%;opacity:.5;
+  background-image:repeating-linear-gradient(var(--border-hair) 0 1px,transparent 1px 34px);
+  -webkit-mask-image:linear-gradient(transparent,#000);mask-image:linear-gradient(transparent,#000)}
+#numero .wrap{position:relative;z-index:1}
+.skick{display:block;flex-basis:100%;color:var(--edem-teal-600);margin-bottom:-4px}
+.agrid{display:grid;grid-template-columns:repeat(2,1fr);gap:26px}
+/* apertura: a lo ancho y en horizontal */
+.acard.feat{grid-column:1/-1;flex-direction:row}
+.acard.feat .im{flex:0 0 46%;aspect-ratio:16/11}
+.acard.feat .abody{padding:34px 38px;justify-content:center}
+.acard.feat h3{font-size:clamp(28px,3vw,40px);line-height:1.04}
+.acard.feat p{font-size:16px;flex:none;max-width:52ch}
+.acard.feat .afoot{margin-top:20px}
+/* foliado grande, como en el papel */
+/* mismo recurso que el número fantasma de la sección: foliado en contorno */
+.apg{position:absolute;top:16px;right:20px;font-family:var(--font-display);font-weight:900;
+  font-size:44px;line-height:1;color:transparent;-webkit-text-stroke:1.5px var(--edem-teal-200);
+  transition:color var(--dur) var(--ease-standard)}
+.acard:hover .apg{color:var(--edem-teal-100,#e8f5f8)}
+.acard.feat .apg{font-size:74px;top:24px;right:28px}
+.abody{position:relative}
+.acard{background:var(--surface-card);border:1px solid var(--border-hair);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-md);display:flex;flex-direction:column;cursor:pointer;transition:all var(--dur) var(--ease-standard);text-align:left;font-family:inherit;color:inherit}
+.acard:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
+.acard .im{aspect-ratio:3/2;overflow:hidden;background:linear-gradient(135deg,var(--edem-teal-800),var(--edem-teal-900));position:relative}
+.acard .im img{width:100%;height:100%;object-fit:cover;transition:transform var(--dur-slow);position:relative;z-index:1}
+.acard:hover .im img{transform:scale(1.05)}
+.acard .im .imfall{position:absolute;inset:0;display:grid;place-items:center;color:var(--edem-teal-200)}
+.acard .im .imfall .lu{width:38px;height:38px;opacity:.7}
+.abody{padding:24px;display:flex;flex-direction:column;gap:11px;flex:1}
+.abadge{align-self:flex-start;padding:5px 12px;border-radius:var(--radius-pill);color:#fff;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.abody h3{font-size:24px;line-height:1.12;color:var(--text-strong)}
+.abody p{font-size:14.5px;line-height:1.5;color:var(--text-muted);flex:1}
+.afoot{border-top:1px solid var(--ink-100);padding-top:12px;display:flex;align-items:center;font-size:13px}
+.afoot .go{color:var(--text-link);font-weight:700;display:inline-flex;align-items:center;gap:6px;transition:gap var(--dur)}
+.acard:hover .afoot .go{gap:11px}
+.afoot .pnum{margin-left:auto;color:var(--text-faint);font-weight:600}
+
+/* ---------- ecosistema ---------- */
+/* La Marina: tríptico oscuro. Cada iniciativa manda con su color de marca
+   (--acc lo pone el render) y se presenta con su verbo en grande.
+   El recorrido es un apilado: el raíl de la izquierda se queda clavado y las
+   tres fichas se van montando una sobre otra sin salir de pantalla. */
+/* el padding inferior es corto a propósito: el colchón de .ecostack::after ya
+   deja aire de sobra bajo la última ficha cuando el mazo se suelta */
+#ecosistema{position:relative;padding:86px 0 48px;background:#0e2129;color:#fff}
+#ecosistema .ebg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.egrid-lines{position:absolute;inset:0;opacity:.5;
+  background-image:linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.055) 1px,transparent 1px);
+  background-size:64px 64px;
+  -webkit-mask-image:radial-gradient(120% 90% at 50% 0,#000,transparent 78%);
+  mask-image:radial-gradient(120% 90% at 50% 0,#000,transparent 78%)}
+.eglow{position:absolute;left:50%;top:-40%;width:min(90vw,1000px);height:700px;transform:translateX(-50%);
+  background:radial-gradient(circle,rgba(63,166,196,.3),transparent 66%);filter:blur(60px)}
+#ecosistema .wrap{position:relative;z-index:1}
+#ecosistema .shead{border-top-color:rgba(255,255,255,.28)}
+#ecosistema .shead h2{color:#fff}
+#ecosistema .skick{color:var(--edem-teal-300,#7fd3e6)}
+.ecointro{font-size:16.5px;line-height:1.7;color:rgba(255,255,255,.72);max-width:46ch}
+/* --eco-top: un único punto de clavado para el raíl y para las fichas. Si cada
+   uno usara su propio `top`, la cabecera y la caja arrancarían alineadas pero
+   se separarían en cuanto ambas se pegan; compartiéndolo, el filete del titular
+   y el canto superior de la ficha se quedan siempre a la misma altura. */
+.ecowrap{--eco-top:clamp(88px,15vh,160px);--eco-card-h:min(460px,64vh);--eco-card-mb:min(22vh,190px);
+  display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:clamp(32px,4.4vw,64px);align-items:start}
+
+/* Raíl clavado. Una sticky se suelta cuando su alto + margen inferior dejan de
+   caber en el bloque contenedor, así que para que raíl y fichas se despeguen en
+   el MISMO scroll su caja tiene que medir lo mismo: de ahí el `height` y el
+   margen calcados de la ficha. El contenido del raíl puede rebosar esa caja sin
+   consecuencias — debajo no hay nada — y así el titular nunca se queda clavado
+   mientras el mazo ya se ha ido hacia arriba (que era lo que recortaba las
+   esquinas superiores de las tarjetas contra el borde de pantalla). */
+.ecorail{position:sticky;top:var(--eco-top);height:var(--eco-card-h);margin-bottom:var(--eco-card-mb)}
+.ecorail .shead{margin-bottom:22px}
+.econav{list-style:none;margin-top:30px;border-top:1px solid rgba(255,255,255,.14)}
+.econav a{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:baseline;
+  padding:15px 0 15px 16px;border-bottom:1px solid rgba(255,255,255,.14);position:relative;
+  color:rgba(255,255,255,.5);transition:color var(--dur) var(--ease-standard),padding-left var(--dur) var(--ease-standard)}
+/* la barra de marca crece de arriba abajo al activarse */
+.econav a::before{content:'';position:absolute;left:0;top:12px;bottom:12px;width:3px;background:var(--acc);
+  transform:scaleY(0);transform-origin:top;transition:transform .5s var(--ease-standard)}
+.econav .n{font-family:var(--font-display);font-weight:900;font-size:12px;letter-spacing:.06em}
+.econav .v{font-family:var(--font-display);font-weight:900;font-size:clamp(19px,2vw,24px);line-height:1;letter-spacing:-.01em}
+.econav .b{grid-column:2;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;opacity:.72}
+.econav a:hover{color:rgba(255,255,255,.82)}
+.econav a.on{color:#fff;padding-left:22px}
+.econav a.on::before{transform:scaleY(1)}
+
+/* apilado de fichas: cada una se clava un poco más abajo que la anterior, de
+   modo que al montarse dejan ver el canto de las de debajo. */
+/* La cola del contenedor es lo que mantiene el mazo montado: una ficha sticky
+   solo puede quedarse clavada mientras su caja quepa en el contenedor, así que
+   sin este colchón las primeras se despegarían antes de que llegue la tercera. */
+.ecostack{display:flex;flex-direction:column}
+/* tiene que ser contenido real, no padding: el rango de una ficha sticky se
+   mide contra la caja de contenido del contenedor y el padding no cuenta.
+   Su alto es exactamente el scroll que el mazo ya montado aguanta clavado
+   antes de soltarse, y también el hueco muerto que queda bajo la última ficha
+   al final de la sección: subirlo alarga la pausa pero abre el vacío. */
+.ecostack::after{content:'';display:block;flex:none;height:min(10vh,90px)}
+/* top y margen IDÉNTICOS en las tres: el punto en el que una sticky se suelta
+   depende de `top` + alto + margen inferior, así que si escalonáramos el `top`
+   cada ficha se despegaría en un scroll distinto y la de arriba se vería
+   acoplarse y desacoplarse del mazo. El escalón visual va en un transform, que
+   no entra en ese cálculo, de modo que las tres se sueltan a la vez. */
+.epanel{position:sticky;top:var(--eco-top);margin-bottom:var(--eco-card-mb)}
+.epanel-in{transform:translateY(calc(var(--i) * 16px))}
+/* El color de marca puro no vale para texto sobre el fondo oscuro: Angels da
+   1,6:1. --accText es el mismo color aclarado, que deja los tres por encima
+   de 4,5:1. El color puro se queda en la barra y en el barrido (decorativos). */
+.epanel-in{--accText:rgba(255,255,255,.86);
+  position:relative;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);
+  min-height:var(--eco-card-h);border-radius:var(--radius-lg);overflow:hidden;
+  background:#132c36;border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 34px 70px rgba(3,22,29,.5);
+  transition:border-color var(--dur) var(--ease-standard)}
+@supports (color:color-mix(in srgb,red,white)){.epanel-in{--accText:color-mix(in srgb,var(--acc) 55%,white)}}
+.epanel-in::before{content:'';position:absolute;left:0;right:0;top:0;height:4px;background:var(--acc);z-index:2}
+.epanel-in:hover{border-color:var(--acc)}
+
+.ephoto{position:relative;overflow:hidden;background:#0a1c24;margin:0}
+.ephoto img{position:relative;z-index:0;width:100%;height:100%;object-fit:cover;display:block;
+  transition:transform 1.1s var(--ease-standard)}
+.epanel-in:hover .ephoto img{transform:scale(1.04)}
+/* velo de marca: tiñe la foto con el color de la iniciativa sin apagarla */
+.ephoto::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:var(--acc);opacity:.24;mix-blend-mode:soft-light}
+/* y una sombra hacia la columna de texto, para que foto y copy no choquen */
+.ephoto::after{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(100deg,transparent 46%,rgba(19,44,54,.62) 84%,#132c36)}
+
+.ecopy{position:relative;z-index:1;padding:clamp(26px,3vw,40px);display:flex;flex-direction:column;gap:12px;justify-content:center}
+.ehead{display:flex;align-items:baseline;gap:14px}
+.eidx{font-family:var(--font-display);font-weight:900;font-size:15px;color:var(--accText);letter-spacing:.04em}
+.ehead .role{font-size:clamp(30px,3.6vw,50px);line-height:1;color:#fff;letter-spacing:-.02em}
+.ecopy h3{font-size:clamp(17px,1.5vw,20px);color:rgba(255,255,255,.92);line-height:1.05;
+  letter-spacing:.14em;text-transform:uppercase;font-family:var(--font-display);font-weight:900}
+.ecopy .edesc{font-size:15px;line-height:1.65;color:rgba(255,255,255,.68);max-width:42ch}
+.ecopy .emeta{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+  color:var(--accText);display:inline-flex;align-items:center;gap:9px}
+.ecopy .emeta::before{content:'';width:20px;height:2px;background:var(--acc);flex:none}
+.ecopy .elink{margin-top:6px;font-size:13.5px;font-weight:700;color:var(--accText);
+  display:inline-flex;align-items:center;gap:6px;transition:gap var(--dur)}
+.ecopy .elink:hover{color:#fff;gap:11px}
+.ecopy .elink .lu{width:15px;height:15px}
+
+/* sin apilado si el usuario ha pedido menos movimiento */
+@media (prefers-reduced-motion:reduce){
+  .ecorail,.epanel{position:static}
+  /* sin sticky no hay nada que sincronizar: el raíl recupera su alto natural */
+  .ecorail{height:auto;margin-bottom:0}
+  .epanel{margin-bottom:22px}
+  .epanel-in{transform:none}
+}
+
+/* ---------- SUSCRÍBETE (novedades) ---------- */
+#suscribete{background:var(--surface-dark);color:var(--text-on-dark);padding:64px 0}
+#suscribete .wrap.in{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+#suscribete h2{font-size:clamp(30px,3.4vw,40px);color:#fff;max-width:520px}
+#suscribete .disp-i{color:var(--edem-teal-200)}
+#suscribete p.desc{color:#b4c9cf;font-size:15px;line-height:1.6;margin-top:10px;max-width:440px}
+#suscribete form{display:flex;gap:10px}
+#suscribete input[type=email]{flex:1;min-width:0;padding:14px 16px;border-radius:var(--radius-sm);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#fff;font:inherit;font-size:14px}
+#suscribete input::placeholder{color:#7d97a0}
+#suscribete input:focus{outline:none;border-color:var(--edem-teal-200)}
+#suscribete .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+#sub-msg{font-size:13px;color:var(--edem-teal-200);margin-top:10px;min-height:18px}
+#sub-msg.err{color:#ffb4a0}
+#suscribete .legal{font-size:11.5px;color:#7d97a0;margin-top:6px}
+#suscribete .legal a{color:#9fb8bf;text-decoration:underline}
+
+/* ---------- pie ---------- */
+footer.site{background:var(--ink-900);color:var(--ink-300)}
+.fgrid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:40px;padding-top:56px;padding-bottom:56px}
+footer.site img.flogo{height:22px}
+footer.site .tag{font-family:var(--font-display);font-style:italic;font-size:21px;color:#fff;margin-top:14px}
+footer.site .col p.h{font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:800;color:var(--ink-400);margin-bottom:14px}
+footer.site .col a,footer.site .col button.aslink{display:block;color:var(--ink-300);font-size:14.5px;padding:4px 0;background:none;border:0;cursor:pointer;text-align:left;width:100%}
+footer.site .col a:hover,footer.site .col button.aslink:hover{color:var(--edem-teal-200)}
+.soc{display:flex;gap:10px;margin-top:20px}
+footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.16);display:grid;place-items:center;color:var(--ink-200);transition:all var(--dur-fast)}
+.soc a:hover{background:var(--edem-teal-500);border-color:var(--edem-teal-500);color:#fff}
+.soc svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fbase{border-top:1px solid rgba(255,255,255,.1)}
+.fbase .wrap{display:flex;justify-content:space-between;gap:18px;padding-top:18px;padding-bottom:20px;font-size:12px;color:var(--ink-400);flex-wrap:wrap}
+.fbase a{color:var(--ink-400);text-decoration:underline;text-underline-offset:2px}
+.fbase a:hover{color:var(--edem-teal-200)}
+
+/* ---------- portadas vivas (páginas reales escaladas) ---------- */
+.coverslot{position:relative;aspect-ratio:794/1123;overflow:hidden;background:repeating-linear-gradient(45deg,#e6e2d5 0 14px,#efece1 14px 28px)}
+.coverslot .cslabel{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--text-muted);text-align:center;padding:12px}
+.pg{width:794px;height:1123px;overflow:hidden;background:#fff;position:relative}
+.pg.void{background:transparent}
+.coverslot .pg{position:absolute;top:0;left:0;transform-origin:0 0}
+.pg iframe{width:794px;height:1123px;border:0;display:block;pointer-events:none}
+
+/* ---------- visor ---------- */
+.visor{position:fixed;inset:0;z-index:100;background:radial-gradient(1200px 700px at 50% 30%,#12262e,#08141a 75%);display:flex;flex-direction:column}
+.visor[hidden]{display:none}
+.vbar{height:62px;display:flex;align-items:center;gap:14px;padding:0 20px;border-bottom:1px solid rgba(255,255,255,.09);flex-shrink:0}
+.vbrand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.vbrand img{height:17px}
+.vbrand span{font-size:10px;letter-spacing:.26em;font-weight:800;color:#6f8b94}
+.vissues{display:flex;gap:6px;margin-left:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.vissues::-webkit-scrollbar{display:none}
+.vchip{padding:8px 14px;border-radius:var(--radius-pill);border:1px solid rgba(255,255,255,.16);background:transparent;color:#c7d6da;font-size:12.5px;font-weight:700;cursor:pointer;transition:all var(--dur-fast);white-space:nowrap}
+.vchip:hover{border-color:var(--edem-teal-200);color:#fff}
+.vchip.on{background:var(--edem-teal-500);border-color:var(--edem-teal-500);color:#fff}
+.vright{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.vsel{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);color:#dbe6e9;font:inherit;font-size:12.5px;font-weight:600;padding:8px 10px;border-radius:var(--radius-sm);max-width:230px;cursor:pointer}
+.vsel option{color:var(--ink-900)}
+.vico{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:transparent;border:1px solid rgba(255,255,255,.16);color:#dbe6e9;cursor:pointer;transition:all var(--dur-fast)}
+.vico:hover{background:var(--edem-teal-500);border-color:var(--edem-teal-500);color:#fff}
+.vico .lu{width:17px;height:17px}
+.vstage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:24px 74px;touch-action:pan-y}
+.bookouter{position:relative}
+.book{position:absolute;top:0;left:0;width:1588px;height:1123px;perspective:2800px;transform-origin:0 0}
+.book.single{width:794px}
+.half{position:absolute;top:0;bottom:0;width:794px;background:transparent}
+.half.l{left:0}.half.r{right:0}
+.book.single .half.l{left:0;right:auto}
+.half.hide{display:none}
+.half:not(.void){box-shadow:0 30px 60px rgba(0,0,0,.5),0 10px 24px rgba(0,0,0,.35);cursor:pointer}
+.spine{position:absolute;top:0;bottom:0;left:50%;width:64px;transform:translateX(-50%);background:linear-gradient(90deg,rgba(6,20,26,0),rgba(6,20,26,.26),rgba(6,20,26,0));z-index:5;pointer-events:none;transition:opacity .4s}
+.spine.off{opacity:0}
+.host{position:absolute;inset:0;pointer-events:none;z-index:30}
+.leaf{position:absolute;top:0;bottom:0;width:50%;transform-style:preserve-3d;transition:transform .82s var(--ease-standard)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;background:#fff}
+.face.back{transform:rotateY(180deg)}
+.face .shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,20,26,.16),rgba(6,20,26,0) 22%,rgba(6,20,26,0) 78%,rgba(6,20,26,.1));pointer-events:none}
+.varrow{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;background:#fff;color:var(--ink-900);border:0;display:grid;place-items:center;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.4);transition:all var(--dur-fast);z-index:40}
+.varrow:hover{background:var(--edem-teal-500);color:#fff}
+.varrow:disabled{opacity:.25;cursor:not-allowed}
+.varrow:disabled:hover{background:#fff;color:var(--ink-900)}
+.varrow.l{left:16px}.varrow.r{right:16px}
+.varrow .lu{width:22px;height:22px}
+.vfoot{flex-shrink:0;display:flex;align-items:center;gap:20px;padding:14px 24px 18px;color:#89a2aa}
+.vfoot #v-ind{font-size:13px;font-weight:700;color:#c7d6da;min-width:150px}
+.vdots{display:flex;gap:7px;flex:1;justify-content:center;flex-wrap:wrap}
+.vdot{width:8px;height:8px;border-radius:var(--radius-pill);background:rgba(255,255,255,.25);border:0;padding:0;cursor:pointer;transition:all var(--dur)}
+.vdot:hover{background:rgba(255,255,255,.55)}
+.vdot.on{background:var(--edem-teal-200);width:24px}
+.vhint{font-size:12px;min-width:150px;text-align:right}
+.vload{position:absolute;inset:62px 0 0;display:flex;align-items:center;justify-content:center;gap:12px;color:#c7d6da;font-size:14px;font-weight:600;background:rgba(8,20,26,.72);z-index:50}
+.vload[hidden]{display:none!important}
+.spin{width:22px;height:22px;border-radius:50%;border:3px solid rgba(255,255,255,.2);border-top-color:var(--edem-teal-200);animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ---------- página del sistema de diseño ---------- */
+.dspage{position:fixed;inset:0;z-index:90;background:var(--surface-page);overflow-y:auto}
+.dspage[hidden]{display:none}
+.dsbar{position:sticky;top:0;z-index:5;height:68px;background:rgba(251,250,246,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--border-hair)}
+.dsbar .wrap{display:flex;align-items:center;gap:18px;height:100%}
+.dsclose{width:40px;height:40px;border-radius:50%;border:1px solid var(--border-hair);background:#fff;color:var(--ink-900);display:grid;place-items:center;cursor:pointer;transition:all var(--dur-fast);margin-left:auto}
+.dsclose:hover{background:var(--edem-teal-500);border-color:var(--edem-teal-500);color:#fff}
+.dsclose .lu{width:18px;height:18px}
+.dshero{padding:56px 28px 6px}
+.dshero h1{font-size:clamp(52px,7vw,96px);line-height:.9;color:var(--text-strong);margin-top:14px}
+.dshero h1 .pt{color:var(--edem-teal-500)}
+.dshero .sub{font-size:clamp(20px,2.2vw,26px);color:var(--edem-teal-700);margin-top:12px}
+.dshero .lead{font-size:17px;line-height:1.65;color:var(--text-muted);max-width:660px;margin-top:18px}
+.dssec{padding:46px 28px}
+.dssec+.dssec{border-top:1px solid var(--border-hair)}
+.dslabel{font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:var(--text-muted);margin:28px 0 12px}
+.scale{display:grid;grid-template-columns:repeat(10,1fr);border:1px solid var(--border-hair);border-radius:12px;overflow:hidden}
+.scale .c{height:106px;display:flex;flex-direction:column;justify-content:flex-end;padding:9px;font-size:10.5px;line-height:1.4}
+.scale .c b{font-size:12px;font-weight:800}
+.scale .c span{font-family:monospace;opacity:.85}
+.ecogrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}
+.ecocard{border:1px solid var(--border-hair);border-radius:12px;overflow:hidden;background:#fff}
+.ecocard .sw{height:92px}
+.ecocard .cap{padding:12px 15px}
+.ecocard .cap .n{font-weight:800;font-size:14px;color:var(--text-strong)}
+.ecocard .cap .h{font-family:monospace;font-size:12px;color:var(--text-muted);margin-top:3px}
+.ecocard .cap .tag{font-size:11px;font-weight:700;margin-top:5px}
+.specrow{padding:22px 0;border-bottom:1px solid var(--ink-100)}
+.specrow:last-child{border-bottom:0}
+.specrow .dslabel{margin:0 0 12px}
+.tscale{border:1px solid var(--border-hair);border-radius:12px;overflow:hidden;margin-top:26px}
+.tscale .r{display:flex;align-items:baseline;gap:18px;padding:12px 18px;border-bottom:1px solid var(--ink-100)}
+.tscale .r:last-child{border-bottom:0}
+.tscale .r .nm{width:130px;flex-shrink:0;font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--text-muted);text-transform:uppercase}
+.tscale .r .px{margin-left:auto;font-family:monospace;font-size:12.5px;color:var(--text-faint)}
+.tscale .r .sm{color:var(--text-strong);line-height:1}
+.dsrow{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:6px}
+.pill{display:inline-flex;align-items:center;padding:6px 14px;border-radius:var(--radius-pill);color:#fff;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.pill.out{background:transparent!important;border:1.5px solid currentColor}
+.dscardwrap{max-width:340px}
+.dscard-ph{aspect-ratio:3/2;background:repeating-linear-gradient(45deg,#e6e2d5 0 14px,#efece1 14px 28px);display:grid;place-items:center;font-family:monospace;font-size:11px;color:var(--text-muted)}
+.foundgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+.foundcard{border:1px solid var(--border-hair);border-radius:12px;background:#fff;padding:22px}
+.foundcard .dslabel{margin:0 0 16px}
+.radii{display:flex;gap:22px;flex-wrap:wrap}
+.radii>div{display:flex;flex-direction:column;align-items:center;gap:9px;font-size:11.5px;color:var(--text-muted);font-weight:600}
+.rbox{width:56px;height:56px;background:var(--edem-teal-200);border:1.5px solid var(--edem-teal-500)}
+.shrow{display:flex;gap:18px}
+.shbox{flex:1;height:72px;border-radius:10px;background:#fff;border:1px solid var(--ink-100);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--text-muted)}
+.icorow{display:flex;gap:16px;flex-wrap:wrap;color:var(--edem-teal-700)}
+.icorow .lu{width:26px;height:26px}
+.brandslab{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.brandbox{border:1px solid var(--border-hair);border-radius:12px;padding:34px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.brandbox img{height:30px}
+.brandbox.dark{background:var(--ink-900);border-color:var(--ink-900)}
+.brandbox .cap{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--text-faint)}
+.brandbox.dark .cap{color:var(--ink-300)}
+.spacescale{display:flex;flex-direction:column;gap:9px}
+.spacescale .r{display:flex;align-items:center;gap:14px;font-size:12.5px;color:var(--text-muted);font-weight:600}
+.spacescale .nm{width:96px;flex-shrink:0;font-family:monospace}
+.spacescale .bar{height:14px;background:var(--edem-teal-500);border-radius:2px}
+
+/* ---------- responsive ---------- */
+@media(max-width:1020px){
+  .hero .grid{grid-template-columns:1fr;gap:44px}
+  .heroDeck{order:-1;padding-top:10px}
+  .deck{width:min(270px,64%)}
+  .heroBg .ring{right:-20%;top:-4%;width:min(70vw,460px)}
+  /* el hero sigue clavado, pero apilado: lo compactamos y lo anclamos arriba
+     para que el contenido quede por encima de la línea de agua */
+  .heroPin{height:660vh}
+  .hero{padding:84px 0 26px;align-items:flex-start}
+  .hero .grid{gap:24px}
+  .heroDeck{gap:14px}
+  .deck{width:min(190px,42%)}
+  .hero p.lead,.hero .meta-chips{display:none}
+  .hero .acts{margin-top:22px}
+  .hero .sea{--sea-fill:176px;--o2:28px;--o3:56px}
+  .beat .kicker{margin-bottom:14px}
+  .heroBg .halft{bottom:110px}
+  .hero .bignum{font-size:260px;right:-30px;top:-40px;opacity:.35}
+  .agrid{grid-template-columns:1fr 1fr}
+  /* el ecosistema pasa a una columna: el raíl se despega y encabeza la sección */
+  .ecowrap{grid-template-columns:1fr;gap:30px}
+  .ecorail{position:static;height:auto;margin-bottom:0}
+  .econav{display:grid;grid-template-columns:repeat(3,1fr);gap:0 14px;margin-top:24px}
+  .econav a{border-bottom:0}
+  .epanel{margin-bottom:min(18vh,150px)}
+  .epanel-in{min-height:0}
+  .acard.feat{flex-direction:column}
+  .acard.feat .im{flex:none;aspect-ratio:3/2}
+  .acard.feat .abody{padding:24px}
+  .acard.feat .apg{font-size:52px;top:18px;right:20px}
+  #numero,#ecosistema{padding:64px 0 70px}
+  /* el kiosko pasa a una columna: la cabecera deja de estar clavada */
+  #kiosko{padding:72px 0 84px}
+  #kiosko .kwrap{grid-template-columns:1fr;gap:28px}
+  .ksticky{position:static}
+  #suscribete .wrap.in{grid-template-columns:1fr}
+  .fgrid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:680px){
+  .wrap{padding:0 20px}
+  .agrid{grid-template-columns:1fr}
+  /* dos portadas por fila aunque el móvil sea estrecho: a una sola columna la
+     cubierta a sangre se come la pantalla entera */
+  .kgrid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:22px 14px}
+  .kbody{padding:15px 14px 16px}
+  .kbody h3{font-size:20px}
+  .kbody p{font-size:12.5px}
+  .kacts{flex-direction:column;gap:7px}
+  .nghost{font-size:clamp(190px,54vw,300px)}
+  /* en móvil la ficha se parte: foto arriba, texto debajo, y se deja de apilar
+     (tres tarjetas montadas no caben en alto sin comerse el texto) */
+  .econav{grid-template-columns:1fr;gap:0}
+  .econav a{border-bottom:1px solid rgba(255,255,255,.14)}
+  .epanel{position:static;margin-bottom:20px}
+  .epanel-in{grid-template-columns:1fr}
+  .ephoto{aspect-ratio:16/10}
+  .ephoto::after{background:linear-gradient(180deg,transparent 52%,rgba(19,44,54,.72) 88%,#132c36)}
+  .ehead .role{font-size:32px}
+  #kiosko{padding:56px 0 64px}
+  nav.main,.hbar .cta{display:none}
+  .menubtn{display:grid}
+  .hero{padding:80px 0 20px}
+  .hero .grid{gap:18px}
+  .hero .sub{font-size:19px}
+  .heroCopy .acts .btn.ghost{display:none}   /* una sola llamada a la acción: el kiosko ya está en el menú */
+  .deck{width:min(168px,40%)}
+  .deckcap .ct{font-size:17px}
+  .hero .bignum{display:none}
+  .beat{padding:0 18px}
+  .beat .bs{margin-top:16px}
+  .shead .more{margin-left:0;flex-basis:100%}
+  #suscribete form{flex-direction:column}
+  #suscribete form .btn{width:100%}
+  .fgrid{grid-template-columns:1fr;gap:30px;padding-top:40px;padding-bottom:40px}
+  .vhint{display:none}
+  .vsel{display:none}
+  .vstage{padding:16px 12px 8px}
+  .varrow{width:40px;height:40px}
+  .varrow.l{left:8px}.varrow.r{right:8px}
+  .vbar{gap:10px;padding:0 12px}
+  .vfoot{gap:10px;padding:10px 14px 14px}
+  .vfoot #v-ind{min-width:0;font-size:11.5px}
+  .scale{grid-template-columns:repeat(5,1fr)}
+  .dshero h1{font-size:clamp(44px,13vw,72px)}
+  .brandslab{grid-template-columns:1fr}
+}

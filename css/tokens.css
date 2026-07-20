@@ -1,0 +1,150 @@
+/* EDEM Times — Design tokens (bundle de tokens/colors.css + typography.css + spacing.css del design system) */
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&family=Archivo:ital,wght@0,300..800;1,400..700&display=swap');
+/* EDEM — Color tokens
+   Primary teal #008AAD extracted pixel-exact from the official EDEM wordmark.
+   Neutrals are a cool "petrol ink" family derived from the primary (OKLCH-harmonized).
+   Lanzadera / Angels accents are PLACEHOLDERS pending official assets — see readme.md. */
+:root{
+  /* ---- Primary: EDEM teal / petrol (base 500 = real brand color) ---- */
+  --edem-teal-50:#eef8fb;
+  --edem-teal-100:#dcf0f5;
+  --edem-teal-200:#b4dee9;
+  --edem-teal-300:#74c1d5;
+  --edem-teal-400:#34a3c0;
+  --edem-teal-500:#008aad;   /* ★ official EDEM primary */
+  --edem-teal-600:#007a99;
+  --edem-teal-700:#006a85;
+  --edem-teal-800:#0a4a5c;
+  --edem-teal-900:#06333f;
+
+  /* ---- Ink / neutrals (cool slate, faint teal cast) ---- */
+  --ink-900:#0c1e24;
+  --ink-800:#183038;
+  --ink-700:#2a3f47;
+  --ink-600:#455a61;
+  --ink-500:#5a6e75;
+  --ink-400:#869aa0;
+  --ink-300:#b9c6ca;
+  --ink-200:#dce4e6;
+  --ink-100:#edf1f2;
+  --ink-50:#f6f9f9;
+
+  /* ---- Paper (warm off-white, magazine stock) ---- */
+  --paper:#fbfaf6;
+  --paper-deep:#f2efe6;
+  --white:#ffffff;
+  --black:#04141a;
+
+  /* ---- Ecosystem accents (Marina de Empresas) ----
+     EDEM is real; the other two are placeholders — confirm official hex. */
+  --edem:#008aad;
+  --lanzadera:#e8502d;   /* placeholder coral */
+  --angels:#3b3a7a;      /* placeholder indigo */
+
+  /* ---- Semantic ---- */
+  --success:#2e8b6f;
+  --warning:#d8912e;
+  --danger:#c7452e;
+  --info:#008aad;
+
+  /* ---- Semantic aliases (use these in product) ---- */
+  --color-primary:var(--edem-teal-500);
+  --color-primary-hover:var(--edem-teal-600);
+  --color-primary-press:var(--edem-teal-700);
+  --color-primary-soft:var(--edem-teal-50);
+  --color-on-primary:var(--white);
+
+  --text-strong:var(--ink-900);
+  --text-body:var(--ink-700);
+  --text-muted:var(--ink-500);
+  --text-faint:var(--ink-400);
+  --text-on-dark:var(--paper);
+  --text-link:var(--edem-teal-600);
+  --text-link-hover:var(--edem-teal-800);
+
+  --surface-page:var(--paper);
+  --surface-card:var(--white);
+  --surface-sunk:var(--ink-50);
+  --surface-dark:var(--edem-teal-900);
+
+  --border-hair:var(--ink-200);
+  --border-strong:var(--ink-300);
+  --border-on-dark:rgba(255,255,255,.16);
+}
+/* EDEM — Typography tokens
+   Display: Bodoni Moda — a true Didone matching the high-contrast serif of the EDEM
+   wordmark. STANDARD DISPLAY SETTING (user-approved): weight 900 "Black" with
+   font-optical-sizing:none + font-variation-settings:'opsz' 14 — the reduced optical
+   size thickens the hairlines so headlines read bold and friendly, never thin.
+   Body/UI: Archivo — a clean grotesque with strong editorial personality.
+   NOTE: both are Google Fonts SUBSTITUTES chosen to match the extracted logo; EDEM's
+   exact licensed webfonts were not recoverable. Swap in the real font files when available. */
+
+:root{
+  --font-display:'Bodoni Moda',Georgia,'Times New Roman',serif;
+  --font-sans:'Archivo','Helvetica Neue',Arial,sans-serif;
+  --font-body:'Archivo','Helvetica Neue',Arial,sans-serif;
+
+  /* Type scale (editorial, generous) */
+  --fs-display:clamp(3rem,6vw,5.5rem); /* @kind font */
+  --fs-h1:clamp(2.25rem,4.5vw,3.75rem); /* @kind font */
+  --fs-h2:clamp(1.75rem,3vw,2.5rem); /* @kind font */
+  --fs-h3:1.5rem; /* @kind font */
+  --fs-h4:1.175rem; /* @kind font */
+  --fs-lead:1.3125rem; /* @kind font */
+  --fs-body:1.0625rem; /* @kind font */
+  --fs-small:0.9375rem; /* @kind font */
+  --fs-caption:0.8125rem; /* @kind font */
+  --fs-overline:0.75rem; /* @kind font */
+
+  --lh-tight:1.04; /* @kind font */
+  --lh-snug:1.18; /* @kind font */
+  --lh-body:1.62; /* @kind font */
+
+  --ls-display:-0.02em; /* @kind font */
+  --ls-tight:-0.01em; /* @kind font */
+  --ls-overline:0.18em; /* @kind font */
+
+  --fw-light:300; /* @kind font */
+  --fw-regular:400; /* @kind font */
+  --fw-medium:500; /* @kind font */
+  --fw-semibold:600; /* @kind font */
+  --fw-bold:700; /* @kind font */
+  --fw-black:800; /* @kind font */
+  --fw-display:900; /* @kind font */
+}
+/* EDEM — Spacing, radii, shadows, motion */
+:root{
+  --space-1:4px;
+  --space-2:8px;
+  --space-3:12px;
+  --space-4:16px;
+  --space-5:24px;
+  --space-6:32px;
+  --space-7:48px;
+  --space-8:64px;
+  --space-9:96px;
+  --space-10:128px;
+
+  /* Corners — restrained, editorial (nothing pill-round except tags/badges) */
+  --radius-xs:2px;
+  --radius-sm:4px;
+  --radius-md:8px;
+  --radius-lg:14px;
+  --radius-pill:999px;
+
+  /* Shadows — soft, cool-tinted */
+  --shadow-sm:0 1px 2px rgba(6,51,63,.06),0 1px 3px rgba(6,51,63,.08);
+  --shadow-md:0 4px 12px rgba(6,51,63,.08),0 2px 4px rgba(6,51,63,.06);
+  --shadow-lg:0 18px 40px rgba(6,51,63,.14),0 6px 14px rgba(6,51,63,.08);
+  --shadow-book:0 30px 60px rgba(6,51,63,.30),0 10px 24px rgba(6,51,63,.20);
+
+  /* Motion */
+  --ease-standard:cubic-bezier(.4,0,.2,1); /* @kind other */
+  --ease-out:cubic-bezier(.16,1,.3,1); /* @kind other */
+  --dur-fast:150ms; /* @kind other */
+  --dur:300ms; /* @kind other */
+  --dur-slow:600ms; /* @kind other */
+
+  --container:1200px;
+}

@@ -1,62 +1,46 @@
-# EDEM Times — Design System
+# EDEM Times — web oficial
 
-Sistema de diseño e identidad visual para **EDEM Times**, la revista de EDEM Escuela de Empresarios, dentro del ecosistema **Marina de Empresas** (junto a Lanzadera y Angels). EDEM Times tiene edición física en papel; la web replica la experiencia de lectura de un PDF maquetado.
+Sitio estático de **EDEM Times**, la revista de EDEM Escuela de Empresarios (Marina de Empresas). Construido con el design system «EDEM Revista»: sin frameworks, sin build — listo para subir a cualquier hosting.
 
-## Contexto de la marca
-- **EDEM Escuela de Empresarios** — escuela de negocios y management en Valencia (fundada 2002). Grados, Másteres, Formación Executive y Alta Dirección. Lema operativo: *"empresarios formando a empresarios"*, *"se aprende haciendo"*.
-- **Marina de Empresas** — polo de emprendimiento de Juan Roig en la Marina de València. Tres iniciativas: **EDEM** (formación), **Lanzadera** (aceleradora/incubadora), **Angels** (inversión).
-- Campaña de marca actual: *"Unpopular Opinion: EDEM — La opción difícil"*. Boletín: **BOGA**, "el mail que rema a contracorriente" (metáfora náutica recurrente — ancla, remo, puerto).
+## Estructura
 
-## Fuentes consultadas
-- Sitio oficial: `https://edem.eu/` (home, textos, imágenes de campaña 2026).
-- **Logo oficial**: aportado por el usuario como PNG (`uploads/pasted-1784139471676-0.png`). Color primario **#008AAD** extraído pixel-exact del wordmark con muestreo de canvas.
-- Ecosistema: `marinadeempresas.es`, `lanzadera.es`, `angelscapital.es`.
-- No se localizó un manual de identidad corporativa público de EDEM. El CSS/tipografías reales del sitio no eran recuperables con las herramientas de navegación (devuelven markdown sin estilos).
+```
+edem-times-web/
+├── index.html            Home: hero, kiosko, artículos, ecosistema, suscripción
+├── css/
+│   ├── tokens.css        Tokens del design system (color, tipografía, espaciado)
+│   └── site.css          Estilos del sitio (usa los tokens)
+├── js/app.js             Toda la lógica: render de la home, visor flipbook, formulario
+├── data/content.json     ★ EL CONTENIDO — ediciones, artículos, ecosistema, enlaces
+├── revistas/             Las revistas maquetadas (una página HTML por número + versión A4)
+└── assets/               Logos, favicon e imágenes (assets/img/)
+```
 
-## CONTENT FUNDAMENTALS — cómo se escribe
-- **Tono**: directo, retador, con orgullo del esfuerzo. "La opción difícil", "No es para todos", "complicarse la vida y demostrarlo con hechos". Nada blando ni corporativo-genérico.
-- **Persona**: tutea al lector ("tú", "elegir EDEM es elegir…"). Cercano pero exigente.
-- **Casing**: titulares en may/min normal con tipografía serif display; overlines en MAYÚSCULAS con tracking amplio (`Número 1 · Marina de Empresas`). Nombres de sección tipo "Radar Lanzadera", "Pasillo EDEM".
-- **Metáforas náuticas**: remar, contracorriente, puerto, ancla, marina, "a bordo". Úsalas con moderación, dan carácter.
-- **Cifras con orgullo**: "+2.100 alumnos insertados", "+1,5M€ en becas". Datos concretos, nunca vagos.
-- **Emoji**: no en superficie de producto. Un guiño puntual (⚓) sólo en microcopy informal (confirmaciones). Por defecto, sin emoji.
-- **Vibe**: revista editorial premium + escuela de negocios ambiciosa. Serio pero con nervio.
+## Publicar
 
-## VISUAL FOUNDATIONS
-- **Color**: primario **teal / petróleo #008AAD** (real, del logo). Escala completa 50→900 en `tokens/colors.css`. Neutrales "petrol ink" (slate frío con tinte teal) para texto. Fondo **paper** #FBFAF6 (off-white cálido, stock de revista). Máx. 1–2 fondos por pieza (paper y petról oscuro para modo lectura).
-- **Acentos de ecosistema**: EDEM teal (real); **Lanzadera** coral `#E8502D` y **Angels** índigo `#3B3A7A` son **PLACEHOLDERS** — pendientes de los hex oficiales. Se usan como badges de categoría color-codificados.
-- **Tipografía**: **Bodoni Moda** para display/titulares — **estándar aprobado: peso 900 "Black" con `font-optical-sizing:none` + `'opsz' 14`** (engorda los trazos finos; nunca titulares finos); **Archivo** (grotesca limpia) para cuerpo y UI. Ambas son **sustitutas de Google Fonts** — ver Caveats.
-- **Layout**: rejilla centrada máx. 1200px. Hero asimétrico (texto/imagen 6+6). Rejilla de artículos a 3 columnas. Generoso espacio en blanco editorial.
-- **Esquinas**: contenidas — `radius-sm` (4px) en botones, `radius-lg` (14px) en tarjetas. Badges tipo pill (`radius-pill`). Nada excesivamente redondeado.
-- **Sombras**: suaves y con tinte frío (`--shadow-sm/md/lg`); `--shadow-book` pronunciada para el efecto de revista abierta.
-- **Tarjetas**: fondo blanco, borde hairline `--border-hair`, esquina `radius-lg`, sombra sutil que se eleva en hover (`translateY(-6px)` + `shadow-lg`), imagen con zoom suave.
-- **Hover**: color más oscuro (teal 500→600), fondo tint suave en outline/ghost, elevación en tarjetas, gap creciente en enlaces con flecha. **Press**: `translateY(1px)`.
-- **Animación**: transiciones 150–300ms con `cubic-bezier(.4,0,.2,1)`; entradas con fade+rise. Flipbook: rotación 3D `rotateY` 820ms para el paso de página, con sombra de pliegue.
-- **Imágenes**: fotografía real de campus/personas, cálida y documental. Overlays de gradiente petról para texto sobre foto.
+Sube la carpeta `edem-times-web/` tal cual a cualquier hosting estático (Netlify, Vercel, GitHub Pages, un Apache/Nginx…). No hay build ni dependencias de servidor. **Debe servirse por HTTP** (el visor carga las revistas con `fetch`); abrir `index.html` con doble clic muestra la home pero no las portadas vivas ni el visor.
 
-## ICONOGRAPHY
-- **Lucide Icons** (vía CDN) — línea, stroke medio, redondeado. Es una **sustitución razonada**: no se identificó un set de iconos propietario de EDEM. Iconos usados: `anchor`, `book-open`, `arrow-right`, `chevron-left/right`, `book-marked`, `quote`, `linkedin`, `instagram`, `youtube`.
-- **Sin emoji** en producto. El motivo náutico (ancla ⚓) aparece como icono Lucide, no como emoji, salvo microcopy informal.
-- **Logo**: `assets/edem-logo.png` (teal, recortado del original) y `assets/edem-logo-white.png` (versión blanca generada para fondos oscuros). No se ha redibujado ningún mark: ambos derivan del PNG oficial aportado.
+Prueba local: `python3 -m http.server 8000` dentro de la carpeta y abre `http://localhost:8000`.
 
-## Components (índice)
-Ubicados en `components/core/` — importar vía `window.EDEMRevistaDesignSystem_7d0987`:
-- **Button** — botón principal editorial. Variantes primary / secondary / outline / ghost; tamaños sm/md/lg; estados hover/press/disabled; iconos.
-- **Badge** — badge de categoría/ecosistema (EDEM · Lanzadera · Angels · neutral · teal), solid u outline.
-- **ArticleCard** — tarjeta de artículo de la rejilla de la revista (imagen, badge, título serif, extracto, meta). Compone `Badge`.
+## Actualizar contenido (sin tocar código)
 
-## Índice del proyecto (manifiesto)
-- `styles.css` — punto de entrada global (sólo `@import`).
-- `tokens/colors.css` · `tokens/typography.css` · `tokens/spacing.css` — tokens.
-- `components/core/` — Button, Badge, ArticleCard (`.jsx` + `.d.ts` + `.prompt.md` + `core.card.html`).
-- `guidelines/*.card.html` — specimen cards (Colors, Type, Brand) para la pestaña Design System.
-- `ui_kits/revista/index.html` — **prototipo estrella**: single-page con 3 vistas conmutables (Design System · Home · Simulador de Lectura/flipbook). Tailwind + JS nativo + Lucide.
-- `assets/` — logo EDEM (teal + blanco).
-- `thumbnail.html` — tile del sistema. `SKILL.md` — envoltorio Agent Skill.
+Todo el contenido de la home vive en **`data/content.json`**:
 
-## CAVEATS / sustituciones a confirmar
-1. **Tipografías**: Bodoni Moda + Archivo son sustitutas de Google Fonts elegidas para casar con el wordmark; **no** son las fuentes licenciadas reales de EDEM. Enviar los archivos de fuente oficiales para reemplazarlas.
-2. **Colores Lanzadera/Angels**: placeholders (`#E8502D`, `#3B3A7A`). Confirmar los hex oficiales de cada marca del ecosistema.
-3. **Iconos**: Lucide como sustituto (no hay set propietario identificado).
-4. **Imágenes**: el prototipo enlaza fotos reales de `edem.eu` de forma remota (con fallback teal si el hotlink se bloquea). Para producción, sustituir por imágenes alojadas/licenciadas.
-5. Sólo el **primario #008AAD** está verificado como oficial; el resto de la escala y neutrales se derivaron armónicamente de ese color.
+- **Publicar un nuevo número**: añade la revista a `revistas/` (misma estructura: `<section class="page">` por página), añade su entrada en `issues` y apunta `site.latest` a su `id`. El hero, el kiosko, el visor y el pie se actualizan solos.
+- **Artículos destacados**: edita `articles` (categoría, color, titular, extracto, página del visor e imagen).
+- **Ecosistema (La Marina)**: edita `ecosystem` — cada iniciativa lleva verbo, descripción, foto (`img` + `alt`) y su línea de enlace con la revista (`meta`).
+- Colores admitidos en los campos `color`/`badgeColor`: `edem`, `lanzadera`, `angels`, `neutral`.
+
+### Conectar un CMS
+
+`app.js` solo necesita que `data/content.json` exista con ese esquema. Cualquier CMS headless (Strapi, Contentful, Sanity, WordPress + plugin REST…) puede generar ese JSON en el deploy, o puedes cambiar la URL del fetch en `boot()` (js/app.js) para leerlo directamente de la API del CMS. Si el JSON no carga, la web usa el catálogo embebido `DEFAULTS` de `app.js` como respaldo.
+
+### Suscripción a las novedades
+
+Por defecto el formulario funciona en modo demo (valida el email y muestra confirmación). Para suscripciones reales, pon la URL de tu servicio en `newsletter.endpoint` del JSON: recibirá un `POST` con `{"email": "...", "list": "edem-times"}`. Sirve cualquier endpoint de Mailchimp/Brevo/API propia que acepte JSON.
+
+## Notas de marca (heredadas del design system)
+
+- Primario **#008AAD** extraído del logotipo oficial. Los acentos de **Lanzadera** (`#E8502D`) y **Angels** (`#3B3A7A`) son placeholders pendientes de confirmar con cada marca.
+- Tipografías **Bodoni Moda** (display) y **Archivo** (cuerpo) vía Google Fonts — sustitutas hasta disponer de las fuentes licenciadas de EDEM.
+- El sistema de diseño completo es consultable en la propia web: pie de página → «Sistema de diseño».
