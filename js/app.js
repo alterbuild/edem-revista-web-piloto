@@ -331,8 +331,15 @@ menubtn.addEventListener('click', () => setMenu(!mnav.classList.contains('open')
 mnav.addEventListener('click', e => { if (e.target.closest('a')) closeMenu(); });
 mscrim.addEventListener('click', closeMenu);
 addEventListener('keydown', e => { if (e.key === 'Escape' && mnav.classList.contains('open')) { closeMenu(); menubtn.focus(); } });
-// si se pasa a escritorio con el menú abierto, se cierra solo
-matchMedia('(min-width:681px)').addEventListener('change', e => { if (e.matches) closeMenu(); });
+// si se pasa a escritorio con el menú abierto, se cierra solo.
+// MediaQueryList.addEventListener no existe antes de Safari 14: sin este puente
+// esta línea lanzaba TypeError y se llevaba por delante TODO lo que va después
+// del script — incluida la inmersión (los «beats» del hero).
+function onMQ(mq, fn) {
+  if (mq.addEventListener) mq.addEventListener('change', fn);
+  else if (mq.addListener) mq.addListener(fn);
+}
+onMQ(matchMedia('(min-width:681px)'), e => { if (e.matches) closeMenu(); });
 
 /* ================= aparición al hacer scroll ================= */
 let revealIO = null;
@@ -358,7 +365,9 @@ function observeReveals() {
   const pin = $('heroPin'), hero = pin && pin.querySelector('.hero'), deep = $('deep');
   if (!pin || !hero || !deep || REDUCED.matches) return;
 
-  const root = document.documentElement;
+  // --seaP/--deepP van sobre el hero, no sobre :root: escribir una custom
+  // property en :root invalida el estilo de TODO el documento en cada frame.
+  const root = hero;
   const beats = [...deep.querySelectorAll('[data-beat]')];
   const N = beats.length;
   const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
@@ -371,7 +380,11 @@ function observeReveals() {
 
   function measure() {
     enabled = getComputedStyle(hero).position === 'sticky';
-    vh = window.innerHeight;
+    // el recorrido real del sticky es alto del pin − alto del HERO, no − innerHeight.
+    // En Safari iOS innerHeight oscila al plegarse la barra de direcciones (svh↔lvh)
+    // mientras que el hero mide 100svh fijo: usar innerHeight desincronizaba los
+    // beats del scroll justo al empezar a bajar. offsetHeight no miente.
+    vh = hero.offsetHeight || window.innerHeight;
     pinTop = pin.getBoundingClientRect().top + window.scrollY;
     range = Math.max(1, pin.offsetHeight - vh);
     // el primer acto (subida del agua) se lleva ~1 pantalla de scroll
@@ -433,11 +446,25 @@ function observeReveals() {
     scatter($('motes'), small ? 7 : 12, 3, 7, 16, 30);
   }
 
-  let rz;
+  let rz, lastW = window.innerWidth;
   addEventListener('scroll', onScroll, { passive: true });
-  addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { measure(); bubbles(); update(); }, 120); });
+  addEventListener('resize', () => {
+    clearTimeout(rz);
+    rz = setTimeout(() => {
+      // En Safari iOS «resize» salta cada vez que se pliega o despliega la barra
+      // de direcciones, o sea constantemente mientras se baja. Remedir es barato;
+      // regenerar las burbujas no lo es (y además las hace parpadear), así que
+      // eso solo cuando cambia el ANCHO: rotación o cambio de ventana de verdad.
+      const w = window.innerWidth;
+      measure();
+      if (w !== lastW) { lastW = w; bubbles(); }
+      update();
+    }, 120);
+  });
   // al volver a la pestaña el rAF estaba parado: recolocamos por si se scrolleó fuera
   addEventListener('visibilitychange', () => { if (!document.hidden) { measure(); update(); } });
+  // vuelta atrás en iOS: la página sale de la bfcache ya scrolleada y sin disparar scroll
+  addEventListener('pageshow', () => { measure(); update(); });
   addEventListener('orientationchange', () => setTimeout(() => { measure(); update(); }, 300));
   bubbles();
   measure();

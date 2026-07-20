@@ -101,10 +101,13 @@ nav.main a:hover::after{transform:scaleX(1)}
 
 /* ---------- hero ---------- */
 /* El hero se «clava» mientras dura .heroPin; el mar sube con --seaP (0→1, lo fija js/app.js). */
-:root{--seaP:0;--deepP:0}
 .heroPin{position:relative;height:760vh}
-/* --heroH: alto real de la pantalla, reutilizado por el mar para su recorrido */
-.hero{--heroH:100vh;padding:92px 0 150px;position:sticky;top:0;overflow:hidden;height:var(--heroH);display:flex;align-items:center}
+/* --heroH: alto real de la pantalla, reutilizado por el mar para su recorrido.
+   --seaP y --deepP se declaran AQUÍ, no en :root: js/app.js las reescribe en
+   cada frame y una custom property en :root invalida el estilo de todo el
+   documento. Acotadas al hero, el recálculo se queda en este subárbol — es la
+   diferencia entre 60fps y un pase de diapositivas en Safari iOS. */
+.hero{--heroH:100vh;--seaP:0;--deepP:0;padding:92px 0 150px;position:sticky;top:0;overflow:hidden;height:var(--heroH);display:flex;align-items:center}
 @supports (height:100svh){.hero{--heroH:100svh}}
 .hero .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center;position:relative;z-index:1;width:100%;transform:translateY(calc(var(--seaP) * -48px))}
 .kicker{display:inline-flex;align-items:center;gap:10px;color:var(--edem-teal-700)}
@@ -150,7 +153,7 @@ nav.main a:hover::after{transform:scaleX(1)}
 /* motas que suben flotando (las genera js/app.js) */
 .heroBg .motes{position:absolute;inset:0;overflow:hidden}
 .heroBg .motes span{position:absolute;bottom:-6%;border-radius:50%;background:var(--edem-teal-400,#63b6cd);
-  will-change:transform,opacity;animation:mote linear infinite}
+  animation:mote linear infinite}
 @keyframes mote{
   0%{transform:translate3d(0,0,0) scale(.6);opacity:0}
   15%{opacity:.5}
@@ -212,7 +215,7 @@ nav.main a:hover::after{transform:scaleX(1)}
 .bubbles span{position:absolute;bottom:-8vh;border-radius:50%;
   border:1px solid rgba(255,255,255,.26);
   background:radial-gradient(circle at 30% 26%,rgba(255,255,255,.55) 0 14%,rgba(255,255,255,.05) 46%,rgba(255,255,255,0) 66%);
-  will-change:transform,opacity;animation:bub linear infinite}
+  animation:bub linear infinite}
 @keyframes bub{
   0%{transform:translate3d(0,0,0) scale(.65);opacity:0}
   12%{opacity:.75}
@@ -237,8 +240,12 @@ nav.main a:hover::after{transform:scaleX(1)}
 .btn.ghost.lt:hover{background:rgba(255,255,255,.14);color:#fff}
 
 /* sin «pin» si el usuario pide menos movimiento o la ventana es muy baja
-   (móvil en horizontal): el hero vuelve a ser una sección normal. */
-@media (prefers-reduced-motion:reduce),(max-height:700px){
+   (móvil en horizontal): el hero vuelve a ser una sección normal.
+   Ojo con el umbral: en Safari iOS las media queries de alto se resuelven contra
+   el viewport GRANDE, que en un iPhone SE (667) o un 13 mini (~713) se queda
+   cerca de 700 — con el corte antiguo la inmersión desaparecía en esos móviles
+   en vertical, que es justo donde debe verse. Solo apagamos en apaisado. */
+@media (prefers-reduced-motion:reduce),(orientation:landscape) and (max-height:560px){
   .heroPin{height:auto}
   .hero{position:static;height:auto;min-height:calc(100vh - 68px);min-height:calc(100svh - 68px);padding:24px 0 150px}
   .hero .grid{transform:none}
