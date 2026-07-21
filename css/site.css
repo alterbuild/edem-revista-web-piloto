@@ -24,7 +24,7 @@ button{font:inherit}
 .disp{font-family:var(--font-display);font-weight:900;font-optical-sizing:none;font-variation-settings:'opsz' 14;letter-spacing:-.015em}
 .disp-i{font-family:var(--font-display);font-style:italic;font-weight:600;letter-spacing:-.01em}
 .over{font-size:11px;letter-spacing:.28em;text-transform:uppercase;font-weight:800}
-.wrap{max-width:var(--container);margin:0 auto;padding:0 28px}
+.wrap{max-width:var(--container);margin:0 auto;padding:0 28px;padding-left:max(28px,env(safe-area-inset-left));padding-right:max(28px,env(safe-area-inset-right))}
 
 /* Skip link */
 .skip{position:absolute;left:-9999px;top:0;z-index:200;background:var(--edem-teal-500);color:#fff;padding:12px 20px;font-weight:700;border-radius:0 0 var(--radius-sm) 0}
@@ -587,7 +587,7 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
 .soc a:hover{background:var(--edem-teal-500);border-color:var(--edem-teal-500);color:#fff}
 .soc svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .fbase{border-top:1px solid rgba(255,255,255,.1)}
-.fbase .wrap{display:flex;justify-content:space-between;gap:18px;padding-top:18px;padding-bottom:20px;font-size:12px;color:var(--ink-400);flex-wrap:wrap}
+.fbase .wrap{display:flex;justify-content:space-between;gap:18px;padding-top:18px;padding-bottom:calc(20px + env(safe-area-inset-bottom));font-size:12px;color:var(--ink-400);flex-wrap:wrap}
 .fbase a{color:var(--ink-400);text-decoration:underline;text-underline-offset:2px}
 .fbase a:hover{color:var(--edem-teal-200)}
 
@@ -760,7 +760,7 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   .fgrid{grid-template-columns:1fr 1fr}
 }
 @media(max-width:680px){
-  .wrap{padding:0 20px}
+  .wrap{padding:0 20px;padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right))}
   .agrid{grid-template-columns:1fr}
   /* dos portadas por fila aunque el móvil sea estrecho: a una sola columna la
      cubierta a sangre se come la pantalla entera */
