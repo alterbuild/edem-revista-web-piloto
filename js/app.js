@@ -61,8 +61,8 @@ const DEFAULTS = {
   },
   ecosystem: [
     { name: 'EDEM', role: 'Formar', color: 'edem', url: 'https://edem.eu/', logo: 'assets/edem-logo-white.png', desc: 'Escuela de empresarios y directivos en Valencia. Grados, másteres y alta dirección con una regla: se aprende haciendo.', img: 'assets/img/eco-edem.jpg', alt: 'Fachada de EDEM en la Marina de València, con la grúa del puerto al lado', meta: 'Aquí se hace esta revista' },
-    { name: 'Lanzadera', role: 'Acelerar', color: 'lanzadera', url: 'https://lanzadera.es/', logo: 'assets/logo-lanzadera-white.svg', desc: 'La aceleradora que empuja startups desde el muelle de la Marina hasta el mercado. Su radar llena páginas de esta revista.', img: 'assets/img/eco-lanzadera.jpg', alt: 'Equipo de una startup trabajando en las oficinas de Lanzadera', meta: 'Sección «Radar Lanzadera»' },
-    { name: 'Angels', role: 'Invertir', color: 'angels', url: 'https://www.angelscapital.es/', logo: 'assets/logo-angels-white.svg', desc: 'La sociedad de inversión de Juan Roig. Capital y criterio para los líderes que eligen la opción difícil.', img: 'assets/img/eco-angels.jpg', alt: 'Público de inversores en el Investors Day de Angels', meta: 'Sección «Angels»' }
+    { name: 'Lanzadera', role: 'Acelerar', color: 'lanzadera', url: 'https://lanzadera.es/', logo: 'assets/logo-lanzadera-white.png', desc: 'La aceleradora que empuja startups desde el muelle de la Marina hasta el mercado. Su radar llena páginas de esta revista.', img: 'assets/img/eco-lanzadera.jpg', alt: 'Equipo de una startup trabajando en las oficinas de Lanzadera', meta: 'Sección «Radar Lanzadera»' },
+    { name: 'Angels', role: 'Invertir', color: 'angels', url: 'https://www.angelscapital.es/', logo: 'assets/logo-angels-white.png', desc: 'La sociedad de inversión de Juan Roig. Capital y criterio para los líderes que eligen la opción difícil.', img: 'assets/img/eco-angels.jpg', alt: 'Público de inversores en el Investors Day de Angels', meta: 'Sección «Angels»' }
   ],
   social: [
     { id: 'linkedin', label: 'LinkedIn', url: 'https://www.linkedin.com/school/edem-escuela-de-empresarios/' },
@@ -390,6 +390,15 @@ function renderFooter() {
 
 /* delegación: todo lo que abre el visor */
 document.addEventListener('click', e => {
+  // el logotipo vuelve al principio: el hero es sticky, así que un enlace a
+  // #ultima no mueve nada (para el navegador ya está en pantalla)
+  const top = e.target.closest('[data-top]');
+  if (top) {
+    e.preventDefault(); closeMenu();
+    scrollTo({ top: 0, behavior: REDUCED.matches ? 'auto' : 'smooth' });
+    if (window.showHeader) showHeader();
+    return;
+  }
   const v = e.target.closest('[data-visor]');
   if (v) { e.preventDefault(); openVisor(v.dataset.visor); return; }
   const slot = e.target.closest('.coverslot[data-mag]');
@@ -417,6 +426,7 @@ function setMenu(open) {
   if (window.lucide) lucide.createIcons();
   clearTimeout(scrimT);
   if (open) {
+    if (window.showHeader) showHeader();   // el panel cuelga de la cabecera
     mscrim.hidden = false;
     requestAnimationFrame(() => mscrim.classList.add('on'));   // dos frames: el velo entra con transición
   } else {
@@ -439,6 +449,40 @@ function onMQ(mq, fn) {
   else if (mq.addListener) mq.addListener(fn);
 }
 onMQ(matchMedia('(min-width:681px)'), e => { if (e.matches) closeMenu(); });
+
+/* ================= la cabecera se aparta al bajar =================
+   Bajando estorba —y en móvil se come 68px de pantalla justo cuando el hero
+   está clavado—; subiendo tiene que estar ahí al instante. Un rAF por frame y
+   una sola clase: nada que obligue a recalcular layout.
+   El menú abierto cuelga de la cabecera, así que mientras esté abierto se queda. */
+(function autoHideHeader() {
+  const head = document.querySelector('header.site');
+  if (!head) return;
+  const TOP = 90;        // arriba del todo siempre visible
+  const DEAD = 6;        // rebote inercial y temblores del trackpad: se ignoran
+  let lastY = Math.max(0, scrollY), hidden = false, ticking = false;
+
+  function set(on) { if (on !== hidden) { hidden = on; head.classList.toggle('hide', on); } }
+  // solo se esconde durante el hero, que es donde estorba de verdad (está
+  // clavado y ocupa la pantalla entera). Del kiosko al pie se queda fija.
+  function inHero() {
+    const k = $('kiosko');
+    return !k || k.getBoundingClientRect().top > head.offsetHeight;
+  }
+  function update() {
+    ticking = false;
+    const y = Math.max(0, scrollY), d = y - lastY;
+    if (y < TOP || mnav.classList.contains('open') || !inHero()) { lastY = y; set(false); return; }
+    if (Math.abs(d) < DEAD) return;
+    lastY = y;
+    set(d > 0);
+  }
+  addEventListener('scroll', () => {
+    if (!ticking) { ticking = true; requestAnimationFrame(update); }
+  }, { passive: true });
+  addEventListener('pageshow', () => { lastY = Math.max(0, scrollY); set(false); });
+  window.showHeader = () => { lastY = Math.max(0, scrollY); set(false); };
+}());
 
 /* ================= aparición al hacer scroll ================= */
 let revealIO = null;

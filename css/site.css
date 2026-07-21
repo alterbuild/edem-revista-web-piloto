@@ -54,7 +54,16 @@ button{font:inherit}
 .btn .lu{width:17px;height:17px;flex-shrink:0}
 
 /* ---------- cabecera ---------- */
-header.site{position:sticky;top:0;z-index:60;background:rgba(251,250,246,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--border-hair)}
+header.site{position:sticky;top:0;z-index:60;background:rgba(251,250,246,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--border-hair);
+  /* la vuelta es lenta y frenada: la cabecera se posa en vez de aparecer de golpe */
+  transition:transform .72s cubic-bezier(.19,.9,.24,1)}
+/* bajando se aparta de en medio (js/app.js pone .hide); subiendo vuelve.
+   Irse sí es rápido —cuanto antes deje sitio, mejor—, de ahí las dos duraciones:
+   la transición que manda es siempre la del estado al que se va.
+   El menú móvil cuelga de la cabecera, así que abierto la mantiene a la vista. */
+header.site.hide{transform:translateY(-100%);transition:transform .32s var(--ease-standard)}
+/* el salto por anclaje no deja el titular debajo de la cabecera */
+main>section[id],main>div>section[id]{scroll-margin-top:76px}
 .hbar{height:68px;display:flex;align-items:center;gap:26px}
 .brand{display:flex;align-items:baseline;gap:8px;flex-shrink:0}
 .brand img{height:22px;width:auto}
@@ -86,8 +95,7 @@ nav.main a:hover::after{transform:scaleX(1)}
 .mnav.open a:nth-child(3){transition-delay:.12s}
 .mnav.open a:nth-child(4){transition-delay:.16s}
 .mnav.open a:nth-child(5){transition-delay:.2s}
-.mnav.open a:nth-child(6){transition-delay:.24s}
-.mnav.open .mcta{transition-delay:.28s}
+.mnav.open .mcta{transition-delay:.24s}
 .mnav a .ic{width:19px;height:19px;flex-shrink:0;color:var(--edem-teal-500)}
 .mnav a .ch{width:17px;height:17px;margin-left:auto;color:var(--ink-300,#c3cdd2);transition:transform .2s var(--ease-out)}
 .mnav a:active{background:var(--edem-teal-50)}
@@ -643,7 +651,10 @@ nav.main a:hover::after{transform:scaleX(1)}
 .ehead .role{font-size:clamp(30px,3.6vw,50px);line-height:1;color:#fff;letter-spacing:-.02em}
 /* la iniciativa firma con su logotipo en blanco, no con el nombre escrito */
 .ecopy .elogoh{display:flex;align-items:center;margin:4px 0 2px}
-.ecopy .elogo{height:clamp(23px,2.3vw,33px);width:auto;max-width:min(100%,260px);object-fit:contain}
+/* Los tres logotipos van igualados por altura de caja, que en estos tres
+   ficheros coincide con la altura de las mayúsculas. El techo son 30px: el
+   original de Lanzadera mide 31px de alto y por encima de eso se emborrona. */
+.ecopy .elogo{height:clamp(22px,2.2vw,30px);width:auto;max-width:min(100%,270px);object-fit:contain}
 .ecopy .elogoh .disp{font-size:clamp(17px,1.5vw,20px);color:rgba(255,255,255,.92);line-height:1.05;
   letter-spacing:.14em;text-transform:uppercase;font-family:var(--font-display);font-weight:900}
 .ecopy .edesc{font-size:15px;line-height:1.65;color:rgba(255,255,255,.68);max-width:42ch}
@@ -679,6 +690,21 @@ nav.main a:hover::after{transform:scaleX(1)}
 #sub-msg.err{color:#ffb4a0}
 #suscribete .legal{font-size:11.5px;color:#7d97a0;margin-top:6px}
 #suscribete .legal a{color:#9fb8bf;text-decoration:underline}
+
+/* ---------- el pez ----------
+   Como en edem.eu: centrado y asomando por encima del canto del pie. La banda
+   prolonga el fondo de «Suscríbete» (así no hay costura) y el pez cuelga de
+   ella con un margen negativo; el z-index es lo que le deja pasar por delante
+   del fondo del pie, que en orden de documento se pinta después. */
+.pezband{position:relative;z-index:1;background:var(--surface-dark);
+  display:flex;justify-content:center;padding-top:8px;line-height:0}
+.pezband img{width:clamp(122px,17vw,162px);height:auto;margin-bottom:-22px;
+  filter:drop-shadow(0 12px 20px rgba(0,0,0,.45))}
+/* un halo muy tenue: el pez es azul petróleo y el pie también, sin esto se
+   confunde con el fondo justo en la juntura */
+.pezband::before{content:'';position:absolute;left:50%;bottom:-26px;transform:translateX(-50%);
+  width:min(420px,80%);height:150px;pointer-events:none;
+  background:radial-gradient(ellipse at center,rgba(63,166,196,.22),transparent 70%)}
 
 /* ---------- pie ---------- */
 footer.site{background:var(--ink-900);color:var(--ink-300)}
@@ -814,6 +840,14 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
 .brandbox.dark{background:var(--ink-900);border-color:var(--ink-900)}
 .brandbox .cap{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--text-faint)}
 .brandbox.dark .cap{color:var(--ink-300)}
+/* logotipos del ecosistema: se documentan tal y como se usan — en blanco, sobre
+   petróleo y con la misma altura de caja que en la sección Marina de Empresas */
+.ecologos{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;
+  margin-top:12px;background:rgba(255,255,255,.1);border-radius:12px;overflow:hidden}
+.ecologo{background:var(--ink-900);padding:34px 20px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:18px;text-align:center}
+.ecologo img{height:28px;width:auto;max-width:100%;object-fit:contain}
+.ecologo .cap{font-family:monospace;font-size:11px;color:var(--ink-400);word-break:break-all}
 .spacescale{display:flex;flex-direction:column;gap:9px}
 .spacescale .r{display:flex;align-items:center;gap:14px;font-size:12.5px;color:var(--text-muted);font-weight:600}
 .spacescale .nm{width:96px;flex-shrink:0;font-family:monospace}
@@ -893,8 +927,9 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   .nghost{font-size:clamp(190px,54vw,300px)}
   /* en móvil la ficha se parte: foto arriba, texto debajo, y se deja de apilar
      (tres tarjetas montadas no caben en alto sin comerse el texto) */
-  .econav{grid-template-columns:1fr;gap:0}
-  .econav a{border-bottom:1px solid rgba(255,255,255,.14)}
+  /* el índice del ecosistema sobra en móvil: sin el raíl clavado no navega nada
+     —las tres fichas van justo debajo— y repetía los nombres dos veces */
+  .econav{display:none}
   .epanel{position:static;margin-bottom:20px}
   .epanel-in{grid-template-columns:1fr}
   .ephoto{aspect-ratio:16/10}

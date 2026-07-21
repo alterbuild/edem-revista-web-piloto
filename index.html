@@ -15,10 +15,10 @@
 <link rel="apple-touch-icon" href="assets/edem-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="css/tokens.css?v=20260721e">
+<link rel="stylesheet" href="css/tokens.css?v=20260721l">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&display=swap">
-<link rel="stylesheet" href="css/site.css?v=20260721e">
-<script src="js/icons.js?v=20260721e" defer></script>
+<link rel="stylesheet" href="css/site.css?v=20260721l">
+<script src="js/icons.js?v=20260721l" defer></script>
 </head>
 <body>
 
@@ -26,9 +26,8 @@
 
 <header class="site">
   <div class="wrap hbar">
-    <a class="brand" href="#ultima" aria-label="EDEM Times — inicio"><img src="assets/edem-logo.png" alt="EDEM"><span class="t">times<span class="pt">.</span></span></a>
+    <a class="brand" href="#" data-top aria-label="EDEM Times — volver al inicio"><img src="assets/edem-logo.png" alt="EDEM"><span class="t">times<span class="pt">.</span></span></a>
     <nav class="main" aria-label="Principal">
-      <a href="#ultima">Última edición</a>
       <a href="#kiosko">Kiosko</a>
       <a href="#numero">En este número</a>
       <a href="#conocenos">Conócenos</a>
@@ -39,7 +38,6 @@
     <button class="menubtn" id="menubtn" aria-label="Abrir menú" aria-expanded="false" aria-controls="mnav"><i data-lucide="menu" class="lu"></i></button>
   </div>
   <nav class="mnav" id="mnav" aria-label="Menú móvil">
-    <a href="#ultima"><i data-lucide="newspaper" class="lu ic"></i><span>Última edición</span><i data-lucide="chevron-right" class="lu ch"></i></a>
     <a href="#kiosko"><i data-lucide="library" class="lu ic"></i><span>Kiosko</span><i data-lucide="chevron-right" class="lu ch"></i></a>
     <a href="#numero"><i data-lucide="list" class="lu ic"></i><span>En este número</span><i data-lucide="chevron-right" class="lu ch"></i></a>
     <a href="#conocenos"><i data-lucide="book-marked" class="lu ic"></i><span>Conócenos</span><i data-lucide="chevron-right" class="lu ch"></i></a>
@@ -206,6 +204,9 @@
 </section>
 </main>
 
+<!-- el pez de EDEM: asoma por encima del borde del pie, como en edem.eu -->
+<div class="pezband" aria-hidden="true"><img src="assets/pez-footer.png" alt="" width="162" height="65" loading="lazy" decoding="async"></div>
+
 <footer class="site">
   <div class="wrap fgrid">
     <div class="col">
@@ -275,6 +276,14 @@
     </div>
     <p class="disp-i" style="font-size:28px;color:var(--edem-teal-700);margin-top:24px">Empresarios formando a empresarios</p>
     <p style="font-size:15px;line-height:1.6;color:var(--text-muted);max-width:620px;margin-top:8px">Motivo náutico recurrente — remar, contracorriente, puerto, ancla. Único wordmark oficial aportado; no se ha redibujado ningún mark.</p>
+
+    <div class="dslabel">Logotipos del ecosistema · blanco sobre petróleo</div>
+    <div class="ecologos">
+      <div class="ecologo"><img src="assets/edem-logo-white.png" alt="EDEM"><span class="cap">edem-logo-white.png · 800×188</span></div>
+      <div class="ecologo"><img src="assets/logo-lanzadera-white.png" alt="Lanzadera"><span class="cap">logo-lanzadera-white.png · 246×31</span></div>
+      <div class="ecologo"><img src="assets/logo-angels-white.png" alt="Angels"><span class="cap">logo-angels-white.png · 320×50</span></div>
+    </div>
+    <p style="font-size:15px;line-height:1.6;color:var(--text-muted);max-width:660px;margin-top:14px">Los tres se usan <b>solo en blanco sobre fondo oscuro</b> y se igualan por altura de caja (28&nbsp;px en escritorio), que en estos ficheros coincide con la altura de las mayúsculas: pesan lo mismo aunque Lanzadera salga casi el doble de ancho. Ninguno se redibuja, se recolorea ni se estira. Originales de <a href="https://lanzadera.es/" target="_blank" rel="noopener">lanzadera.es</a> y <a href="https://www.angelscapital.es/" target="_blank" rel="noopener">angelscapital.es</a>; el de Lanzadera es el eslabón débil — a 28&nbsp;px va casi a escala 1:1, así que conviene sustituirlo en cuanto haya un SVG.</p>
   </section>
 
   <section class="dssec wrap">
@@ -405,6 +414,6 @@
   </div>
 </div>
 
-<script src="js/app.js?v=20260721e" defer></script>
+<script src="js/app.js?v=20260721l" defer></script>
 </body>
 </html>
