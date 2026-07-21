@@ -827,6 +827,7 @@ async function setIssue(id, pageIdx = 0) {
 window.openVisor = function (id, pageIdx = 0) {
   vReturnFocus = document.activeElement;
   visor.hidden = false; document.body.classList.add('lock');
+  if (window.syncBarTint) syncBarTint();
   closeMenu(); setIssue(id, pageIdx);
   lucide.createIcons();
   requestAnimationFrame(fitBook);
@@ -835,6 +836,7 @@ window.openVisor = function (id, pageIdx = 0) {
 window.closeVisor = function () {
   if (fsEl()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
   visor.hidden = true; document.body.classList.remove('lock');
+  if (window.syncBarTint) syncBarTint();
   if (vReturnFocus) vReturnFocus.focus();
 };
 
@@ -955,3 +957,60 @@ async function boot() {
   mountCovers();
 }
 boot();
+
+/* ============ theme-color dinámico (barra flotante de Safari iOS) ============
+   Safari muestrea la página UNA vez al cargar para teñir su barra inferior y no
+   lo refresca al hacer scroll: entrando por arriba se quedaba el azul de las
+   olas (#91cede) clavado toda la visita, incluso sobre las secciones oscuras.
+   Publicamos el color nosotros: un <meta name="theme-color"> que sigue a la
+   sección que toca el borde inferior del viewport, que es donde vive la barra.
+   Safari (iOS 15+) y Chrome Android animan solos cada cambio del meta. */
+(function barTint() {
+  const meta = document.createElement('meta');
+  meta.name = 'theme-color';
+  document.head.appendChild(meta);
+
+  const rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const mix = (a, b, t) => '#' + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, '0')).join('');
+
+  const SURF = rgb('#91cede'), DEEP = rgb('#052635');   // agua de las olas → fondo de la inmersión (.deepTint)
+  const KTOP = rgb('#062737'), KBOT = rgb('#17708a');   // extremos del gradiente del kiosko
+  const PAPER = '#fbfaf6';
+
+  const hero = document.querySelector('#heroPin .hero');
+  // secciones con fondo propio bajo el hero, en orden de documento; el color
+  // null del kiosko se interpola sobre su gradiente según la posición.
+  const zones = [['kiosko', null], ['numero', PAPER], ['ecosistema', '#0e2129'], ['suscribete', PAPER]]
+    .map(([id, color]) => ({ el: $(id), color }))
+    .filter(z => z.el);
+  const foot = document.querySelector('footer.site');
+  if (foot) zones.push({ el: foot, color: '#0c1e24' });
+
+  let cur = '', ticking = false;
+  function apply() {
+    ticking = false;
+    let c;
+    if (visor && !visor.hidden) c = '#0b1c23';          // fondo del visor
+    else {
+      const y = scrollY + innerHeight;                  // borde inferior del viewport
+      for (let i = zones.length - 1; i >= 0; i--) {
+        const r = zones[i].el.getBoundingClientRect(), top = r.top + scrollY;
+        if (y >= top) {
+          c = zones[i].color || mix(KTOP, KBOT, Math.min(1, (y - top) / Math.max(1, r.height)));
+          break;
+        }
+      }
+      if (!c) {                                         // aún en el hero: según baja la inmersión
+        const deepP = hero ? parseFloat(hero.style.getPropertyValue('--deepP')) || 0 : 0;
+        c = mix(SURF, DEEP, deepP);
+      }
+    }
+    if (c !== cur) { cur = c; meta.content = c; }
+  }
+  const kick = () => { if (!ticking) { ticking = true; requestAnimationFrame(apply); } };
+  window.syncBarTint = kick;
+  addEventListener('scroll', kick, { passive: true });
+  addEventListener('resize', kick, { passive: true });
+  addEventListener('load', kick);
+  apply();
+}());
