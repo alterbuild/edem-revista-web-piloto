@@ -15,10 +15,10 @@
 <link rel="apple-touch-icon" href="assets/edem-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="css/tokens.css?v=20260721d">
+<link rel="stylesheet" href="css/tokens.css?v=20260721e">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&display=swap">
-<link rel="stylesheet" href="css/site.css?v=20260721d">
-<script src="js/icons.js?v=20260721d" defer></script>
+<link rel="stylesheet" href="css/site.css?v=20260721e">
+<script src="js/icons.js?v=20260721e" defer></script>
 </head>
 <body>
 
@@ -26,24 +26,26 @@
 
 <header class="site">
   <div class="wrap hbar">
-    <a class="brand" href="#ultima" aria-label="EDEM Times — inicio"><img src="assets/edem-logo.png" alt="EDEM"><span class="t">times</span></a>
+    <a class="brand" href="#ultima" aria-label="EDEM Times — inicio"><img src="assets/edem-logo.png" alt="EDEM"><span class="t">times<span class="pt">.</span></span></a>
     <nav class="main" aria-label="Principal">
       <a href="#ultima">Última edición</a>
       <a href="#kiosko">Kiosko</a>
       <a href="#numero">En este número</a>
+      <a href="#conocenos">Conócenos</a>
       <a href="#ecosistema">Ecosistema</a>
       <a href="#suscribete">Suscríbete</a>
     </nav>
-    <button class="btn pri cta" data-open-visor><i data-lucide="book-open" class="lu"></i> Abrir el visor</button>
+    <button class="btn pri cta" data-open-visor><i data-lucide="book-open" class="lu"></i> Leer</button>
     <button class="menubtn" id="menubtn" aria-label="Abrir menú" aria-expanded="false" aria-controls="mnav"><i data-lucide="menu" class="lu"></i></button>
   </div>
   <nav class="mnav" id="mnav" aria-label="Menú móvil">
     <a href="#ultima"><i data-lucide="newspaper" class="lu ic"></i><span>Última edición</span><i data-lucide="chevron-right" class="lu ch"></i></a>
     <a href="#kiosko"><i data-lucide="library" class="lu ic"></i><span>Kiosko</span><i data-lucide="chevron-right" class="lu ch"></i></a>
     <a href="#numero"><i data-lucide="list" class="lu ic"></i><span>En este número</span><i data-lucide="chevron-right" class="lu ch"></i></a>
+    <a href="#conocenos"><i data-lucide="book-marked" class="lu ic"></i><span>Conócenos</span><i data-lucide="chevron-right" class="lu ch"></i></a>
     <a href="#ecosistema"><i data-lucide="waypoints" class="lu ic"></i><span>Ecosistema</span><i data-lucide="chevron-right" class="lu ch"></i></a>
     <a href="#suscribete"><i data-lucide="mail" class="lu ic"></i><span>Suscríbete</span><i data-lucide="chevron-right" class="lu ch"></i></a>
-    <button class="btn pri mcta" data-open-visor><i data-lucide="book-open" class="lu"></i> Abrir el visor</button>
+    <button class="btn pri mcta" data-open-visor><i data-lucide="book-open" class="lu"></i> Leer</button>
   </nav>
 </header>
 <div class="mscrim" id="mscrim" hidden></div>
@@ -99,22 +101,10 @@
       <p class="bs">Lo que de verdad pasa en las aulas, contado por quien las llena.</p>
     </div>
 
-    <div class="beat" data-beat>
-      <span class="kicker over dk">Quién la hace</span>
-      <p class="bl disp">Escrito por<br>alumnos<span class="pt">.</span></p>
-      <p class="bs">Y la editan alumnos. Para los que vienen detrás.</p>
-    </div>
-
-    <div class="beat" data-beat>
-      <p class="bl disp big">Se aprende<br>haciendo<span class="pt">.</span></p>
-      <p class="bs">Esta revista también.</p>
-    </div>
-
     <div class="beat beat-cta" data-beat>
-      <p class="bl disp">Ahora te toca a ti<span class="pt">.</span></p>
-      <span class="brand ctabrand" aria-label="EDEM Times"><img src="assets/edem-logo-white.png" alt="EDEM"><span class="t">times</span></span>
+      <span class="brand ctabrand" aria-label="EDEM Times"><img src="assets/edem-logo-white.png" alt="EDEM"><span class="t">times<span class="pt">.</span></span></span>
       <div class="acts">
-        <button class="btn pri" data-open-visor tabindex="-1"><i data-lucide="book-open" class="lu"></i> Abrir el visor</button>
+        <button class="btn pri" data-open-visor tabindex="-1"><i data-lucide="book-open" class="lu"></i> Leer</button>
         <a class="btn ghost lt" href="#kiosko" tabindex="-1"><i data-lucide="library" class="lu"></i> Ver el kiosko</a>
       </div>
     </div>
@@ -149,6 +139,31 @@
       <a class="more" href="#" data-open-visor>Leer completo →</a>
     </div>
     <div class="agrid" id="agrid"></div>
+  </div>
+</section>
+
+<!-- CONÓCENOS · la invitación a hacer la revista -->
+<!-- La sección se clava (.jstage sticky) mientras el scroll va encendiendo
+     una a una las formas de participar. Contenido en data/content.json → join. -->
+<section id="conocenos">
+  <div class="jstage">
+    <div class="jbg" aria-hidden="true">
+      <span class="jblob j1"></span><span class="jblob j2"></span><span class="jblob j3"></span>
+      <span class="jmesh"></span><span class="jdots"></span>
+    </div>
+    <div class="wrap jwrap">
+      <div class="jcopy">
+        <span class="kicker over jkick"><span class="dot"></span><span id="join-kicker">Conócenos</span></span>
+        <h2 class="disp jtitle" id="join-title"></h2>
+        <p class="jlead" id="join-lead"></p>
+        <div class="jacts" id="join-acts"></div>
+      </div>
+      <div class="jright">
+        <ol class="jroles" id="jroles"></ol>
+        <div class="jprog" aria-hidden="true"><span id="jbar"></span></div>
+      </div>
+    </div>
+    <div class="jticker" aria-hidden="true"><div class="jtrack" id="jtrack"></div></div>
   </div>
 </section>
 
@@ -227,7 +242,7 @@
 <div id="ds" class="dspage" role="dialog" aria-modal="true" aria-label="Sistema de diseño" hidden>
   <div class="dsbar">
     <div class="wrap">
-      <span class="brand"><img src="assets/edem-logo.png" alt="EDEM"><span class="t">times</span></span>
+      <span class="brand"><img src="assets/edem-logo.png" alt="EDEM"><span class="t">times<span class="pt">.</span></span></span>
       <span class="over" style="color:var(--text-faint)">Sistema de diseño</span>
       <button class="dsclose" id="ds-close" onclick="closeDS()" title="Volver (Esc)" aria-label="Cerrar sistema de diseño"><i data-lucide="x" class="lu"></i></button>
     </div>
@@ -390,6 +405,6 @@
   </div>
 </div>
 
-<script src="js/app.js?v=20260721d" defer></script>
+<script src="js/app.js?v=20260721e" defer></script>
 </body>
 </html>

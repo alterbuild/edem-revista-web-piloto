@@ -45,10 +45,24 @@ const DEFAULTS = {
     { issue: 'n2', color: 'lanzadera', cat: 'Radar Lanzadera', title: '3 startups de Lanzadera rompiendo moldes', excerpt: 'Del muelle al mercado global: las apuestas del último cohorte que ya mueven el Mediterráneo.', page: 12, img: 'assets/img/intro-grados.jpg' },
     { issue: 'n2', color: 'angels', cat: 'Angels', title: 'Los secretos de Angels para medir el éxito', excerpt: 'Las métricas que un inversor mira antes que cualquier promesa — y las que ignora por completo.', page: 14, img: 'assets/img/campus-talento.jpg' }
   ],
+  join: {
+    kicker: 'Conócenos',
+    titleHtml: 'La revista<br>la haces tú<span class="pt">.</span>',
+    lead: 'EDEM Times la escriben, la fotografían y la maquetan alumnos de EDEM. No hace falta experiencia previa: hace falta tener ganas de contar lo que pasa aquí dentro. Cada edición abre la redacción — y siempre queda sitio.',
+    note: 'Redacción abierta a todos los grados y másteres',
+    cta: { label: 'Quiero participar', url: 'mailto:comunicacion@edem.es?subject=Quiero%20participar%20en%20EDEM%20Times' },
+    roles: [
+      { t: 'Escribe', d: 'Crónicas, entrevistas, columnas y hasta los pasatiempos. Si tienes algo que contar, tienes página.' },
+      { t: 'Fotografía', d: 'El campus, la Marina, los eventos. Una buena foto abre sección y se queda en el papel.' },
+      { t: 'Diseña', d: 'Maqueta, ilustra, inventa portadas. El papel admite cualquier idea que aguante la imprenta.' },
+      { t: 'Edita', d: 'Cierra temas, corrige, decide el sumario. Se aprende haciendo — y aquí se hace una revista de verdad.' }
+    ],
+    ticker: ['Escribe', 'Fotografía', 'Diseña', 'Edita', 'Difunde', 'Entrevista', 'Propón']
+  },
   ecosystem: [
-    { name: 'EDEM', role: 'Formar', color: 'edem', url: 'https://edem.eu/', desc: 'Escuela de empresarios y directivos en Valencia. Grados, másteres y alta dirección con una regla: se aprende haciendo.', img: 'assets/img/eco-edem.jpg', alt: 'Fachada de EDEM en la Marina de València, con la grúa del puerto al lado', meta: 'Aquí se hace esta revista' },
-    { name: 'Lanzadera', role: 'Acelerar', color: 'lanzadera', url: 'https://lanzadera.es/', desc: 'La aceleradora que empuja startups desde el muelle de la Marina hasta el mercado. Su radar llena páginas de esta revista.', img: 'assets/img/eco-lanzadera.jpg', alt: 'Equipo de una startup trabajando en las oficinas de Lanzadera', meta: 'Sección «Radar Lanzadera»' },
-    { name: 'Angels', role: 'Invertir', color: 'angels', url: 'https://www.angelscapital.es/', desc: 'La sociedad de inversión de Juan Roig. Capital y criterio para los líderes que eligen la opción difícil.', img: 'assets/img/eco-angels.jpg', alt: 'Público de inversores en el Investors Day de Angels', meta: 'Sección «Angels»' }
+    { name: 'EDEM', role: 'Formar', color: 'edem', url: 'https://edem.eu/', logo: 'assets/edem-logo-white.png', desc: 'Escuela de empresarios y directivos en Valencia. Grados, másteres y alta dirección con una regla: se aprende haciendo.', img: 'assets/img/eco-edem.jpg', alt: 'Fachada de EDEM en la Marina de València, con la grúa del puerto al lado', meta: 'Aquí se hace esta revista' },
+    { name: 'Lanzadera', role: 'Acelerar', color: 'lanzadera', url: 'https://lanzadera.es/', logo: 'assets/logo-lanzadera-white.svg', desc: 'La aceleradora que empuja startups desde el muelle de la Marina hasta el mercado. Su radar llena páginas de esta revista.', img: 'assets/img/eco-lanzadera.jpg', alt: 'Equipo de una startup trabajando en las oficinas de Lanzadera', meta: 'Sección «Radar Lanzadera»' },
+    { name: 'Angels', role: 'Invertir', color: 'angels', url: 'https://www.angelscapital.es/', logo: 'assets/logo-angels-white.svg', desc: 'La sociedad de inversión de Juan Roig. Capital y criterio para los líderes que eligen la opción difícil.', img: 'assets/img/eco-angels.jpg', alt: 'Público de inversores en el Investors Day de Angels', meta: 'Sección «Angels»' }
   ],
   social: [
     { id: 'linkedin', label: 'LinkedIn', url: 'https://www.linkedin.com/school/edem-escuela-de-empresarios/' },
@@ -195,6 +209,86 @@ function renderArticles() {
     '<div class="afoot"><span class="go">Leer en el visor <i data-lucide="arrow-right" class="lu" style="width:15px;height:15px"></i></span><span class="pnum">pág. ' + String(a.page).padStart(2, '0') + '</span></div></div></article>').join('');
 }
 
+/* ---------- Conócenos: la invitación a hacer la revista ----------
+   La sección se clava (.jstage sticky) y el scroll va encendiendo las formas de
+   participar, una a una, mientras la barra de la derecha marca el recorrido.
+   Mismo patrón de rendimiento que el resto de efectos: un rAF por frame y solo
+   clases y transform — nada que obligue a recalcular layout. */
+function renderJoin() {
+  const j = C.join || DEFAULTS.join;
+  $('join-kicker').textContent = j.kicker || 'Conócenos';
+  $('join-title').innerHTML = j.titleHtml || '';
+  $('join-lead').textContent = j.lead || '';
+  const cta = j.cta || {};
+  $('join-acts').innerHTML =
+    (cta.url ? '<a class="btn pri" href="' + esc(cta.url) + '"><i data-lucide="mail" class="lu"></i> ' + esc(cta.label || 'Quiero participar') + '</a>' : '') +
+    '<button class="btn ghost lt" data-open-visor><i data-lucide="book-open" class="lu"></i> Leer</button>' +
+    (j.note ? '<span class="jnote">' + esc(j.note) + '</span>' : '');
+  $('jroles').innerHTML = (j.roles || []).map((r, i) =>
+    '<li><button class="jrole" type="button" data-jrole="' + i + '" aria-expanded="false">' +
+    '<span class="jn">' + String(i + 1).padStart(2, '0') + '</span>' +
+    '<span class="jt disp">' + esc(r.t) + '</span>' +
+    '<span class="jd"><span>' + esc(r.d) + '</span></span></button></li>').join('');
+  // el rótulo del pie va dos veces: así el bucle del carrusel no tiene costura
+  const words = (j.ticker && j.ticker.length ? j.ticker : (j.roles || []).map(r => r.t));
+  const strip = words.map(w => '<span>' + esc(w) + '</span>').join('');
+  $('jtrack').innerHTML = strip + strip;
+  observeJoin();
+}
+
+let joinBound = false, joinCards = [], joinCur = -1, joinTick = false, joinLock = 0;
+const JOIN_FLAT = matchMedia('(max-width:1020px)');
+// en móvil (y con movimiento reducido) no hay clavado: se abren todas
+const joinFlat = () => REDUCED.matches || JOIN_FLAT.matches;
+
+function setJoinRole(i) {
+  if (i === joinCur) return;
+  joinCur = i;
+  joinCards.forEach((b, k) => {
+    const on = k === i;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-expanded', String(on));
+  });
+}
+
+function joinMeasure() {
+  joinTick = false;
+  const sec = $('conocenos'), stage = sec && sec.querySelector('.jstage');
+  if (!sec || !stage || !joinCards.length) return;
+  if (joinFlat()) {
+    joinCur = -1;
+    joinCards.forEach(b => { b.classList.add('on'); b.setAttribute('aria-expanded', 'true'); });
+    return;
+  }
+  const box = sec.getBoundingClientRect();
+  if (box.bottom < 0 || box.top > innerHeight) return;
+  const range = Math.max(1, sec.offsetHeight - stage.offsetHeight);
+  const p = Math.min(1, Math.max(0, -box.top / range));
+  const bar = $('jbar');
+  if (bar) bar.style.transform = 'scaleY(' + (0.05 + p * 0.95).toFixed(3) + ')';
+  if (Date.now() < joinLock) return;                 // un clic reciente manda sobre el scroll
+  setJoinRole(Math.min(joinCards.length - 1, Math.floor(p * joinCards.length)));
+}
+
+function observeJoin() {
+  joinCards = [...document.querySelectorAll('[data-jrole]')];
+  joinCur = -1;
+  if (!joinCards.length) return;
+  joinMeasure();
+  if (joinBound) return;
+  joinBound = true;
+  const kick = () => { if (!joinTick) { joinTick = true; requestAnimationFrame(joinMeasure); } };
+  addEventListener('scroll', kick, { passive: true });
+  addEventListener('resize', kick, { passive: true });
+  onMQ(JOIN_FLAT, () => { joinCur = -1; joinMeasure(); });
+  $('jroles').addEventListener('click', e => {
+    const b = e.target.closest('[data-jrole]');
+    if (!b || joinFlat()) return;
+    joinLock = Date.now() + 2600;
+    setJoinRole(+b.dataset.jrole);
+  });
+}
+
 /* Tríptico apilado: cada ficha es sticky y se queda clavada mientras la
    siguiente sube a taparla, dejando asomar el borde superior de la anterior
    (de ahí el desfase por --i). El raíl de la izquierda marca la activa. */
@@ -206,7 +300,10 @@ function renderEcosystem() {
     '<div class="ecopy">' +
     '<div class="ehead"><span class="eidx">' + String(i + 1).padStart(2, '0') + '</span>' +
     '<span class="role disp">' + esc(e.role) + '</span></div>' +
-    '<h3 class="disp">' + esc(e.name) + '</h3>' +
+    // la marca se firma con su logotipo en blanco, no con el nombre escrito
+    '<h3 class="elogoh">' + (e.logo
+      ? '<img class="elogo" src="' + esc(e.logo) + '" alt="' + esc(e.name) + '" loading="lazy" decoding="async">'
+      : '<span class="disp">' + esc(e.name) + '</span>') + '</h3>' +
     '<p class="edesc">' + esc(e.desc) + '</p>' +
     (e.meta ? '<p class="emeta">' + esc(e.meta) + '</p>' : '') +
     '<a class="elink" href="' + esc(e.url) + '" target="_blank" rel="noopener">Visitar ' + esc(e.name) + ' <i data-lucide="arrow-up-right" class="lu"></i></a>' +
@@ -216,7 +313,9 @@ function renderEcosystem() {
     '<li><a href="#eco-' + i + '" style="--acc:' + color(e.color) + '" data-econav="' + i + '">' +
     '<span class="n">' + String(i + 1).padStart(2, '0') + '</span>' +
     '<span class="v">' + esc(e.role) + '</span>' +
-    '<span class="b">' + esc(e.name) + '</span></a></li>').join('');
+    '<span class="b">' + (e.logo
+      ? '<img class="enavlogo" src="' + esc(e.logo) + '" alt="' + esc(e.name) + '" loading="lazy" decoding="async">'
+      : esc(e.name)) + '</span></a></li>').join('');
 
   observeEcosystem();
 }
@@ -937,7 +1036,7 @@ window.addEventListener('resize', () => { if (!visor.hidden) applyMode(); });
 
 /* ================= arranque ================= */
 function renderAll() {
-  renderHero(); renderKiosko(); renderArticles(); renderEcosystem(); renderFooter();
+  renderHero(); renderKiosko(); renderArticles(); renderJoin(); renderEcosystem(); renderFooter();
   $('v-issues').innerHTML = MAGS.map(m => '<button class="vchip" role="tab" data-id="' + m.id + '" data-visor-issue="' + m.id + '">' + esc(m.chip) + '</button>').join('');
   $('v-issues').onclick = e => { const c = e.target.closest('[data-visor-issue]'); if (c) setIssue(c.dataset.visorIssue, 0); };
   lucide.createIcons();
@@ -994,7 +1093,7 @@ boot();
   const hero = document.querySelector('#heroPin .hero');
   // secciones con fondo propio bajo el hero, en orden de documento; el color
   // null del kiosko se interpola sobre su gradiente según la posición.
-  const zones = [['kiosko', null], ['numero', PAPER], ['ecosistema', '#0e2129'], ['suscribete', PAPER]]
+  const zones = [['kiosko', null], ['numero', PAPER], ['conocenos', '#0e2129'], ['ecosistema', '#0e2129'], ['suscribete', PAPER]]
     .map(([id, color]) => ({ el: $(id), color }))
     .filter(z => z.el);
   const foot = document.querySelector('footer.site');

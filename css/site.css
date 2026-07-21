@@ -59,6 +59,8 @@ header.site{position:sticky;top:0;z-index:60;background:rgba(251,250,246,.92);ba
 .brand{display:flex;align-items:baseline;gap:8px;flex-shrink:0}
 .brand img{height:22px;width:auto}
 .brand .t{font-family:var(--font-display);font-style:italic;font-weight:600;font-size:24px;color:var(--text-strong);line-height:1}
+/* el punto azul cierra el logotipo, como en los titulares de la revista */
+.brand .t .pt{font-style:normal;color:var(--edem-teal-500)}
 nav.main{display:flex;gap:26px;font-size:14px;font-weight:600}
 nav.main a{color:var(--ink-600);position:relative;padding:24px 0}
 nav.main a::after{content:'';position:absolute;left:0;right:0;bottom:16px;height:2px;background:var(--edem-teal-500);transform:scaleX(0);transform-origin:left;transition:transform var(--dur) var(--ease-standard)}
@@ -84,7 +86,8 @@ nav.main a:hover::after{transform:scaleX(1)}
 .mnav.open a:nth-child(3){transition-delay:.12s}
 .mnav.open a:nth-child(4){transition-delay:.16s}
 .mnav.open a:nth-child(5){transition-delay:.2s}
-.mnav.open .mcta{transition-delay:.24s}
+.mnav.open a:nth-child(6){transition-delay:.24s}
+.mnav.open .mcta{transition-delay:.28s}
 .mnav a .ic{width:19px;height:19px;flex-shrink:0;color:var(--edem-teal-500)}
 .mnav a .ch{width:17px;height:17px;margin-left:auto;color:var(--ink-300,#c3cdd2);transition:transform .2s var(--ease-out)}
 .mnav a:active{background:var(--edem-teal-50)}
@@ -101,7 +104,9 @@ nav.main a:hover::after{transform:scaleX(1)}
 
 /* ---------- hero ---------- */
 /* El hero se «clava» mientras dura .heroPin; el mar sube con --seaP (0→1, lo fija js/app.js). */
-.heroPin{position:relative;height:760vh}
+/* el alto reparte el recorrido: ~1 pantalla para que suba el mar y otro tanto
+   por cada «beat» del relato (ahora dos) */
+.heroPin{position:relative;height:480vh}
 /* --heroH: alto real de la pantalla, reutilizado por el mar para su recorrido.
    --seaP y --deepP se declaran AQUÍ, no en :root: js/app.js las reescribe en
    cada frame y una custom property en :root invalida el estilo de todo el
@@ -250,10 +255,12 @@ nav.main a:hover::after{transform:scaleX(1)}
 .beat .bl.big{font-size:clamp(44px,8.4vw,118px)}
 .beat .bl .pt{color:var(--edem-teal-300,#7fd3e6)}
 .beat .bs{margin:22px auto 0;max-width:620px;font-size:clamp(15px,1.7vw,20px);line-height:1.6;color:rgba(255,255,255,.74)}
-.beat-cta .ctabrand{display:inline-flex;justify-content:center;margin-top:clamp(18px,2.4vw,34px);gap:clamp(8px,1vw,16px)}
-.beat-cta .ctabrand img{height:clamp(26px,3.4vw,50px)}
-.beat-cta .ctabrand .t{color:#fff;font-size:clamp(28px,3.7vw,54px)}
-.beat-cta .acts{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:34px;pointer-events:auto}
+/* el último beat es solo el logotipo, a tamaño de titular, y las acciones */
+.beat-cta .ctabrand{display:inline-flex;justify-content:center;gap:clamp(12px,1.4vw,26px)}
+.beat-cta .ctabrand img{height:clamp(42px,6.6vw,96px)}
+.beat-cta .ctabrand .t{color:#fff;font-size:clamp(46px,7.2vw,106px)}
+.beat-cta .ctabrand .t .pt{color:var(--edem-teal-300,#7fd3e6)}
+.beat-cta .acts{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:clamp(30px,4vw,52px);pointer-events:auto}
 .btn.ghost.lt{color:#fff;border:1.5px solid rgba(255,255,255,.34)}
 .btn.ghost.lt:hover{background:rgba(255,255,255,.14);color:#fff}
 
@@ -449,6 +456,89 @@ nav.main a:hover::after{transform:scaleX(1)}
 .acard:hover .afoot .go{gap:11px}
 .afoot .pnum{margin-left:auto;color:var(--text-faint);font-weight:600}
 
+/* ---------- Conócenos ----------
+   La llamada a la redacción. Es la sección más viva de la página: fondo de
+   color en movimiento (teal · Lanzadera · Angels) y un escenario que se queda
+   clavado mientras el scroll enciende, una a una, las formas de participar.
+   Acaba exactamente en #0e2129, el fondo del ecosistema, para que las dos
+   secciones oscuras parezcan una sola pieza. */
+#conocenos{position:relative;height:340vh;background:#0e2129}
+.jstage{position:sticky;top:0;height:100svh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;
+  background:linear-gradient(168deg,#07303f 0%,#0d5470 44%,#123a49 78%,#0e2129 100%);color:#fff}
+.jbg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.jblob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.5;animation:drift 21s ease-in-out infinite alternate}
+.jblob.j1{width:620px;height:620px;left:-12%;top:-20%;background:radial-gradient(circle,rgba(63,166,196,.85),transparent 68%)}
+.jblob.j2{width:560px;height:560px;right:-10%;top:12%;background:radial-gradient(circle,rgba(232,80,45,.62),transparent 68%);animation-duration:27s;animation-delay:-8s}
+.jblob.j3{width:520px;height:520px;left:24%;bottom:-28%;background:radial-gradient(circle,rgba(59,58,122,.8),transparent 70%);animation-duration:17s;animation-delay:-4s}
+.jmesh{position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.055) 1px,transparent 1px);
+  background-size:72px 72px;
+  -webkit-mask-image:radial-gradient(120% 85% at 18% 0,#000,transparent 76%);
+  mask-image:radial-gradient(120% 85% at 18% 0,#000,transparent 76%)}
+.jdots{position:absolute;right:5%;bottom:16%;width:min(28vw,320px);height:250px;
+  background-image:radial-gradient(rgba(255,255,255,.32) 1.4px,transparent 1.5px);background-size:18px 18px;opacity:.5;
+  -webkit-mask-image:radial-gradient(closest-side,#000,transparent);mask-image:radial-gradient(closest-side,#000,transparent)}
+
+.jwrap{position:relative;z-index:1;width:100%;display:grid;grid-template-columns:1.02fr .98fr;
+  gap:clamp(30px,5vw,72px);align-items:center;padding-top:56px;padding-bottom:96px}
+.jkick{color:var(--edem-teal-200)}
+.jtitle{font-size:clamp(40px,6.2vw,88px);line-height:.92;color:#fff;margin-top:18px}
+.jtitle .pt{color:var(--lanzadera)}
+.jlead{margin-top:20px;font-size:16.5px;line-height:1.7;color:rgba(255,255,255,.76);max-width:46ch}
+.jacts{display:flex;align-items:center;gap:14px;margin-top:30px;flex-wrap:wrap}
+.jnote{flex-basis:100%;font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:rgba(255,255,255,.46)}
+
+.jright{display:grid;grid-template-columns:1fr 3px;gap:20px;align-items:stretch}
+.jroles{list-style:none;display:flex;flex-direction:column;gap:10px}
+/* cada forma de participar: cerrada es solo el verbo; al encenderse se abre y
+   se tiñe del naranja de la Marina */
+.jrole{position:relative;display:block;width:100%;text-align:left;cursor:pointer;
+  padding:16px 22px 17px 60px;color:#fff;border-radius:var(--radius-lg);
+  background:linear-gradient(100deg,rgba(255,255,255,.07),rgba(255,255,255,.028));
+  border:1px solid rgba(255,255,255,.14);overflow:hidden;
+  transition:background .5s var(--ease-standard),border-color .5s var(--ease-standard)}
+.jrole::before{content:'';position:absolute;left:0;top:12px;bottom:12px;width:3px;background:var(--lanzadera);
+  transform:scaleY(0);transform-origin:top;transition:transform .5s var(--ease-standard)}
+.jrole .jn{position:absolute;left:22px;top:22px;font-family:var(--font-display);font-weight:900;font-size:12.5px;
+  letter-spacing:.06em;color:rgba(255,255,255,.4);transition:color .5s var(--ease-standard)}
+.jrole .jt{display:block;font-size:clamp(23px,2.5vw,34px);line-height:1.04;letter-spacing:-.02em;
+  color:rgba(255,255,255,.6);transition:color .5s var(--ease-standard)}
+.jrole .jd{display:block;max-height:0;opacity:0;overflow:hidden;
+  transition:max-height .55s var(--ease-standard),opacity .4s var(--ease-standard)}
+.jrole .jd>span{display:block;padding-top:11px;font-size:14.5px;line-height:1.6;color:rgba(255,255,255,.74);max-width:46ch}
+.jrole:hover{border-color:rgba(255,255,255,.3)}
+.jrole.on{background:linear-gradient(100deg,rgba(232,80,45,.24),rgba(255,255,255,.05) 62%);border-color:rgba(255,255,255,.36)}
+.jrole.on::before{transform:scaleY(1)}
+.jrole.on .jn{color:var(--lanzadera)}
+.jrole.on .jt{color:#fff}
+.jrole.on .jd{max-height:220px;opacity:1}
+.jprog{position:relative;border-radius:var(--radius-pill);background:rgba(255,255,255,.14);overflow:hidden}
+.jprog span{position:absolute;inset:0;border-radius:var(--radius-pill);transform:scaleY(.05);transform-origin:top;
+  background:linear-gradient(180deg,var(--edem-teal-300,#7fd3e6),var(--lanzadera))}
+
+/* rótulo continuo al pie: los verbos de la redacción pasando en bucle */
+.jticker{position:absolute;left:0;right:0;bottom:0;z-index:1;padding:15px 0;
+  border-top:1px solid rgba(255,255,255,.12);background:rgba(6,28,38,.28);overflow:hidden;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+.jtrack{display:flex;width:max-content;animation:jslide 30s linear infinite}
+.jtrack span{font-family:var(--font-display);font-weight:900;letter-spacing:-.01em;white-space:nowrap;
+  font-size:clamp(20px,2.6vw,34px);padding-left:26px;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.42)}
+.jtrack span::after{content:'·';margin-left:26px;color:var(--lanzadera);-webkit-text-stroke:0}
+@keyframes jslide{to{transform:translate3d(-50%,0,0)}}
+
+/* sin clavado con movimiento reducido: la sección se lee de una vez */
+@media (prefers-reduced-motion:reduce){
+  #conocenos{height:auto}
+  .jstage{position:static;height:auto;padding:70px 0 0}
+  .jwrap{padding-bottom:40px}
+  .jrole .jd{max-height:none;opacity:1}
+  .jticker{position:relative;margin-top:36px}
+  .jprog{display:none}
+  .jright{grid-template-columns:1fr}
+}
+
 /* ---------- ecosistema ---------- */
 /* La Marina: tríptico oscuro. Cada iniciativa manda con su color de marca
    (--acc lo pone el render) y se presenta con su verbo en grande.
@@ -497,6 +587,9 @@ nav.main a:hover::after{transform:scaleX(1)}
 .econav .n{font-family:var(--font-display);font-weight:900;font-size:12px;letter-spacing:.06em}
 .econav .v{font-family:var(--font-display);font-weight:900;font-size:clamp(19px,2vw,24px);line-height:1;letter-spacing:-.01em}
 .econav .b{grid-column:2;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;opacity:.72}
+.econav .enavlogo{height:14px;width:auto;max-width:130px;object-fit:contain;object-position:left center;
+  opacity:.72;transition:opacity var(--dur) var(--ease-standard)}
+.econav a.on .enavlogo{opacity:1}
 .econav a:hover{color:rgba(255,255,255,.82)}
 .econav a.on{color:#fff;padding-left:22px}
 .econav a.on::before{transform:scaleY(1)}
@@ -548,7 +641,10 @@ nav.main a:hover::after{transform:scaleX(1)}
 .ehead{display:flex;align-items:baseline;gap:14px}
 .eidx{font-family:var(--font-display);font-weight:900;font-size:15px;color:var(--accText);letter-spacing:.04em}
 .ehead .role{font-size:clamp(30px,3.6vw,50px);line-height:1;color:#fff;letter-spacing:-.02em}
-.ecopy h3{font-size:clamp(17px,1.5vw,20px);color:rgba(255,255,255,.92);line-height:1.05;
+/* la iniciativa firma con su logotipo en blanco, no con el nombre escrito */
+.ecopy .elogoh{display:flex;align-items:center;margin:4px 0 2px}
+.ecopy .elogo{height:clamp(23px,2.3vw,33px);width:auto;max-width:min(100%,260px);object-fit:contain}
+.ecopy .elogoh .disp{font-size:clamp(17px,1.5vw,20px);color:rgba(255,255,255,.92);line-height:1.05;
   letter-spacing:.14em;text-transform:uppercase;font-family:var(--font-display);font-weight:900}
 .ecopy .edesc{font-size:15px;line-height:1.65;color:rgba(255,255,255,.68);max-width:42ch}
 .ecopy .emeta{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
@@ -731,7 +827,7 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   .heroBg .ring{right:-20%;top:-4%;width:min(70vw,460px)}
   /* el hero sigue clavado, pero apilado: lo compactamos y lo anclamos arriba
      para que el contenido quede por encima de la línea de agua */
-  .heroPin{height:660vh}
+  .heroPin{height:430vh}
   .hero{padding:84px 0 26px;align-items:flex-start}
   .hero .grid{gap:24px}
   .heroDeck{gap:14px}
@@ -745,11 +841,26 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
      opacidad para compensar el borde algo menos difuso). El destello es un
      barrido lento que a este tamaño de pantalla no se aprecia. */
   .heroBg .blob{filter:none;opacity:.6}
+  .jblob{filter:none;opacity:.55}
   .heroBg .sheen{display:none}
   .beat .kicker{margin-bottom:14px}
   .heroBg .halft{bottom:110px}
   .hero .bignum{font-size:260px;right:-30px;top:-40px;opacity:.35}
   .agrid{grid-template-columns:1fr 1fr}
+  /* Conócenos deja de estar clavado: una columna, con todas las formas de
+     participar abiertas (tres tarjetas cerradas no se entienden sin el scroll) */
+  #conocenos{height:auto}
+  .jstage{position:static;height:auto;padding:66px 0 0}
+  .jwrap{grid-template-columns:1fr;gap:32px;padding-top:0;padding-bottom:44px}
+  .jlead{max-width:none}
+  .jright{grid-template-columns:1fr}
+  .jprog{display:none}
+  .jrole{padding:15px 18px 16px 54px}
+  .jrole .jd{max-height:none;opacity:1}
+  .jrole .jt{color:#fff}
+  .jrole::before{transform:scaleY(1)}
+  .jrole .jn{color:var(--lanzadera)}
+  .jticker{position:relative;margin-top:34px}
   /* el ecosistema pasa a una columna: el raíl se despega y encabeza la sección */
   .ecowrap{grid-template-columns:1fr;gap:30px}
   .ecorail{position:static;height:auto;margin-bottom:0}
