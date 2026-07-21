@@ -958,14 +958,28 @@ async function boot() {
 }
 boot();
 
-/* ============ theme-color dinámico (barra flotante de Safari iOS) ============
-   Safari muestrea la página UNA vez al cargar para teñir su barra inferior y no
-   lo refresca al hacer scroll: entrando por arriba se quedaba el azul de las
-   olas (#91cede) clavado toda la visita, incluso sobre las secciones oscuras.
-   Publicamos el color nosotros: un <meta name="theme-color"> que sigue a la
-   sección que toca el borde inferior del viewport, que es donde vive la barra.
-   Safari (iOS 15+) y Chrome Android animan solos cada cambio del meta. */
+/* ============ theme-color dinámico (barra inferior del navegador móvil) ======
+   La barra inferior es UI del sistema: una página no puede volverla transparente
+   ni quitarla, solo publicar un <meta name="theme-color"> como color de fondo.
+
+   Safari iOS (cristal líquido): NO tocamos nada. Sin theme-color, su barra es un
+   material translúcido que difumina en vivo lo que pasa por detrás y flota sola
+   —exactamente como en apple.com, que tampoco declara theme-color, solo
+   viewport-fit=cover—. En cuanto le dábamos un color, Safari lo ANIMABA con
+   retardo y la barra se ponía a perseguir tintes (el «efecto extraño»). Mejor
+   dejar actuar al cristal nativo.
+
+   Chrome/Android sí aplica cada cambio al instante y no difumina el fondo, así
+   que ahí sí publicamos el color de la sección que toca el borde inferior del
+   viewport y el degradado acompaña al scroll. */
 (function barTint() {
+  // Safari de verdad en iOS/iPadOS (Chrome/Firefox/Edge en iOS llevan otro UA).
+  // iPadOS moderno se anuncia como «Macintosh»: lo delatan los puntos táctiles.
+  const ua = navigator.userAgent;
+  const iOS = /iP(hone|ad|od)/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const IOS_SAFARI = iOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
+  if (IOS_SAFARI) { window.syncBarTint = () => {}; return; }   // cristal nativo, como Apple
+
   const meta = document.createElement('meta');
   meta.name = 'theme-color';
   document.head.appendChild(meta);
