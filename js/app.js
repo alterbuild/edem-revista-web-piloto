@@ -214,6 +214,56 @@ function renderArticles() {
    participar, una a una, mientras la barra de la derecha marca el recorrido.
    Mismo patrón de rendimiento que el resto de efectos: un rAF por frame y solo
    clases y transform — nada que obligue a recalcular layout. */
+/* Fondos flat: una escena de formas planas por forma de participar. Sin
+   degradados ni desenfoques — círculos, rectángulos y triángulos de color
+   plano. Cada escena lleva su fondo y su acento, que también tiñe las cajas.
+   Si hay más formas que escenas, el ciclo se repite. */
+const JOIN_SCENES = [
+  { bg: '#06333f', acc: '#e8502d', art:
+    '<circle class="sh" style="--d:.05s;--dy:40px" cx="1140" cy="235" r="215" fill="#e8502d"/>' +
+    '<rect class="sh" style="--d:.12s;--dx:-50px" x="40" y="560" width="300" height="400" rx="10" fill="#ffffff" opacity=".10"/>' +
+    '<rect class="sh" style="--d:.2s;--dx:-30px" x="130" y="510" width="300" height="400" rx="10" fill="#74c1d5" opacity=".26"/>' +
+    '<rect class="sh" style="--d:.28s" x="180" y="585" width="180" height="14" rx="7" fill="#06333f" opacity=".5"/>' +
+    '<rect class="sh" style="--d:.34s" x="180" y="630" width="215" height="14" rx="7" fill="#06333f" opacity=".38"/>' +
+    '<rect class="sh" style="--d:.4s" x="180" y="675" width="130" height="14" rx="7" fill="#06333f" opacity=".38"/>' +
+    '<path class="sh" style="--d:.46s;--dy:60px" d="M600 900 L815 520 L1030 900 Z" fill="#ffffff" opacity=".08"/>' +
+    '<circle class="sh" style="--d:.52s" cx="640" cy="120" r="58" fill="#74c1d5" opacity=".45"/>' },
+  { bg: '#12213f', acc: '#008aad', art:
+    '<rect class="sh" style="--d:.05s;--dx:60px" x="810" y="120" width="520" height="520" rx="18" fill="#008aad" opacity=".9"/>' +
+    '<circle class="sh" style="--d:.14s" cx="1070" cy="380" r="175" fill="#12213f"/>' +
+    '<circle class="sh" style="--d:.2s" cx="1070" cy="380" r="92" fill="#b4dee9" opacity=".9"/>' +
+    '<circle class="sh" style="--d:.26s" cx="1035" cy="345" r="30" fill="#ffffff"/>' +
+    '<path class="sh" style="--d:.32s;--dy:70px" d="M0 900 L300 470 L600 900 Z" fill="#ffffff" opacity=".09"/>' +
+    '<path class="sh" style="--d:.38s;--dy:70px" d="M260 900 L520 590 L780 900 Z" fill="#e8502d" opacity=".8"/>' +
+    '<circle class="sh" style="--d:.44s;--dy:-40px" cx="215" cy="205" r="86" fill="#e8502d" opacity=".85"/>' },
+  { bg: '#3b3a7a', acc: '#e8502d', art:
+    '<path class="sh" style="--d:.05s;--dx:70px" d="M1440 190 A250 250 0 0 1 1440 690 Z" fill="#e8502d"/>' +
+    '<rect class="sh" style="--d:.12s;--dx:-60px" x="0" y="0" width="330" height="330" fill="#ffffff" opacity=".10"/>' +
+    '<rect class="sh" style="--d:.18s;--dx:-40px" x="120" y="330" width="210" height="210" fill="#b4dee9" opacity=".85"/>' +
+    '<circle class="sh" style="--d:.24s" cx="330" cy="330" r="105" fill="#008aad"/>' +
+    '<path class="sh" style="--d:.3s;--dy:60px" d="M560 900 L560 640 L820 640 Z" fill="#ffffff" opacity=".13"/>' +
+    '<rect class="sh" style="--d:.36s;--dy:60px" x="880" y="740" width="420" height="26" fill="#ffffff" opacity=".22"/>' +
+    '<rect class="sh" style="--d:.42s;--dy:60px" x="880" y="800" width="260" height="26" fill="#ffffff" opacity=".14"/>' },
+  { bg: '#0e2129', acc: '#008aad', art:
+    '<rect class="sh" style="--d:.05s;--dy:70px" x="90" y="430" width="150" height="470" fill="#008aad"/>' +
+    '<rect class="sh" style="--d:.11s;--dy:70px" x="270" y="300" width="150" height="600" fill="#ffffff" opacity=".12"/>' +
+    '<rect class="sh" style="--d:.17s;--dy:70px" x="450" y="560" width="150" height="340" fill="#e8502d" opacity=".9"/>' +
+    '<circle class="sh" style="--d:.24s;--dy:-50px" cx="1130" cy="300" r="200" fill="#008aad" opacity=".22"/>' +
+    '<circle class="sh" style="--d:.3s;--dy:-50px" cx="1130" cy="300" r="112" fill="#b4dee9" opacity=".9"/>' +
+    '<path class="sh" style="--d:.36s;--dx:60px" d="M1440 900 L1080 900 L1440 560 Z" fill="#ffffff" opacity=".08"/>' +
+    '<rect class="sh" style="--d:.42s;--dy:-40px" x="760" y="90" width="26" height="220" fill="#e8502d"/>' }
+];
+
+function renderJoinScenes(n) {
+  const host = $('jscenes');
+  if (!host) return;
+  host.innerHTML = Array.from({ length: n }, (_, i) => {
+    const s = JOIN_SCENES[i % JOIN_SCENES.length];
+    return '<div class="jscene" data-jscene="' + i + '" data-bg="' + s.bg + '" data-acc="' + s.acc + '">' +
+      '<svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + s.art + '</svg></div>';
+  }).join('');
+}
+
 function renderJoin() {
   const j = C.join || DEFAULTS.join;
   $('join-kicker').textContent = j.kicker || 'Conócenos';
@@ -233,10 +283,24 @@ function renderJoin() {
   const words = (j.ticker && j.ticker.length ? j.ticker : (j.roles || []).map(r => r.t));
   const strip = words.map(w => '<span>' + esc(w) + '</span>').join('');
   $('jtrack').innerHTML = strip + strip;
+  renderJoinScenes((j.roles || []).length || 1);
   observeJoin();
 }
 
-let joinBound = false, joinCards = [], joinCur = -1, joinTick = false, joinLock = 0;
+let joinBound = false, joinCards = [], joinScenes = [], joinCur = -1, joinTick = false, joinLock = 0;
+
+/* enciende la escena de fondo i y pasa su fondo y su acento a la sección:
+   el mismo color plano manda en el fondo, en la caja activa y en la barra */
+function setJoinScene(i) {
+  if (!joinScenes.length) return;
+  const k = Math.min(joinScenes.length - 1, Math.max(0, i));
+  joinScenes.forEach((s, n) => s.classList.toggle('on', n === k));
+  const sec = $('conocenos'), sc = joinScenes[k];
+  if (sec && sc) {
+    sec.style.setProperty('--jbg', sc.dataset.bg);
+    sec.style.setProperty('--jacc', sc.dataset.acc);
+  }
+}
 const JOIN_FLAT = matchMedia('(max-width:1020px)');
 // en móvil (y con movimiento reducido) no hay clavado: se abren todas
 const joinFlat = () => REDUCED.matches || JOIN_FLAT.matches;
@@ -244,6 +308,7 @@ const joinFlat = () => REDUCED.matches || JOIN_FLAT.matches;
 function setJoinRole(i) {
   if (i === joinCur) return;
   joinCur = i;
+  setJoinScene(i);
   joinCards.forEach((b, k) => {
     const on = k === i;
     b.classList.toggle('on', on);
@@ -257,6 +322,7 @@ function joinMeasure() {
   if (!sec || !stage || !joinCards.length) return;
   if (joinFlat()) {
     joinCur = -1;
+    setJoinScene(0);                                 // sin clavado, una sola escena
     joinCards.forEach(b => { b.classList.add('on'); b.setAttribute('aria-expanded', 'true'); });
     return;
   }
@@ -272,7 +338,9 @@ function joinMeasure() {
 
 function observeJoin() {
   joinCards = [...document.querySelectorAll('[data-jrole]')];
+  joinScenes = [...document.querySelectorAll('[data-jscene]')];
   joinCur = -1;
+  setJoinScene(0);
   if (!joinCards.length) return;
   joinMeasure();
   if (joinBound) return;

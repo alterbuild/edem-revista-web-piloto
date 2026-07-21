@@ -156,27 +156,62 @@ nav.main a:hover::after{transform:scaleX(1)}
 
 /* fondo animado */
 .heroBg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.heroBg .blob{position:absolute;border-radius:50%;filter:blur(72px);opacity:.5;animation:drift 19s ease-in-out infinite alternate}
-.heroBg .b1{width:540px;height:540px;left:-140px;top:-170px;background:radial-gradient(circle,var(--edem-teal-200),transparent 70%)}
-.heroBg .b2{width:460px;height:460px;right:-120px;top:24%;background:radial-gradient(circle,var(--edem-teal-100,#dcf0f5),transparent 70%);animation-duration:24s;animation-delay:-7s}
-.heroBg .b3{width:330px;height:330px;left:34%;bottom:-160px;background:radial-gradient(circle,rgba(232,80,45,.16),transparent 70%);animation-duration:16s;animation-delay:-3s}
-/* Sin scale(): escalar una capa con filter:blur(72px) obliga a rerasterizar el
-   desenfoque en CADA frame (en Safari iOS es lo que más caro sale de todo el
-   hero). Solo con traslación el compositor mueve la capa ya rasterizada y las
-   olas recuperan los frames. El recorrido se alarga un poco para compensar. */
-@keyframes drift{from{transform:translate3d(0,0,0)}to{transform:translate3d(76px,50px,0)}}
-.heroBg .halft{position:absolute;left:2%;bottom:150px;width:min(40vw,440px);height:240px;background-image:radial-gradient(var(--edem-teal-200) 1.5px,transparent 1.6px);background-size:17px 17px;opacity:.45;-webkit-mask-image:radial-gradient(closest-side,#000,transparent);mask-image:radial-gradient(closest-side,#000,transparent)}
-.heroBg .ring{position:absolute;right:-2%;top:4%;width:min(44vw,560px);aspect-ratio:1;border:1.5px dashed var(--edem-teal-200);border-radius:50%;opacity:.65;animation:ringspin 80s linear infinite}
-@keyframes ringspin{to{transform:rotate(360deg)}}
-/* segundo anillo, más pequeño y en sentido contrario: da profundidad */
-.heroBg .ring.r2{right:6%;top:16%;width:min(26vw,320px);border-style:dotted;border-color:var(--edem-teal-300,#a9d9e6);opacity:.5;
-  animation:ringspin 54s linear infinite reverse}
-/* destello lento que barre el fondo, como luz sobre el agua */
-.heroBg .sheen{position:absolute;top:-30%;left:-40%;width:55%;height:170%;
-  background:linear-gradient(100deg,transparent,rgba(255,255,255,.55) 45%,rgba(190,228,238,.35) 60%,transparent);
-  transform:rotate(14deg);animation:sheen 17s ease-in-out infinite}
-@keyframes sheen{0%{transform:rotate(14deg) translate3d(0,0,0);opacity:0}
-  12%{opacity:.85}70%{opacity:.5}100%{transform:rotate(14deg) translate3d(230%,0,0);opacity:0}}
+/* Paisaje flat de la Marina, anclado al horizonte (por eso xMidYMax) y en tres
+   capas. Cada una se hunde a distinta velocidad con --seaP: el cielo apenas se
+   mueve, los veleros del primer plano bajan el triple. Solo transform y
+   opacity — el mismo trato que el resto del hero. */
+.hscene{position:absolute;left:0;right:0;bottom:0;height:min(54vh,470px);
+  will-change:transform;transform:translate3d(0,calc(var(--seaP) * var(--par,24px)),0)}
+.hscene svg{width:100%;height:100%;display:block}
+.hscene.sky{--par:-34px;height:min(96vh,900px);opacity:calc(1 - var(--seaP) * .55)}
+.hscene.far{--par:26px}
+.hscene.near{--par:78px;opacity:calc(1 - var(--seaP) * .35)}
+/* entrada: el paisaje se levanta una vez con la página, como el resto del hero */
+@keyframes hsceneIn{from{opacity:0;transform:translate3d(0,34px,0)}}
+.hscene{animation:hsceneIn 1.1s var(--ease-out) both}
+.hscene.far{animation-delay:.1s}
+.hscene.near{animation-delay:.2s}
+
+/* Cada pieza va en dos grupos anidados para que las dos cosas no se pisen:
+   .ex se encarga de la SALIDA (la manda el scroll con --seaP) y dentro va el
+   grupo del movimiento en bucle (.bob, .fly, .sway…), que es quien anima. */
+.hscene .ex{transition:opacity .3s linear}
+.hscene .left{transform:translate(calc(var(--seaP) * -820px),calc(var(--seaP) * 40px))}
+.hscene .right{transform:translate(calc(var(--seaP) * 880px),calc(var(--seaP) * 40px))}
+.hscene .up{transform:translate(calc(var(--seaP) * 210px),calc(var(--seaP) * -300px))}
+/* lo que está más lejos tarda más en irse: el puerto se vacía por capas */
+.hscene .far2{transform:translate(calc(var(--seaP) * var(--fx,520px)),calc(var(--seaP) * 26px))}
+.hscene .left.far2{--fx:-520px}
+.hscene .quay{opacity:calc(.45 - var(--seaP) * .45)}
+
+/* movimiento en bucle: recorridos de pocos píxeles y ciclos largos — se nota
+   que el puerto respira, no que algo se mueve */
+.hscene .bob,.hscene .sway,.hscene .brea{transform-box:view-box;transform-origin:var(--o)}
+@keyframes hsBob{0%,100%{transform:rotate(-.9deg) translateY(0)}50%{transform:rotate(.9deg) translateY(-5px)}}
+.hscene .bob{animation:hsBob 9s var(--ease-standard) infinite}
+.hscene .bob.b2{animation-duration:7.2s;animation-delay:-2.4s}
+.hscene .bob.b3{animation-duration:5.4s;animation-delay:-1.1s}
+.hscene .bob.b4{animation-duration:8.1s;animation-delay:-3.7s}
+.hscene .bob.b5{animation-duration:6.3s;animation-delay:-5.2s}
+@keyframes hsSway{0%,100%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}}
+.hscene .sway{animation:hsSway 8s ease-in-out infinite}
+.hscene .sway.s2{animation-duration:6.4s;animation-delay:-2s}
+@keyframes hsBrea{50%{transform:scale(1.035)}}
+.hscene .brea{animation:hsBrea 14s ease-in-out infinite}
+@keyframes hsFly{0%{transform:translate(0,0)}50%{transform:translate(46px,-9px)}100%{transform:translate(0,0)}}
+.hscene .fly{animation:hsFly 19s ease-in-out infinite}
+.hscene .fly.f2{animation-duration:24s;animation-delay:-6s}
+.hscene .fly.f3{animation-duration:29s;animation-delay:-13s}
+.hscene .fly.f4{animation-duration:21s;animation-delay:-9s}
+.hscene .fly.f5{animation-duration:26s;animation-delay:-4s}
+.hscene .fly.f6{animation-duration:23s;animation-delay:-17s}
+/* el carro de la grúa, yendo y viniendo por la pluma */
+@keyframes hsTroll{0%,100%{transform:translateX(0)}50%{transform:translateX(268px)}}
+.hscene .troll{animation:hsTroll 22s var(--ease-standard) infinite}
+
+@media (prefers-reduced-motion:reduce){
+  .hscene,.hscene .bob,.hscene .sway,.hscene .brea,.hscene .fly,.hscene .troll{animation:none}
+}
 /* motas que suben flotando (las genera js/app.js) */
 .heroBg .motes{position:absolute;inset:0;overflow:hidden}
 .heroBg .motes span{position:absolute;bottom:-6%;border-radius:50%;background:var(--edem-teal-400,#63b6cd);
@@ -374,6 +409,7 @@ nav.main a:hover::after{transform:scaleX(1)}
   -webkit-mask-image:radial-gradient(closest-side,#000,transparent);mask-image:radial-gradient(closest-side,#000,transparent)}
 .kring{position:absolute;left:-6%;bottom:-18%;width:min(46vw,540px);aspect-ratio:1;
   border:1.5px dashed rgba(255,255,255,.22);border-radius:50%;animation:ringspin 90s linear infinite}
+@keyframes ringspin{to{transform:rotate(360deg)}}
 
 #kiosko .kwrap{position:relative;z-index:1;display:grid;grid-template-columns:minmax(230px,300px) 1fr;gap:56px;align-items:start}
 .ksticky{position:sticky;top:104px}
@@ -470,23 +506,27 @@ nav.main a:hover::after{transform:scaleX(1)}
    clavado mientras el scroll enciende, una a una, las formas de participar.
    Acaba exactamente en #0e2129, el fondo del ecosistema, para que las dos
    secciones oscuras parezcan una sola pieza. */
-#conocenos{position:relative;height:340vh;background:#0e2129}
+#conocenos{position:relative;height:340vh;background:#0e2129;
+  /* el color de la escena activa; lo va cambiando el scroll (ver .jstage[data-scene]) */
+  --jbg:#06333f;--jacc:var(--lanzadera)}
 .jstage{position:sticky;top:0;height:100svh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;
-  background:linear-gradient(168deg,#07303f 0%,#0d5470 44%,#123a49 78%,#0e2129 100%);color:#fff}
+  background:var(--jbg);color:#fff;transition:background 1s var(--ease-standard)}
+
+/* --- fondos flat: cada escena es un dibujo de formas planas (sin degradados
+   ni desenfoques) que entra cuando se enciende su forma de participar --- */
 .jbg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.jblob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.5;animation:drift 21s ease-in-out infinite alternate}
-.jblob.j1{width:620px;height:620px;left:-12%;top:-20%;background:radial-gradient(circle,rgba(63,166,196,.85),transparent 68%)}
-.jblob.j2{width:560px;height:560px;right:-10%;top:12%;background:radial-gradient(circle,rgba(232,80,45,.62),transparent 68%);animation-duration:27s;animation-delay:-8s}
-.jblob.j3{width:520px;height:520px;left:24%;bottom:-28%;background:radial-gradient(circle,rgba(59,58,122,.8),transparent 70%);animation-duration:17s;animation-delay:-4s}
-.jmesh{position:absolute;inset:0;
-  background-image:linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px),
-                   linear-gradient(90deg,rgba(255,255,255,.055) 1px,transparent 1px);
-  background-size:72px 72px;
-  -webkit-mask-image:radial-gradient(120% 85% at 18% 0,#000,transparent 76%);
-  mask-image:radial-gradient(120% 85% at 18% 0,#000,transparent 76%)}
-.jdots{position:absolute;right:5%;bottom:16%;width:min(28vw,320px);height:250px;
-  background-image:radial-gradient(rgba(255,255,255,.32) 1.4px,transparent 1.5px);background-size:18px 18px;opacity:.5;
-  -webkit-mask-image:radial-gradient(closest-side,#000,transparent);mask-image:radial-gradient(closest-side,#000,transparent)}
+/* velo plano del propio color de la escena: las formas siguen leyéndose pero
+   el texto y las cajas mandan por encima */
+.jbg::after{content:'';position:absolute;inset:0;background:var(--jbg);opacity:.5;
+  transition:background 1s var(--ease-standard)}
+.jscene{position:absolute;inset:0;opacity:0;transform:scale(1.06);
+  transition:opacity .85s var(--ease-standard),transform 1.2s var(--ease-standard)}
+.jscene svg{width:100%;height:100%;display:block}
+.jscene.on{opacity:1;transform:none}
+/* las piezas de la escena entran escalonadas, cada una desde su lado */
+.jscene .sh{opacity:0;transform:translate3d(var(--dx,0),var(--dy,26px),0);
+  transition:opacity .7s var(--ease-standard),transform .9s var(--ease-standard);transition-delay:var(--d,0s)}
+.jscene.on .sh{opacity:1;transform:none}
 
 .jwrap{position:relative;z-index:1;width:100%;display:grid;grid-template-columns:1.02fr .98fr;
   gap:clamp(30px,5vw,72px);align-items:center;padding-top:56px;padding-bottom:96px}
@@ -503,10 +543,10 @@ nav.main a:hover::after{transform:scaleX(1)}
    se tiñe del naranja de la Marina */
 .jrole{position:relative;display:block;width:100%;text-align:left;cursor:pointer;
   padding:16px 22px 17px 60px;color:#fff;border-radius:var(--radius-lg);
-  background:linear-gradient(100deg,rgba(255,255,255,.07),rgba(255,255,255,.028));
+  background:rgba(255,255,255,.06);
   border:1px solid rgba(255,255,255,.14);overflow:hidden;
-  transition:background .5s var(--ease-standard),border-color .5s var(--ease-standard)}
-.jrole::before{content:'';position:absolute;left:0;top:12px;bottom:12px;width:3px;background:var(--lanzadera);
+  transition:background .6s var(--ease-standard),border-color .6s var(--ease-standard),transform .6s var(--ease-standard)}
+.jrole::before{content:'';position:absolute;left:0;top:12px;bottom:12px;width:3px;background:var(--jacc);
   transform:scaleY(0);transform-origin:top;transition:transform .5s var(--ease-standard)}
 .jrole .jn{position:absolute;left:22px;top:22px;font-family:var(--font-display);font-weight:900;font-size:12.5px;
   letter-spacing:.06em;color:rgba(255,255,255,.4);transition:color .5s var(--ease-standard)}
@@ -516,14 +556,15 @@ nav.main a:hover::after{transform:scaleX(1)}
   transition:max-height .55s var(--ease-standard),opacity .4s var(--ease-standard)}
 .jrole .jd>span{display:block;padding-top:11px;font-size:14.5px;line-height:1.6;color:rgba(255,255,255,.74);max-width:46ch}
 .jrole:hover{border-color:rgba(255,255,255,.3)}
-.jrole.on{background:linear-gradient(100deg,rgba(232,80,45,.24),rgba(255,255,255,.05) 62%);border-color:rgba(255,255,255,.36)}
-.jrole.on::before{transform:scaleY(1)}
-.jrole.on .jn{color:var(--lanzadera)}
+/* la caja activa se pinta plana con el color de la escena en curso */
+.jrole.on{background:var(--jacc);border-color:var(--jacc);transform:translate3d(-10px,0,0)}
+.jrole.on::before{transform:scaleY(1);background:#fff}
+.jrole.on .jn{color:rgba(255,255,255,.72)}
 .jrole.on .jt{color:#fff}
 .jrole.on .jd{max-height:220px;opacity:1}
 .jprog{position:relative;border-radius:var(--radius-pill);background:rgba(255,255,255,.14);overflow:hidden}
 .jprog span{position:absolute;inset:0;border-radius:var(--radius-pill);transform:scaleY(.05);transform-origin:top;
-  background:linear-gradient(180deg,var(--edem-teal-300,#7fd3e6),var(--lanzadera))}
+  background:var(--jacc);transition:background 1s var(--ease-standard)}
 
 /* rótulo continuo al pie: los verbos de la redacción pasando en bucle */
 .jticker{position:absolute;left:0;right:0;bottom:0;z-index:1;padding:15px 0;
@@ -533,7 +574,7 @@ nav.main a:hover::after{transform:scaleX(1)}
 .jtrack{display:flex;width:max-content;animation:jslide 30s linear infinite}
 .jtrack span{font-family:var(--font-display);font-weight:900;letter-spacing:-.01em;white-space:nowrap;
   font-size:clamp(20px,2.6vw,34px);padding-left:26px;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.42)}
-.jtrack span::after{content:'·';margin-left:26px;color:var(--lanzadera);-webkit-text-stroke:0}
+.jtrack span::after{content:'·';margin-left:26px;color:var(--jacc);-webkit-text-stroke:0}
 @keyframes jslide{to{transform:translate3d(-50%,0,0)}}
 
 /* sin clavado con movimiento reducido: la sección se lee de una vez */
@@ -542,6 +583,9 @@ nav.main a:hover::after{transform:scaleX(1)}
   .jstage{position:static;height:auto;padding:70px 0 0}
   .jwrap{padding-bottom:40px}
   .jrole .jd{max-height:none;opacity:1}
+  .jrole.on{transform:none}
+  .jscene,.jscene .sh{transition:none}
+  .jscene .sh{opacity:1;transform:none}
   .jticker{position:relative;margin-top:36px}
   .jprog{display:none}
   .jright{grid-template-columns:1fr}
@@ -858,7 +902,6 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   .hero .grid{grid-template-columns:1fr;gap:44px}
   .heroDeck{order:-1;padding-top:10px}
   .deck{width:min(270px,64%)}
-  .heroBg .ring{right:-20%;top:-4%;width:min(70vw,460px)}
   /* el hero sigue clavado, pero apilado: lo compactamos y lo anclamos arriba
      para que el contenido quede por encima de la línea de agua */
   .heroPin{height:430vh}
@@ -869,16 +912,11 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   .hero p.lead,.hero .meta-chips{display:none}
   .hero .acts{margin-top:22px}
   .hero .sea{--sea-fill:176px;--o2:28px;--o3:56px}
-  /* En un móvil el coste de rasterizar estos desenfoques compite directamente
-     con las olas. El blob YA es un radial-gradient que se apaga en transparent
-     70%: el blur encima apenas se nota, así que fuera (se sube un pelín la
-     opacidad para compensar el borde algo menos difuso). El destello es un
-     barrido lento que a este tamaño de pantalla no se aprecia. */
-  .heroBg .blob{filter:none;opacity:.6}
-  .jblob{filter:none;opacity:.55}
-  .heroBg .sheen{display:none}
+  /* en pantalla estrecha el paisaje se queda como banda baja: el titular sube y
+     no debe competir con las grúas */
+  .hscene{height:min(46vh,360px)}
+  .hscene.sky{height:min(70vh,560px)}
   .beat .kicker{margin-bottom:14px}
-  .heroBg .halft{bottom:110px}
   .hero .bignum{font-size:260px;right:-30px;top:-40px;opacity:.35}
   .agrid{grid-template-columns:1fr 1fr}
   /* Conócenos deja de estar clavado: una columna, con todas las formas de
@@ -891,6 +929,9 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   .jprog{display:none}
   .jrole{padding:15px 18px 16px 54px}
   .jrole .jd{max-height:none;opacity:1}
+  .jrole.on{transform:none}
+  .jscene,.jscene .sh{transition:none}
+  .jscene .sh{opacity:1;transform:none}
   .jrole .jt{color:#fff}
   .jrole::before{transform:scaleY(1)}
   .jrole .jn{color:var(--lanzadera)}
