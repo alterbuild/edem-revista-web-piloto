@@ -409,14 +409,27 @@ function ecoSyncHeights() {
   wrap.style.setProperty('--eco-card-h', h + 'px');
 }
 
+let ecoPrev = -1;
+
 function ecoMeasure() {
   ecoTick = false;
   const sec = $('ecosistema');
   if (!sec || !ecoPanels.length) return;
+  // alto de ventana: innerHeight puede llegar a 0 en vistas embebidas, así que
+  // clientHeight hace de red — si no, la sección se daría siempre por fuera
+  const vh = innerHeight || document.documentElement.clientHeight || 800;
   const box = sec.getBoundingClientRect();
-  if (box.bottom < 0 || box.top > innerHeight) return;
+  if (box.bottom < 0 || box.top > vh) return;
 
-  const line = innerHeight * .34;
+  // --ecoP: 0 cuando la sección entra por abajo, 1 cuando acaba de salir por
+  // arriba. Mueve las dos tramas del fondo (ver .eweave/.esigns en el CSS).
+  // Se redondea a tres decimales y solo se escribe si cambia: una custom
+  // property nueva invalida el estilo de todo el subárbol.
+  const p = Math.min(1, Math.max(0, -box.top / Math.max(1, sec.offsetHeight - vh)));
+  const q = +p.toFixed(3);
+  if (q !== ecoPrev) { ecoPrev = q; sec.style.setProperty('--ecoP', q); }
+
+  const line = vh * .34;
   let act = 0;
   ecoPanels.forEach((p, i) => { if (p.getBoundingClientRect().top <= line) act = i; });
   if (act === ecoCur) return;
@@ -1169,31 +1182,35 @@ async function boot() {
 }
 boot();
 
-/* ============ theme-color dinámico (barra inferior del navegador móvil) ======
+/* ============ theme-color de la barra inferior del navegador móvil ==========
    La barra inferior es UI del sistema: una página no puede volverla transparente
    ni quitarla, solo publicar un <meta name="theme-color"> como color de fondo.
 
-   Safari iOS (cristal líquido): NO tocamos nada. Sin theme-color, su barra es un
-   material translúcido que difumina en vivo lo que pasa por detrás y flota sola
-   —exactamente como en apple.com, que tampoco declara theme-color, solo
-   viewport-fit=cover—. En cuanto le dábamos un color, Safari lo ANIMABA con
-   retardo y la barra se ponía a perseguir tintes (el «efecto extraño»). Mejor
-   dejar actuar al cristal nativo.
+   Safari iOS (cristal líquido): SIN theme-color, la barra queda en modo cristal y
+   REFLEJA en vivo los píxeles de la página que tiene detrás. En el hero eso es el
+   mar (#91cede), así que aparecía una «franja azul» pegada a la barra; en las
+   secciones oscuras de más abajo se fundía y no se notaba. La barra no se puede
+   volver invisible, pero SÍ se puede fijar: con un theme-color ESTÁTICO (definido
+   en el <head> del HTML, presente al cargar) iOS pinta la barra de ese color
+   sólido y deja de reflejar. Estático a propósito: cuando lo cambiábamos por
+   scroll, Safari animaba el tinte con retardo (el «efecto perseguidor»). Por eso
+   aquí, en iOS, NO lo tocamos: dejamos el valor fijo del HTML.
 
    Chrome/Android sí aplica cada cambio al instante y no difumina el fondo, así
-   que ahí sí publicamos el color de la sección que toca el borde inferior del
+   que ahí sí actualizamos el color de la sección que toca el borde inferior del
    viewport y el degradado acompaña al scroll. */
 (function barTint() {
+  // Reutiliza el <meta name="theme-color"> estático del HTML (uno solo); si no
+  // existiera, lo crea. En Chrome/Android se irá actualizando; en iOS se deja fijo.
+  const meta = document.querySelector('meta[name="theme-color"]')
+    || document.head.appendChild(Object.assign(document.createElement('meta'), { name: 'theme-color' }));
+
   // Safari de verdad en iOS/iPadOS (Chrome/Firefox/Edge en iOS llevan otro UA).
   // iPadOS moderno se anuncia como «Macintosh»: lo delatan los puntos táctiles.
   const ua = navigator.userAgent;
   const iOS = /iP(hone|ad|od)/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const IOS_SAFARI = iOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
-  if (IOS_SAFARI) { window.syncBarTint = () => {}; return; }   // cristal nativo, como Apple
-
-  const meta = document.createElement('meta');
-  meta.name = 'theme-color';
-  document.head.appendChild(meta);
+  if (IOS_SAFARI) { window.syncBarTint = () => {}; return; }   // barra sólida fija (valor del HTML)
 
   const rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
   const mix = (a, b, t) => '#' + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, '0')).join('');
