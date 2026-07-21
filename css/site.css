@@ -182,7 +182,8 @@ nav.main a:hover::after{transform:scaleX(1)}
 /* lo que está más lejos tarda más en irse: el puerto se vacía por capas */
 .hscene .far2{transform:translate(calc(var(--seaP) * var(--fx,520px)),calc(var(--seaP) * 26px))}
 .hscene .left.far2{--fx:-520px}
-.hscene .quay{opacity:calc(.45 - var(--seaP) * .45)}
+/* el horizonte no se aparta: se desvanece según lo tapa el mar */
+.hscene .quay{opacity:calc(1 - var(--seaP))}
 
 /* movimiento en bucle: recorridos de pocos píxeles y ciclos largos — se nota
    que el puerto respira, no que algo se mueve */
@@ -606,8 +607,38 @@ nav.main a:hover::after{transform:scaleX(1)}
   background-size:64px 64px;
   -webkit-mask-image:radial-gradient(120% 90% at 50% 0,#000,transparent 78%);
   mask-image:radial-gradient(120% 90% at 50% 0,#000,transparent 78%)}
-.eglow{position:absolute;left:50%;top:-40%;width:min(90vw,1000px);height:700px;transform:translateX(-50%);
-  background:radial-gradient(circle,rgba(63,166,196,.3),transparent 66%);filter:blur(60px)}
+/* Señalética de fondo. Van por los márgenes y con muy poco contraste: son
+   marcas de orientación, no ilustración — nunca deben competir con las fichas.
+   Trazo fino y uniforme en todas, que es lo que las hace parecer un juego. */
+/* Las tres fichas ocupan casi todo el ancho, así que las marcas viven donde
+   queda aire de verdad: la columna izquierda por debajo del raíl y los bordes,
+   por los que asoman recortadas — como un pliego de señales. */
+/* bajas de contraste a propósito: el raíl de la izquierda es sticky y las
+   marcas le pasan por detrás — a este nivel no molestan al texto */
+.emark{position:absolute;display:block;pointer-events:none;opacity:.62}
+.emark.m1{top:23%;left:3%;width:min(19vw,225px)}
+.emark.m2{top:40%;left:1%;width:min(24vw,290px)}
+.emark.m3{top:53%;right:-2%;width:min(12vw,145px)}
+.emark.m4{top:62%;left:3%;width:min(18vw,215px)}
+.emark.m5{top:82%;left:4%;width:min(16vw,195px)}
+/* la ruta avanza, la rosa gira despacio y los galones se encienden en orden */
+@keyframes eDash{to{stroke-dashoffset:-140}}
+.eroute{animation:eDash 26s linear infinite}
+@keyframes eSpin{to{transform:rotate(360deg)}}
+.espin{transform-box:view-box;transform-origin:var(--o);animation:eSpin 120s linear infinite}
+@keyframes eChev{0%,70%,100%{opacity:.45}22%{opacity:1}}
+.echev{animation:eChev 4.6s var(--ease-standard) infinite}
+.echev.c2{animation-delay:.3s}
+.echev.c3{animation-delay:.6s}
+@media (prefers-reduced-motion:reduce){
+  .eroute,.espin,.echev{animation:none}
+}
+@media(max-width:1020px){
+  /* en estrecho solo se quedan las dos marcas que no estorban */
+  .emark.m2,.emark.m4,.emark.m5{display:none}
+  .emark.m1{width:38vw;top:1%}
+  .emark.m3{width:22vw}
+}
 #ecosistema .wrap{position:relative;z-index:1}
 #ecosistema .shead{border-top-color:rgba(255,255,255,.28)}
 #ecosistema .shead h2{color:#fff}
