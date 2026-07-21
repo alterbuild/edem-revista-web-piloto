@@ -108,7 +108,10 @@ nav.main a:hover::after{transform:scaleX(1)}
    documento. Acotadas al hero, el recálculo se queda en este subárbol — es la
    diferencia entre 60fps y un pase de diapositivas en Safari iOS. */
 .hero{--heroH:100vh;--seaP:0;--deepP:0;padding:92px 0 150px;position:sticky;top:0;overflow:hidden;height:var(--heroH);display:flex;align-items:center}
-@supports (height:100svh){.hero{--heroH:100svh}}
+/* Viewport GRANDE (barra de Safari plegada), como el 100vh clásico de iOS y las
+   secciones full-screen de apple.com: si midiera 100svh, al plegarse la barra
+   durante los beats el viewport crece y asoma una franja de papel bajo el hero. */
+@supports (height:100lvh){.hero{--heroH:100lvh}}
 .hero .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center;position:relative;z-index:1;width:100%;transform:translateY(calc(var(--seaP) * -48px))}
 .kicker{display:inline-flex;align-items:center;gap:10px;color:var(--edem-teal-700)}
 .kicker .dot{width:7px;height:7px;border-radius:50%;background:var(--lanzadera);animation:kpulse 2.6s ease-in-out infinite}
