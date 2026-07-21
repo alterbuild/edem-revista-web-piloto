@@ -107,7 +107,14 @@ nav.main a:hover::after{transform:scaleX(1)}
    cada frame y una custom property en :root invalida el estilo de todo el
    documento. Acotadas al hero, el recálculo se queda en este subárbol — es la
    diferencia entre 60fps y un pase de diapositivas en Safari iOS. */
-.hero{--heroH:100vh;--seaP:0;--deepP:0;padding:92px 0 150px;position:sticky;top:0;overflow:hidden;height:var(--heroH);display:flex;align-items:center}
+.hero{--heroH:100vh;--seaP:0;--deepP:0;padding:92px 0 150px;position:sticky;top:0;overflow:hidden;
+  /* El hero es transparente: su fondo claro es el papel del <body>. Durante la
+     inmersión, .deep (inset:0) lo pinta de oscuro hasta el ALTO del hero. En
+     Safari iOS ese alto (lvh) acaba por encima del área segura inferior / barra
+     flotante, y en esa franja reaparece el papel del body, que el cristal de
+     Safari tiñe de azul. Sumamos el safe-area-inset para que .sea y .deep bajen
+     hasta el borde físico y la franja quede cubierta con el agua, no con papel. */
+  height:calc(var(--heroH) + env(safe-area-inset-bottom, 0px));display:flex;align-items:center}
 /* Viewport GRANDE (barra de Safari plegada), como el 100vh clásico de iOS y las
    secciones full-screen de apple.com: si midiera 100svh, al plegarse la barra
    durante los beats el viewport crece y asoma una franja de papel bajo el hero. */
