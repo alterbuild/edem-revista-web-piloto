@@ -114,7 +114,10 @@ nav.main a:hover::after{transform:scaleX(1)}
 /* El hero se «clava» mientras dura .heroPin; el mar sube con --seaP (0→1, lo fija js/app.js). */
 /* el alto reparte el recorrido: ~1 pantalla para que suba el mar y otro tanto
    por cada «beat» del relato (ahora dos) */
-.heroPin{position:relative;height:480vh}
+/* 370vh y no 480: con solo dos beats, 480 daba 1,4 pantallas de scroll a cada
+   uno —casi todo de meseta, con la imagen quieta— y el tramo se hacía eterno.
+   Así cada beat cae en ~0,95 pantallas y la subida del agua en 0,8. */
+.heroPin{position:relative;height:370vh}
 /* --heroH: alto real de la pantalla, reutilizado por el mar para su recorrido.
    --seaP y --deepP se declaran AQUÍ, no en :root: js/app.js las reescribe en
    cada frame y una custom property en :root invalida el estilo de todo el
@@ -1011,7 +1014,7 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   .deck{width:min(270px,64%)}
   /* el hero sigue clavado, pero apilado: lo compactamos y lo anclamos arriba
      para que el contenido quede por encima de la línea de agua */
-  .heroPin{height:430vh}
+  .heroPin{height:330vh}
   .hero{padding:84px 0 26px;align-items:flex-start}
   .hero .grid{gap:24px}
   .heroDeck{gap:14px}

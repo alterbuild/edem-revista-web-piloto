@@ -684,10 +684,17 @@ function observeReveals() {
     for (let i = 0; i < N; i++) {
       const u = (s - waveEnd - i * seg) / seg;      // 0→1 dentro de la ventana del beat
       const ph = (clamp01(u) - 0.5) * 2;            // -1 entra · 0 centrado · 1 sale
-      // entra rápido, se queda quieto la mayor parte del tramo, y sale.
-      // el último aguanta más y se va justo antes de soltarse el pin, para que
-      // el borde del kiosko no llegue a recortar el texto.
-      const op = step(0, .22, u) * (1 - step(i === N - 1 ? .9 : .82, 1, u));
+      // Entra rápido, se queda quieto la mayor parte del tramo, y sale.
+      // El ÚLTIMO no se apaga dentro del pin: aguanta entero hasta que el hero
+      // se suelta (u=1) y se va subiendo con él, ya en scroll normal. Antes se
+      // desvanecía justo en el pin y quedaba una pantalla entera de azul vacío
+      // antes de que asomara el kiosko; así el hueco lo ocupa el propio texto
+      // saliendo. No hay riesgo de que el borde del kiosko lo recorte: el texto
+      // va centrado en el hero, o sea media pantalla por encima de ese borde,
+      // y las dos cosas suben a la vez.
+      const op = i === N - 1
+        ? step(0, .22, u) * (1 - step(1, 1.3, u))
+        : step(0, .22, u) * (1 - step(.82, 1, u));
       const b = beats[i];
       if (Math.abs(ph - prevPh[i]) > 0.001) { b.style.setProperty('--ph', ph.toFixed(4)); prevPh[i] = ph; }
       if (Math.abs(op - prevOp[i]) > 0.001) { b.style.opacity = op.toFixed(3); prevOp[i] = op; }
