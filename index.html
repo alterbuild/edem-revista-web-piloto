@@ -75,12 +75,16 @@
     <div class="hscene sky">
       <svg viewBox="0 0 1440 620" data-vbm="430 -680 720 1300" preserveAspectRatio="xMidYMax slice">
         <!-- sol de tarde, sobre el tercio derecho: halo, disco y un anillo fino
-             que le da el aire de grabado -->
-        <g class="ex up xs-off"><g class="brea" style="--o:1150px 120px">
-          <circle cx="1150" cy="120" r="146" fill="#fdf0eb"/>
-          <circle cx="1150" cy="120" r="104" fill="#fae0d7"/>
-          <circle cx="1150" cy="120" r="58" fill="#f6cabb"/>
-          <circle cx="1150" cy="120" r="126" fill="none" stroke="#f6cabb" stroke-width="1.5"/>
+             que le da el aire de grabado.
+             cy=158 y no 120: con «slice» nunca se ve nada por encima de y=0 del
+             viewBox, así que un halo de r=146 centrado más arriba salía siempre
+             rebanado por el borde de la banda. 158 - 146 = 12 de margen, que
+             aguanta también el 3,5% que lo agranda el latido (.brea). -->
+        <g class="ex up xs-off"><g class="brea" style="--o:1150px 158px">
+          <circle cx="1150" cy="158" r="146" fill="#fdf0eb"/>
+          <circle cx="1150" cy="158" r="104" fill="#fae0d7"/>
+          <circle cx="1150" cy="158" r="58" fill="#f6cabb"/>
+          <circle cx="1150" cy="158" r="126" fill="none" stroke="#f6cabb" stroke-width="1.5"/>
         </g></g>
         <!-- bando de gaviotas: tamaños graduados y repartidas en diagonal, que
              es como vuelan de verdad — no una fila -->
