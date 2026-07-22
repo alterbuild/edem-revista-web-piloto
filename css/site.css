@@ -141,8 +141,6 @@ nav.main a:hover::after{transform:scaleX(1)}
 .hero .sub{font-size:clamp(22px,2.4vw,30px);color:var(--edem-teal-700);margin-top:14px}
 .hero p.lead{font-size:17px;line-height:1.65;color:var(--text-muted);max-width:520px;margin-top:20px}
 .hero .acts{display:flex;align-items:center;gap:14px;margin-top:32px;flex-wrap:wrap}
-.meta-chips{display:flex;gap:8px;margin-top:26px;flex-wrap:wrap}
-.chip{padding:6px 13px;border:1px solid var(--border-hair);border-radius:var(--radius-pill);font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--text-muted);background:var(--surface-card)}
 
 /* Colchón bajo el texto: el paisaje pasa justo por detrás del titular y de la
    entradilla (la pluma de la grúa cruza la línea de texto) y el contraste se
@@ -267,6 +265,29 @@ nav.main a:hover::after{transform:scaleX(1)}
   /* las gaviotas entran en el encuadre y bajan a volar sobre la dársena: donde
      estaban se cruzaban con el botón de «Leer en el visor» */
   .hscene .left.far2{transform:translate(calc(350px + var(--seaP) * var(--fx,-520px)),calc(150px + var(--seaP) * 26px))}
+
+  /* El puerto sube por encima de la línea de agua. Las tres capas van pegadas
+     al fondo del hero, pero la banda de olas mide 176px fijos, así que grúa y
+     cascos quedaban medio metidos bajo las crestas.
+     El dibujo se escala con el ANCHO (100vw/720), de modo que la línea de
+     flotación —y=500 del viewBox, 120 unidades por encima del borde— cae a
+     16,67vw del suelo. Subiendo la banda esos 161px menos lo que ya sube sola,
+     los cascos se posan justo en la cresta a cualquier ancho: apoyados en el
+     agua, mojándose solo la obra viva.
+     El segundo término del min() es el freno por ALTO: en una pantalla corta
+     (un SE) el hero se comprime, el texto baja y esos mismos píxeles meterían
+     los veleros dentro del titular. La recta 42vh-240px da los 98px enteros a
+     partir de ~810px de alto y los va recortando hasta casi nada por debajo de
+     600 — donde sencillamente no caben las dos cosas y manda el texto.
+     El tope inferior en 0 es por si alguna cuenta se pasara de rosca. Las tres
+     capas suben igual, así que el horizonte no se despega del mar ni asoma
+     papel entre medias. */
+  .hscene{bottom:max(0px,min(161px - 16.67vw,42vh - 240px))}
+  /* Al subir el puerto, la pluma de la grúa entra en el colchón del texto y se
+     desvanecía casi del todo. El colchón se recoge por abajo: hace falta detrás
+     del titular y del subtítulo, no detrás del botón —que ya es una pieza
+     sólida y se defiende solo—. */
+  .heroCopy::before{inset:-54px -14% 30px -10%}
 }
 /* motas que suben flotando (las genera js/app.js) */
 .heroBg .motes{position:absolute;inset:0;overflow:hidden}
@@ -995,7 +1016,7 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   .hero .grid{gap:24px}
   .heroDeck{gap:14px}
   .deck{width:min(190px,42%)}
-  .hero p.lead,.hero .meta-chips{display:none}
+  .hero p.lead{display:none}
   .hero .acts{margin-top:22px}
   .hero .sea{--sea-fill:176px;--o2:28px;--o3:56px}
   /* en pantalla estrecha el paisaje se queda como banda baja: el titular sube y

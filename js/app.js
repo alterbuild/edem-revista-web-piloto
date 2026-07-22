@@ -89,14 +89,15 @@ const SOC_SVG = {
 /* ================= render de la home ================= */
 function latestIssue() { return MAGS.find(m => m.id === C.site.latest) || MAGS[0]; }
 
+/* El hero ya no pinta antetítulo ni chips (ver el comentario en index.html): el
+   número lo canta el pie de la pila de portadas. Los campos `kicker` y `chips`
+   de content.json siguen ahí y no molestan — simplemente no se leen. */
 function renderHero() {
   const m = latestIssue(), h = m.hero || {};
-  if (h.kicker) $('hero-kicker').textContent = h.kicker;
   if (h.titleHtml) $('hero-title').innerHTML = h.titleHtml;
   if (h.num) $('hero-num').textContent = h.num;
   if (h.sub) $('hero-sub').textContent = h.sub;
   if (h.lead) $('hero-lead').textContent = h.lead;
-  if (h.chips) $('hero-chips').innerHTML = h.chips.map(c => '<span class="chip">' + esc(c) + '</span>').join('');
   buildDeck();
 }
 
