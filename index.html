@@ -20,10 +20,10 @@
 <link rel="apple-touch-icon" href="assets/edem-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="css/tokens.css?v=20260722a">
+<link rel="stylesheet" href="css/tokens.css?v=20260722c">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&display=swap">
-<link rel="stylesheet" href="css/site.css?v=20260722a">
-<script src="js/icons.js?v=20260722a" defer></script>
+<link rel="stylesheet" href="css/site.css?v=20260722c">
+<script src="js/icons.js?v=20260722c" defer></script>
 </head>
 <body>
 
@@ -74,17 +74,33 @@
          el recorte caiga siempre arriba y NUNCA a los lados. -->
     <div class="hscene sky">
       <svg viewBox="0 0 1440 620" data-vbm="430 -680 720 1300" preserveAspectRatio="xMidYMax slice">
-        <!-- sol de tarde, sobre el tercio derecho: halo, disco y un anillo fino
-             que le da el aire de grabado.
-             cy=158 y no 120: con «slice» nunca se ve nada por encima de y=0 del
-             viewBox, así que un halo de r=146 centrado más arriba salía siempre
-             rebanado por el borde de la banda. 158 - 146 = 12 de margen, que
-             aguanta también el 3,5% que lo agranda el latido (.brea). -->
-        <g class="ex up xs-off"><g class="brea" style="--o:1150px 158px">
-          <circle cx="1150" cy="158" r="146" fill="#fdf0eb"/>
-          <circle cx="1150" cy="158" r="104" fill="#fae0d7"/>
-          <circle cx="1150" cy="158" r="58" fill="#f6cabb"/>
-          <circle cx="1150" cy="158" r="126" fill="none" stroke="#f6cabb" stroke-width="1.5"/>
+        <!-- Sol de tarde, sobre el tercio derecho: corona de rayos, halo, disco y
+             un anillo fino que le da el aire de grabado. Los rayos van largos y
+             cortos alternados —12 en total, cada 30°— y giran muy despacio.
+             El astro va a ~0,68 del tamaño original: a escala completa competía
+             con el titular. Con la corona en r=134 y cy=160 quedan 21 de margen
+             contra el borde de arriba (con «slice» nunca se ve nada por encima
+             de y=0), holgura que aguanta el 3,5% del latido (.brea). Y cx=1080
+             en vez de 1150 para que el sol entero quepa a lo ancho. -->
+        <g class="ex up xs-off"><g class="brea" style="--o:1080px 160px">
+          <g transform="translate(1080 160)"><g class="rays" fill="#f6cabb">
+            <path d="M-6.5 -102 L6.5 -102 L2.5 -134 L-2.5 -134 Z"/>
+            <path d="M-5 -102 L5 -102 L2 -118 L-2 -118 Z" transform="rotate(30)"/>
+            <path d="M-6.5 -102 L6.5 -102 L2.5 -134 L-2.5 -134 Z" transform="rotate(60)"/>
+            <path d="M-5 -102 L5 -102 L2 -118 L-2 -118 Z" transform="rotate(90)"/>
+            <path d="M-6.5 -102 L6.5 -102 L2.5 -134 L-2.5 -134 Z" transform="rotate(120)"/>
+            <path d="M-5 -102 L5 -102 L2 -118 L-2 -118 Z" transform="rotate(150)"/>
+            <path d="M-6.5 -102 L6.5 -102 L2.5 -134 L-2.5 -134 Z" transform="rotate(180)"/>
+            <path d="M-5 -102 L5 -102 L2 -118 L-2 -118 Z" transform="rotate(210)"/>
+            <path d="M-6.5 -102 L6.5 -102 L2.5 -134 L-2.5 -134 Z" transform="rotate(240)"/>
+            <path d="M-5 -102 L5 -102 L2 -118 L-2 -118 Z" transform="rotate(270)"/>
+            <path d="M-6.5 -102 L6.5 -102 L2.5 -134 L-2.5 -134 Z" transform="rotate(300)"/>
+            <path d="M-5 -102 L5 -102 L2 -118 L-2 -118 Z" transform="rotate(330)"/>
+          </g></g>
+          <circle cx="1080" cy="160" r="100" fill="#fdf0eb"/>
+          <circle cx="1080" cy="160" r="71" fill="#fae0d7"/>
+          <circle cx="1080" cy="160" r="40" fill="#f6cabb"/>
+          <circle cx="1080" cy="160" r="86" fill="none" stroke="#f6cabb" stroke-width="1.5"/>
         </g></g>
         <!-- bando de gaviotas: tamaños graduados y repartidas en diagonal, que
              es como vuelan de verdad — no una fila -->
@@ -252,14 +268,8 @@
           <rect x="1315" y="428" width="4" height="18" fill="#3d7c92"/>
         </g></g></g>
 
-        <!-- boya cardinal y norays del atraque -->
+        <!-- norays del atraque -->
         <g>
-          <g class="ex right"><g class="bob b3" style="--o:1200px 486px">
-            <rect x="1198" y="450" width="6" height="36" fill="#0a4a5c"/>
-            <path d="M1200 448 l18 10 -18 10 z" fill="#e8502d"/>
-            <circle cx="1200" cy="490" r="15" fill="#e8502d"/>
-            <path d="M1185 490 a15 15 0 0 0 30 0 z" fill="#0a4a5c"/>
-          </g></g>
           <g class="ex left" fill="#0a4a5c" opacity=".55">
             <path d="M124 478 h16 v54 h-16 z"/><circle cx="132" cy="478" r="9"/>
             <path d="M176 478 h14 v54 h-14 z" opacity=".75"/><circle cx="183" cy="478" r="8" opacity=".75"/>
@@ -293,7 +303,11 @@
     </div>
   </div>
   <a class="scrollcue" href="#kiosko" aria-label="Seguir bajando al kiosko"><i data-lucide="chevron-down" class="lu"></i></a>
-  <div class="sea" aria-hidden="true"><div class="wave w1"></div><div class="wave w2"></div><div class="wave w3"></div></div>
+  <!-- el pez de EDEM (el mismo del pie) cruza la dársena por debajo de la
+       superficie. Va dentro de .sea a propósito: así sube con el agua cuando el
+       mar cubre el hero, en vez de quedarse clavado en mitad de la pantalla. -->
+  <div class="sea" aria-hidden="true"><div class="wave w1"></div><div class="wave w2"></div><div class="wave w3"></div>
+    <img class="pez" src="assets/pez-footer.png" alt="" width="162" height="65" loading="lazy" decoding="async"></div>
 
   <!-- inmersión: el relato que aparece una vez el mar ha cubierto la pantalla.
        Decorativo para lectores de pantalla: todo lo que dice está en el resto de la página. -->
@@ -631,6 +645,6 @@
   </div>
 </div>
 
-<script src="js/app.js?v=20260722a" defer></script>
+<script src="js/app.js?v=20260722c" defer></script>
 </body>
 </html>
