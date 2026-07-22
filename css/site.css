@@ -160,10 +160,18 @@ nav.main a:hover::after{transform:scaleX(1)}
    capas. Cada una se hunde a distinta velocidad con --seaP: el cielo apenas se
    mueve, los veleros del primer plano bajan el triple. Solo transform y
    opacity — el mismo trato que el resto del hero. */
-.hscene{position:absolute;left:0;right:0;bottom:0;height:min(54vh,470px);
+/* El alto de la banda va atado al ancho a propósito. Con «slice» el dibujo se
+   escala por el ANCHO, así que con un alto fijo cuanto más ancha es la pantalla
+   menos alto del dibujo cabe: a partir de ~1550px la torre de la grúa se salía
+   por arriba (portátiles de 15", monitores). El suelo de 470px mantiene la
+   medida de siempre hasta 1470px —ahí no cambia nada— y de ahí en adelante la
+   banda crece con la pantalla para que la escena entre entera. El tope en vh
+   evita que el paisaje se coma el hero en ventanas bajas. */
+.hscene{position:absolute;left:0;right:0;bottom:0;height:min(62vh,max(470px,32vw));
   will-change:transform;transform:translate3d(0,calc(var(--seaP) * var(--par,24px)),0)}
 .hscene svg{width:100%;height:100%;display:block}
-.hscene.sky{--par:-34px;height:min(96vh,900px);opacity:calc(1 - var(--seaP) * .55)}
+/* el cielo necesita más margen: el sol asoma por encima del borde del viewBox */
+.hscene.sky{--par:-34px;height:min(96vh,max(900px,45vw));opacity:calc(1 - var(--seaP) * .55)}
 .hscene.far{--par:26px}
 .hscene.near{--par:78px;opacity:calc(1 - var(--seaP) * .35)}
 /* entrada: el paisaje se levanta una vez con la página, como el resto del hero */
@@ -212,6 +220,25 @@ nav.main a:hover::after{transform:scaleX(1)}
 
 @media (prefers-reduced-motion:reduce){
   .hscene,.hscene .bob,.hscene .sway,.hscene .brea,.hscene .fly,.hscene .troll{animation:none}
+}
+
+/* ---- el paisaje en un teléfono ----
+   El encuadre apaisado, metido a la fuerza en una pantalla vertical, obliga al
+   «slice» a comerse los laterales: la grúa, la lancha y las palmeras salían
+   partidas por la mitad. Con el viewBox de móvil (data-vbm en el HTML, lo pone
+   js/app.js) el cuadro se cierra sobre la dársena y le sobra cielo, así que el
+   recorte cae siempre ARRIBA —donde no hay nada— y nunca a los lados.
+   Aquí solo se recoloca lo que se quedaba fuera de ese cuadro nuevo. */
+@media(max-width:680px){
+  /* fuera lo que no cabe sin amontonarse: la grúa lejana, la segunda palmera y
+     el sol —que a esta escala se plantaba justo detrás de la llamada a la
+     acción y le comía el contraste. El puerto se lee mejor con una sola grúa. */
+  .hscene .xs-off{display:none}
+  /* la palmera que queda se arrima al muelle, dentro de cuadro */
+  .hscene .palm{transform:translate(1018px,472px)}
+  /* las gaviotas entran en el encuadre y bajan a volar sobre la dársena: donde
+     estaban se cruzaban con el botón de «Leer en el visor» */
+  .hscene .left.far2{transform:translate(calc(350px + var(--seaP) * var(--fx,-520px)),calc(150px + var(--seaP) * 26px))}
 }
 /* motas que suben flotando (las genera js/app.js) */
 .heroBg .motes{position:absolute;inset:0;overflow:hidden}
@@ -946,6 +973,22 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   .jrole .jt{color:#fff}
   .jrole::before{transform:scaleY(1)}
   .jrole .jn{color:var(--lanzadera)}
+  /* Sin clavado se abren las cuatro a la vez, y cuatro cajas de naranja a
+     sangre se comen la pantalla entera. En móvil la caja se queda en panel
+     sobrio sobre el fondo de la escena y el color de la Marina se reserva
+     para la pauta lateral y el número, que es donde se agradece. */
+  /* La escena plana está dibujada apaisada (1440×900) y sin clavado la sección
+     mide más de mil píxeles de alto: el «slice» la ampliaba casi al doble y
+     detrás de las cajas solo quedaba un triángulo enorme. En móvil se recoge en
+     una banda al pie —el resto es el color plano de la escena— y así las formas
+     vuelven a leerse a su tamaño. */
+  .jbg{top:auto;height:min(34vh,300px)}
+  /* la banda queda justo detrás de la última caja: un punto más de velo para
+     que el texto no compita con las formas */
+  .jbg::after{opacity:.62}
+  .jrole,.jrole.on{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16)}
+  .jrole.on::before{background:var(--jacc)}
+  .jrole.on .jn{color:var(--jacc)}
   .jticker{position:relative;margin-top:34px}
   /* el ecosistema pasa a una columna: el raíl se despega y encabeza la sección */
   .ecowrap{grid-template-columns:1fr;gap:30px}
@@ -1014,6 +1057,23 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   .scale{grid-template-columns:repeat(5,1fr)}
   .dshero h1{font-size:clamp(44px,13vw,72px)}
   .brandslab{grid-template-columns:1fr}
+}
+
+/* Móvil ancho / ventana estrecha: con el encuadre de móvil el paisaje se dibuja
+   a la escala del ANCHO, así que a 680px sube tanto que una banda de 360px le
+   cortaría la torre de la grúa por arriba. Un poco más de alto y entra entera.
+   (Va aquí, después del bloque de arriba, para ganarle en cascada.) */
+@media(min-width:561px) and (max-width:680px){
+  .hscene{height:min(52vh,440px)}
+}
+
+/* Tablet estrecha: aquí ya manda el encuadre apaisado (1440×620), y con la
+   banda a 360px de alto el «slice» todavía se comía un trozo por los lados —la
+   grúa lejana y el sol salían partidos. Atando el alto al ancho (1440/620 ≈
+   2,32) la escena entra completa a cualquier medida de esta franja. */
+@media(min-width:681px) and (max-width:840px){
+  .hscene{height:min(46vh,42vw)}
+  .hscene.sky{height:min(70vh,42vw)}
 }
 
 /* ---------- visor: pulido de interfaz ----------

@@ -100,6 +100,26 @@ function renderHero() {
   buildDeck();
 }
 
+/* ---- el paisaje flat del hero: encuadre según la pantalla ----
+   El dibujo es apaisado (1440×620) y se pinta con «slice», o sea que rellena
+   la caja recortando lo que sobra. En una pantalla vertical lo que sobra son
+   los laterales, y la grúa, la lancha o las palmeras salían partidas. Cada
+   capa lleva en data-vbm un viewBox pensado para el móvil: más estrecho —se
+   queda con la dársena— y con cielo de sobra por arriba, que es por donde
+   interesa que recorte. El viewBox no se puede tocar desde CSS, de ahí este
+   puente; el resto del reajuste (lo que se aparta o se retira) va en site.css. */
+(function heroSceneFrame() {
+  const svgs = [...document.querySelectorAll('.hscene svg[data-vbm]')];
+  if (!svgs.length) return;
+  const XS = matchMedia('(max-width:680px)');   // el mismo corte de móvil que usa site.css
+  const apply = () => svgs.forEach(s => {
+    if (!s.dataset.vbw) s.dataset.vbw = s.getAttribute('viewBox');   // el de escritorio, tal cual venía
+    s.setAttribute('viewBox', XS.matches ? s.dataset.vbm : s.dataset.vbw);
+  });
+  apply();
+  onMQ(XS, apply);
+})();
+
 /* ---- pila de portadas del hero: rota entre ediciones ---- */
 let deckOrder = [], deckTimer = null, deckPaused = false;
 const issueNum = m => (m.hero && m.hero.num) || (String(m.nr || '').match(/\d+/) || ['•'])[0];

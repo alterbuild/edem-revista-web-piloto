@@ -20,10 +20,10 @@
 <link rel="apple-touch-icon" href="assets/edem-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="css/tokens.css?v=20260721n">
+<link rel="stylesheet" href="css/tokens.css?v=20260722a">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&display=swap">
-<link rel="stylesheet" href="css/site.css?v=20260721n">
-<script src="js/icons.js?v=20260721n" defer></script>
+<link rel="stylesheet" href="css/site.css?v=20260722a">
+<script src="js/icons.js?v=20260722a" defer></script>
 </head>
 <body>
 
@@ -67,11 +67,16 @@
        Las tres capas se mueven a distinta velocidad con --seaP (el mar
        subiendo) y cada pieza se aparta de pantalla al bajar. -->
   <div class="heroBg" aria-hidden="true">
+    <!-- data-vbm: encuadre alternativo para móvil (lo aplica js/app.js bajo
+         560px). El de escritorio es apaisado y en un teléfono el «slice» se
+         come los laterales y parte las piezas por la mitad; el de móvil recorta
+         la escena a la parte que interesa y sobra alto —cielo vacío— para que
+         el recorte caiga siempre arriba y NUNCA a los lados. -->
     <div class="hscene sky">
-      <svg viewBox="0 0 1440 620" preserveAspectRatio="xMidYMax slice">
+      <svg viewBox="0 0 1440 620" data-vbm="430 -680 720 1300" preserveAspectRatio="xMidYMax slice">
         <!-- sol de tarde, sobre el tercio derecho: halo, disco y un anillo fino
              que le da el aire de grabado -->
-        <g class="ex up"><g class="brea" style="--o:1150px 120px">
+        <g class="ex up xs-off"><g class="brea" style="--o:1150px 120px">
           <circle cx="1150" cy="120" r="146" fill="#fdf0eb"/>
           <circle cx="1150" cy="120" r="104" fill="#fae0d7"/>
           <circle cx="1150" cy="120" r="58" fill="#f6cabb"/>
@@ -90,7 +95,7 @@
       </svg>
     </div>
     <div class="hscene far">
-      <svg viewBox="0 0 1440 620" preserveAspectRatio="xMidYMax slice">
+      <svg viewBox="0 0 1440 620" data-vbm="430 -260 720 880" preserveAspectRatio="xMidYMax slice">
         <!-- El horizonte: un plano de agua pálido que separa cielo y mar y da
              sitio a lo que está lejos. Se disuelve cuando el mar sube. -->
         <g class="quay">
@@ -117,7 +122,7 @@
              escala 0,66 y un valor más claro. -->
         <g stroke-linecap="square">
           <!-- lejana primero: la cercana la tapa, que para eso está delante -->
-          <g transform="translate(786 132) scale(.66)"><g class="ex right far2">
+          <g class="xs-off" transform="translate(786 132) scale(.66)"><g class="ex right far2">
             <path d="M596 470 L636 300 M712 470 L672 300" stroke="#f5c7ba" stroke-width="10" fill="none"/>
             <path d="M615 398 L694 398" stroke="#f5c7ba" stroke-width="5" fill="none"/>
             <rect x="628" y="286" width="52" height="20" fill="#f5c7ba"/>
@@ -152,7 +157,7 @@
              cerrada con su nervio, así que se leen como palmeras y no como un
              garabato. La copa entera se mece desde la base del tronco. -->
         <g class="ex right">
-          <g transform="translate(1318 472)">
+          <g class="palm" transform="translate(1318 472)">
             <g class="sway" style="--o:0px 0px">
               <path d="M-6 0 C-4 -28 0 -54 9 -80 L20 -77 C10 -52 5 -27 4 0 Z" fill="#658d97"/>
               <!-- hojas a la sombra (babor) y hojas al sol (estribor) -->
@@ -171,7 +176,7 @@
               </g>
             </g>
           </g>
-          <g transform="translate(1398 472) scale(.74)">
+          <g class="xs-off" transform="translate(1398 472) scale(.74)">
             <g class="sway s2" style="--o:0px 0px">
               <path d="M-6 0 C-5 -28 -2 -54 -12 -80 L-23 -77 C-11 -52 -5 -27 -4 0 Z" fill="#82a2a9"/>
               <g fill="#7b9da5">
@@ -190,7 +195,7 @@
       </svg>
     </div>
     <div class="hscene near">
-      <svg viewBox="0 0 1440 620" preserveAspectRatio="xMidYMax slice">
+      <svg viewBox="0 0 1440 620" data-vbm="430 -260 720 880" preserveAspectRatio="xMidYMax slice">
         <!-- Velero grande, el punto más oscuro del cuadro: es lo que está más
              cerca. Cada vela lleva dos valores — el paño al sol y una cuña de
              sombra pegada al palo — y el casco su franja de obra muerta. -->
@@ -622,6 +627,6 @@
   </div>
 </div>
 
-<script src="js/app.js?v=20260721n" defer></script>
+<script src="js/app.js?v=20260722a" defer></script>
 </body>
 </html>
