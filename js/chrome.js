@@ -39,7 +39,7 @@
     if (mscrim) mscrim.addEventListener('click', closeMenu);
     addEventListener('keydown', e => { if (e.key === 'Escape') { closeMenu(); } });
     // Safari < 14 no tiene addEventListener en MediaQueryList (ver app.js)
-    const mq = matchMedia('(min-width:681px)');
+    const mq = matchMedia('(min-width:861px)');   // ver el corte de la cabecera en site.css
     const onWide = e => { if (e.matches) closeMenu(); };
     if (mq.addEventListener) mq.addEventListener('change', onWide);
     else if (mq.addListener) mq.addListener(onWide);

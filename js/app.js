@@ -536,7 +536,8 @@ function onMQ(mq, fn) {
   if (mq.addEventListener) mq.addEventListener('change', fn);
   else if (mq.addListener) mq.addListener(fn);
 }
-onMQ(matchMedia('(min-width:681px)'), e => { if (e.matches) closeMenu(); });
+// 861px = el ancho al que la cabecera recupera sus enlaces (ver site.css)
+onMQ(matchMedia('(min-width:861px)'), e => { if (e.matches) closeMenu(); });
 
 /* ================= la cabecera se aparta al bajar =================
    Bajando estorba —y en móvil se come 68px de pantalla justo cuando el hero

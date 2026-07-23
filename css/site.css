@@ -75,7 +75,9 @@ nav.main a{color:var(--ink-600);position:relative;padding:24px 0}
 nav.main a::after{content:'';position:absolute;left:0;right:0;bottom:16px;height:2px;background:var(--edem-teal-500);transform:scaleX(0);transform-origin:left;transition:transform var(--dur) var(--ease-standard)}
 nav.main a:hover{color:var(--edem-teal-600)}
 nav.main a:hover::after{transform:scaleX(1)}
-.hbar .cta{margin-left:auto}
+/* las dos acciones de la cabecera: portal de noticias y visor */
+.hbar .hacts{margin-left:auto;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.hbar .hacts .btn{padding:11px 18px;font-size:14px;white-space:nowrap}
 .menubtn{display:none;margin-left:auto;width:44px;height:44px;border-radius:var(--radius-sm);border:1px solid var(--border-hair);background:#fff;color:var(--text-strong);place-items:center;cursor:pointer}
 .menubtn .lu{width:20px;height:20px}
 /* menú móvil: panel que se despliega sobre la página, con velo detrás */
@@ -993,6 +995,16 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
 .spacescale .bar{height:14px;background:var(--edem-teal-500);border-radius:2px}
 
 /* ---------- responsive ---------- */
+/* Con dos acciones a la derecha (portal y visor), los enlaces sueltos dejan de
+   caber bastante antes de llegar al móvil: por debajo de 860 la lista se recoge
+   en el menú —que los lleva todos— y en la barra quedan la marca, las dos
+   acciones y la hamburguesa.
+   Ojo si se toca este valor: app.js y chrome.js cierran el menú al volver a
+   escritorio con una media query que tiene que ser la contraria de esta. */
+@media(max-width:860px){
+  nav.main{display:none}
+  .menubtn{display:grid}
+}
 @media(max-width:1020px){
   .hero .grid{grid-template-columns:1fr;gap:44px}
   .heroDeck{order:-1;padding-top:10px}
@@ -1081,7 +1093,7 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   .ephoto::after{background:linear-gradient(180deg,transparent 52%,rgba(19,44,54,.72) 88%,#132c36)}
   .ehead .role{font-size:32px}
   #kiosko{padding:56px 0 64px}
-  nav.main,.hbar .cta{display:none}
+  nav.main,.hbar .hacts{display:none}
   .menubtn{display:grid}
   .hero{padding:80px 0 20px}
   .hero .grid{gap:18px}
