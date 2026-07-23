@@ -1247,8 +1247,12 @@ function abrirVisorPorURL() {
   const mix = (a, b, t) => '#' + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, '0')).join('');
 
   const SURF = rgb('#91cede'), DEEP = rgb('#052635');   // agua de las olas → fondo de la inmersión (.deepTint)
-  const ATOP = rgb('#062737'), ABOT = rgb('#0a4152');   // extremos del gradiente de «Actualidad»
-  const KTOP = rgb('#0a4152'), KBOT = rgb('#17708a');   // extremos del gradiente del kiosko
+  // «Actualidad» y el kiosko ya no pintan su propio fondo: comparten el de
+  // .bajada (ver css/site.css). Estos son los tramos de ESE degradado que le
+  // tocan a cada una — el kiosko cierra en el #06333f con el que abre
+  // «Conócenos». Si se toca .bajada, hay que tocar esto.
+  const ATOP = rgb('#072837'), ABOT = rgb('#0a4152');
+  const KTOP = rgb('#0a4152'), KBOT = rgb('#06333f');
   const PAPER = '#fbfaf6';
 
   const hero = document.querySelector('#heroPin .hero');

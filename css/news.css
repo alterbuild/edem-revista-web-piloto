@@ -72,27 +72,18 @@
 /* Ya no es papel: la sección va entre la inmersión y el kiosko, así que se
    compone con el mismo material que el kiosko —fondo marino, raíl clavado y
    fichas de vidrio oscuro— y las dos se leen como un solo tramo de bajada.
-   El degradado arranca en #062737, que es exactamente el color con el que acaba
-   la inmersión, y termina en #0a4152, que es con el que abre el kiosko: si se
-   toca uno de los dos extremos, hay que tocar el de al lado (ver css/site.css).
+   SIN FONDO PROPIO a propósito: el degradado lo pinta .bajada, el contenedor que
+   envuelve esta sección y el kiosko (ver css/site.css). Es lo que hace que la
+   inmersión, «Lo último» y el kiosko se lean como una sola bajada sin costuras:
+   mientras cada sección pintaba su trozo, en cada junta se veía una raya aunque
+   los colores casaran al píxel.
    Ojo: nada de overflow:hidden aquí — anularía el sticky de .ksticky. El
    recorte de los adornos lo hace .kbg. */
-#actualidad{position:relative;padding:92px 0 104px;
-  background:linear-gradient(180deg,#062737 0,#073040 34%,#0a4152 100%)}
+#actualidad{position:relative;padding:92px 0 104px}
 /* los mismos adornos del kiosko, espejados: se reconoce el material sin que las
-   dos secciones seguidas sean literalmente la misma imagen */
+   dos secciones seguidas sean literalmente la misma imagen. La máscara vertical
+   que los desvanece antes de los bordes está en css/site.css. */
 #actualidad .kbg{transform:scaleX(-1)}
-/* Las dos juntas, blindadas: los primeros 200px son exactamente el color con el
-   que acaba la inmersión y los últimos 200px, exactamente el color con el que
-   abre el kiosko —que hace lo mismo por su lado—, por encima de halos, tramas y
-   aros. Sin esto, el halo naranja que la sección hereda del kiosko cae justo en
-   el borde de abajo y marca el corte. Las dos bandas van en el mismo ::after
-   porque es el ÚLTIMO hijo de .kbg y pinta por encima de los halos; un ::before
-   quedaría por debajo y no taparía nada. */
-#actualidad .kbg::after{content:'';position:absolute;inset:0;
-  background:
-    linear-gradient(#062737,rgba(6,39,55,0) 200px),
-    linear-gradient(rgba(10,65,82,0) calc(100% - 200px),#0a4152)}
 #actualidad .skick{color:var(--edem-teal-200)}
 /* el titular de esta sección sí parte en varias líneas dentro del raíl (el del
    kiosko cabe en una): sin interlineado propio el hueco entre líneas se abría */

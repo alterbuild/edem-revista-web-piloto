@@ -461,8 +461,16 @@ html.sbusca-on{overflow:hidden}
 .deepTint{position:absolute;inset:-12%;background:
   radial-gradient(120% 88% at 50% -12%,rgba(146,214,232,.5),rgba(13,74,96,.93) 52%,rgba(5,38,53,.99) 100%)}
 
-/* haces de luz que entran desde la superficie */
-.rays{position:absolute;inset:0;overflow:hidden;opacity:.5}
+/* haces de luz que entran desde la superficie.
+   Se apagan antes de tocar el fondo del hero. Los haces van girados 14°, así que
+   el punto en el que su degradado se vuelve transparente cae en diagonal y por un
+   lado podía filtrar algo de luz hasta el borde de abajo — justo la costura con
+   «Lo último», donde el fondo ya es plano. Con la máscara el cierre es limpio en
+   todo el ancho, y además tiene sentido físico: la luz se pierde con la
+   profundidad. */
+.rays{position:absolute;inset:0;overflow:hidden;opacity:.5;
+  -webkit-mask-image:linear-gradient(180deg,#000 62%,transparent 94%);
+  mask-image:linear-gradient(180deg,#000 62%,transparent 94%)}
 .rays span{position:absolute;top:-30%;height:150%;width:min(22vw,240px);
   background:linear-gradient(rgba(255,255,255,.22),rgba(255,255,255,0) 72%);
   filter:blur(22px);transform:rotate(14deg);transform-origin:top center;animation:sway 13s ease-in-out infinite alternate}
@@ -471,8 +479,11 @@ html.sbusca-on{overflow:hidden}
 .rays span:nth-child(3){left:74%;animation-duration:21s;animation-delay:-9s;opacity:.55}
 @keyframes sway{from{transform:rotate(11deg) translate3d(-14px,0,0)}to{transform:rotate(17deg) translate3d(16px,0,0)}}
 
-/* burbujas (las genera js/app.js) */
-.bubbles{position:absolute;inset:0;overflow:hidden}
+/* burbujas (las genera js/app.js). Como los rayos, se desvanecen antes del
+   borde de abajo: una burbuja cortada en seco contra la junta la delataría. */
+.bubbles{position:absolute;inset:0;overflow:hidden;
+  -webkit-mask-image:linear-gradient(180deg,#000 82%,transparent 98%);
+  mask-image:linear-gradient(180deg,#000 82%,transparent 98%)}
 .bubbles span{position:absolute;bottom:-8vh;border-radius:50%;
   border:1px solid rgba(255,255,255,.26);
   background:radial-gradient(circle at 30% 26%,rgba(255,255,255,.55) 0 14%,rgba(255,255,255,.05) 46%,rgba(255,255,255,0) 66%);
@@ -581,38 +592,72 @@ html.sbusca-on{overflow:hidden}
 .shead .note{font-size:13px;color:var(--text-faint);font-weight:600}
 .shead .more{margin-left:auto;font-size:13.5px;font-weight:700;white-space:nowrap}
 
+/* ---------- la bajada: «Actualidad» + «Kiosko» ----------
+   UN SOLO fondo para las dos secciones (envueltas en .bajada, ver index.html).
+   Antes cada una pintaba su propio degradado y en cada junta se veía una raya:
+   no porque los colores no casaran —casaban al píxel— sino porque el degradado
+   bajaba hasta la costura y volvía a subir justo después. Ese pico de
+   luminancia el ojo lo lee como una línea (bandas de Mach) aunque a los dos
+   lados haya exactamente el mismo color. Con un fondo único y monótono no hay
+   nada que casar y la bajada se lee de un tirón.
+
+   El kiosko ya no «sale del agua»: lleva el mismo color y el mismo material que
+   «Lo último», su predecesora. El degradado se mueve muy poco —de #072837 a
+   #0a4152 y vuelta— y todo el tramo se lee como un único fondo; lo que
+   diferencia una sección de otra son los adornos (espejados) y el contenido, no
+   el color.
+
+   Los dos extremos SÍ siguen atados a sus vecinos:
+   · arriba, #072837 es el color con el que acaba la inmersión del hero
+     (.deepTint cierra en rgba(5,38,53,.99) sobre el papel del body; medido, no
+     estimado: el degradado radial ya llega a su última parada bastante antes
+     del borde de abajo, así que ahí el color es plano);
+   · abajo, #06333f es el fondo con el que abre «Conócenos» (--jbg).
+   Además el degradado sale y entra plano en los dos extremos (mesetas del 0-8%
+   y del 92-100%): sin cambio de pendiente en la costura, no hay raya.
+   Si se toca un extremo hay que tocar el de al lado (.hero .deepTint / #conocenos).
+
+   El margen negativo mete el fondo 2px POR DEBAJO del hero. No es para casar
+   colores —ya casan— sino por el recorte: el hero es sticky con overflow:hidden
+   y su borde inferior cae en una fracción de píxel, así que en esa fila el
+   navegador mezclaba el agua oscura con el papel claro del body y dejaba un
+   pelo de luz justo en la costura. Con el solape no hay fila que mezclar. El
+   padding equivalente devuelve el contenido a su sitio. */
+.bajada{position:relative;margin-top:-2px;padding-top:2px;
+  background:linear-gradient(180deg,
+    #072837 0,      /* meseta: entra al mismo ritmo (ninguno) con el que baja la inmersión */
+    #072837 8%,
+    #08333f 26%,
+    #0a4152 55%,
+    #0a4152 82%,    /* el kiosko se queda en el tono con el que cierra «Lo último» */
+    #083c4c 92%,
+    #06333f 100%)}  /* meseta de salida hacia «Conócenos» */
+
 /* ---------- kiosko ----------
-   Sale del agua: fondo profundo con luz, y la cabecera se queda clavada
+   Mismo fondo y mismo material que «Lo último»; la cabecera se queda clavada
    mientras las portadas desfilan al lado. */
 /* ojo: nada de overflow:hidden aquí — anularía el sticky de .ksticky.
    El recorte de los adornos lo hace .kbg. */
-/* La bajada es una sola: la inmersión acaba en #062737, «Actualidad» arranca
-   justo ahí y sube hasta #0a4152, y el kiosko toma ese mismo tono y sigue
-   subiendo hasta la superficie. Los últimos puntos vuelven a #06333f, que es el
-   fondo con el que abre «Conócenos»: así ninguna de las tres juntas se ve.
-   Si se toca un extremo hay que tocar el de al lado (ver css/news.css). */
-#kiosko{position:relative;padding:96px 0 110px;
-  background:linear-gradient(180deg,#0a4152 0,#0f5266 30%,#17708a 74%,#0e4c60 92%,#06333f 100%)}
-#kiosko .kbg,#actualidad .kbg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.kglow{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55}
-.kglow.g1{width:620px;height:620px;left:-160px;top:8%;background:radial-gradient(circle,#3fa6c4,transparent 68%)}
-.kglow.g2{width:520px;height:520px;right:-140px;bottom:-200px;background:radial-gradient(circle,rgba(232,80,45,.5),transparent 68%)}
+#kiosko{position:relative;padding:96px 0 110px}
+/* Los adornos se apagan antes de llegar a los bordes de su sección. Antes se
+   recortaban en seco contra el borde (overflow:hidden) y hacía falta taparlos
+   con una franja opaca; esa franja era justo la que creaba el pico de
+   luminancia en la junta. Con la máscara, la trama y el aro se desvanecen solos
+   y no hay nada que tapar. */
+#kiosko .kbg,#actualidad .kbg{position:absolute;inset:0;pointer-events:none;overflow:hidden;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 20%,#000 80%,transparent 100%);
+  mask-image:linear-gradient(180deg,transparent 0,#000 20%,#000 80%,transparent 100%)}
+/* Aquí vivían dos «orbes» (.kglow g1/g2): dos círculos enormes y desenfocados,
+   uno azul arriba y otro naranja abajo, que hacían de resplandor de fondo. Se
+   quitaron a propósito: quietos y sin nada que los justifique se leían como
+   manchas sobre un fondo que ahora es liso. El adorno se queda en la trama de
+   puntos y el aro, que sí tienen dibujo. */
 .kdots{position:absolute;right:4%;top:12%;width:min(30vw,340px);height:300px;
   background-image:radial-gradient(rgba(255,255,255,.35) 1.4px,transparent 1.5px);background-size:18px 18px;opacity:.5;
   -webkit-mask-image:radial-gradient(closest-side,#000,transparent);mask-image:radial-gradient(closest-side,#000,transparent)}
 .kring{position:absolute;left:-6%;bottom:-18%;width:min(46vw,540px);aspect-ratio:1;
   border:1.5px dashed rgba(255,255,255,.22);border-radius:50%;animation:ringspin 90s linear infinite}
 @keyframes ringspin{to{transform:rotate(360deg)}}
-/* Las dos juntas, blindadas: los primeros 200px son exactamente el color con el
-   que cierra «Actualidad» y los últimos 200px, exactamente el #06333f con el que
-   abre «Conócenos». El halo naranja y el aro caen justo en el borde de abajo y,
-   sin esta franja, marcaban el corte. Las dos bandas van en el mismo ::after
-   porque es el ÚLTIMO hijo de .kbg y pinta por encima de los halos; un ::before
-   quedaría por debajo y no taparía nada. */
-#kiosko .kbg::after{content:'';position:absolute;inset:0;
-  background:
-    linear-gradient(#0a4152,rgba(10,65,82,0) 200px),
-    linear-gradient(rgba(6,51,63,0) calc(100% - 200px),#06333f)}
 
 /* la retícula del kiosko, compartida con «Actualidad»: raíl clavado a la
    izquierda y la parrilla desfilando al lado */

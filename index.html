@@ -348,6 +348,16 @@
 </section>
 </div>
 
+<!-- LA BAJADA · «Actualidad» + «Kiosko»
+     Las dos secciones van dentro del mismo contenedor porque comparten UN SOLO
+     fondo, pintado en .bajada (ver css/site.css). Antes cada una llevaba su
+     propio degradado y, por muy afinados que estuvieran los extremos, en cada
+     junta se veía una raya: el degradado bajaba hasta la costura y volvía a
+     subir justo después, y el ojo lee ese pico como una línea aunque el color
+     sea el mismo a los dos lados. Con un único fondo continuo no hay juntas que
+     casar. -->
+<div class="bajada">
+
 <!-- ACTUALIDAD · las noticias destacadas del portal digital
      Va nada más salir de la inmersión y antes del kiosko: primero lo que ha
      pasado esta semana, después el papel. Comparte material y retícula con el
@@ -358,7 +368,7 @@
      y lo pinta js/news.js. -->
 <section id="actualidad">
   <!-- los mismos adornos del kiosko, espejados (ver css/news.css) -->
-  <div class="kbg" aria-hidden="true"><span class="kglow g1"></span><span class="kglow g2"></span><span class="kdots"></span><span class="kring"></span></div>
+  <div class="kbg" aria-hidden="true"><span class="kdots"></span><span class="kring"></span></div>
   <div class="wrap kwrap">
     <div class="ksticky">
       <div class="shead rv">
@@ -374,7 +384,7 @@
 
 <!-- KIOSKO -->
 <section id="kiosko">
-  <div class="kbg" aria-hidden="true"><span class="kglow g1"></span><span class="kglow g2"></span><span class="kdots"></span><span class="kring"></span></div>
+  <div class="kbg" aria-hidden="true"><span class="kdots"></span><span class="kring"></span></div>
   <div class="wrap kwrap">
     <div class="ksticky">
       <div class="shead rv">
@@ -386,6 +396,8 @@
     <div class="kgrid" id="kgrid"></div>
   </div>
 </section>
+
+</div><!-- /.bajada -->
 
 <!-- CONÓCENOS · la invitación a hacer la revista -->
 <!-- La sección se clava (.jstage sticky) mientras el scroll va encendiendo
