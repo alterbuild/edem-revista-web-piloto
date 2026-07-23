@@ -555,34 +555,19 @@ nav.main a:hover::after{transform:scaleX(1)}
 #kiosko .kacts .btn.out{color:#fff;border-color:rgba(255,255,255,.34);background:transparent}
 #kiosko .kacts .btn.out:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.6)}
 
-/* ---------- rejilla de artículos ---------- */
-/* Sumario: se lee como el índice de la revista — apertura destacada,
-   foliado grande y el número de la edición en fantasma detrás. */
-#numero{position:relative;padding:82px 0 88px;overflow:hidden}
-#numero .nbg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.nghost{position:absolute;right:-3%;top:-6%;font-family:var(--font-display);font-weight:900;
-  font-size:clamp(280px,34vw,520px);line-height:.78;color:transparent;
-  -webkit-text-stroke:1.5px var(--edem-teal-200);opacity:.4;user-select:none}
+/* ---------- fondo de papel de las secciones editoriales ----------
+   La pauta de renglones la comparten el bloque «Actualidad» de la home y la
+   mancheta del portal de noticias (ver css/news.css); va dentro de un .nbg
+   que recorta. */
+.nbg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .nrules{position:absolute;left:0;right:0;bottom:0;height:56%;opacity:.5;
   background-image:repeating-linear-gradient(var(--border-hair) 0 1px,transparent 1px 34px);
   -webkit-mask-image:linear-gradient(transparent,#000);mask-image:linear-gradient(transparent,#000)}
-#numero .wrap{position:relative;z-index:1}
 .skick{display:block;flex-basis:100%;color:var(--edem-teal-600);margin-bottom:-4px}
-.agrid{display:grid;grid-template-columns:repeat(2,1fr);gap:26px}
-/* apertura: a lo ancho y en horizontal */
-.acard.feat{grid-column:1/-1;flex-direction:row}
-.acard.feat .im{flex:0 0 46%;aspect-ratio:16/11}
-.acard.feat .abody{padding:34px 38px;justify-content:center}
-.acard.feat h3{font-size:clamp(28px,3vw,40px);line-height:1.04}
-.acard.feat p{font-size:16px;flex:none;max-width:52ch}
-.acard.feat .afoot{margin-top:20px}
-/* foliado grande, como en el papel */
-/* mismo recurso que el número fantasma de la sección: foliado en contorno */
-.apg{position:absolute;top:16px;right:20px;font-family:var(--font-display);font-weight:900;
-  font-size:44px;line-height:1;color:transparent;-webkit-text-stroke:1.5px var(--edem-teal-200);
-  transition:color var(--dur) var(--ease-standard)}
-.acard:hover .apg{color:var(--edem-teal-100,#e8f5f8)}
-.acard.feat .apg{font-size:74px;top:24px;right:28px}
+
+/* ---------- tarjeta de artículo ----------
+   Queda como componente documentado del sistema de diseño; las tarjetas del
+   portal de noticias son las de css/news.css. */
 .abody{position:relative}
 .acard{background:var(--surface-card);border:1px solid var(--border-hair);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-md);display:flex;flex-direction:column;cursor:pointer;transition:all var(--dur) var(--ease-standard);text-align:left;font-family:inherit;color:inherit}
 .acard:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
@@ -1028,7 +1013,6 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   .hscene.sky{height:min(70vh,560px)}
   .beat .kicker{margin-bottom:14px}
   .hero .bignum{font-size:260px;right:-30px;top:-40px;opacity:.35}
-  .agrid{grid-template-columns:1fr 1fr}
   /* Conócenos deja de estar clavado: una columna, con todas las formas de
      participar abiertas (tres tarjetas cerradas no se entienden sin el scroll) */
   #conocenos{height:auto}
@@ -1069,11 +1053,7 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   .econav a{border-bottom:0}
   .epanel{margin-bottom:min(18vh,150px)}
   .epanel-in{min-height:0}
-  .acard.feat{flex-direction:column}
-  .acard.feat .im{flex:none;aspect-ratio:3/2}
-  .acard.feat .abody{padding:24px}
-  .acard.feat .apg{font-size:52px;top:18px;right:20px}
-  #numero,#ecosistema{padding:64px 0 70px}
+  #ecosistema{padding:64px 0 70px}
   /* el kiosko pasa a una columna: la cabecera deja de estar clavada */
   #kiosko{padding:72px 0 84px}
   #kiosko .kwrap{grid-template-columns:1fr;gap:28px}
@@ -1083,7 +1063,6 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
 }
 @media(max-width:680px){
   .wrap{padding:0 20px;padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right))}
-  .agrid{grid-template-columns:1fr}
   /* dos portadas por fila aunque el móvil sea estrecho: a una sola columna la
      cubierta a sangre se come la pantalla entera */
   .kgrid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:22px 14px}
@@ -1091,7 +1070,6 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   .kbody h3{font-size:20px}
   .kbody p{font-size:12.5px}
   .kacts{flex-direction:column;gap:7px}
-  .nghost{font-size:clamp(190px,54vw,300px)}
   /* en móvil la ficha se parte: foto arriba, texto debajo, y se deja de apilar
      (tres tarjetas montadas no caben en alto sin comerse el texto) */
   /* el índice del ecosistema sobra en móvil: sin el raíl clavado no navega nada

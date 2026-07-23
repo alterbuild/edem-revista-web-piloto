@@ -1,0 +1,684 @@
+{
+  "_ayuda": "Portal de noticias de EDEM Times. Este archivo es TODO el contenido del portal (noticias.html), de las fichas de noticia (noticia.html?a=ID) y del bloque «Actualidad» de la home. Añadir una noticia = añadir un objeto a `noticias`; no hay que tocar código ni crear archivos HTML. OJO: las noticias de este archivo son CONTENIDO DE EJEMPLO (textos, autores y declaraciones inventados) para ver el diseño con material realista — sustitúyelas por las reales antes de publicar.",
+  "_campos": {
+    "id": "identificador para la URL: noticia.html?a=ID. Solo minúsculas, números y guiones.",
+    "seccion": "id de una de las `secciones` de más abajo",
+    "portada": "1 = apertura del portal y de la home · 2 y 3 = destacadas secundarias · sin campo = va al flujo por fecha",
+    "cuerpo": "lista de bloques. Tipos: p (párrafo), h2 (ladillo), cita {texto, autor}, img {src, alt, pie}, lista {items}, destacado (frase suelta), dato {cifra, texto}",
+    "revista": "opcional: enlaza la noticia con una página de la revista en el visor {issue, page, texto}"
+  },
+  "cms": {
+    "_ayuda": "Origen de los datos. Con `activo: false` manda la lista `noticias` de este archivo (modo local, sin backend). Poniendo `activo: true` y un `endpoint`, el portal, las fichas de noticia y la home leen del CMS headless y este archivo pasa a ser solo la copia de seguridad si la API falla. Ver js/cms.js y README.md.",
+    "activo": false,
+    "tipo": "generico",
+    "_tipo": "Preajustes de mapeo incluidos: generico · strapi (v4/v5) · wordpress · contentful · hygraph. `mapeo` sobrescribe campo a campo lo que traiga el preajuste.",
+    "endpoint": "",
+    "_endpoint": "URL de la colección de noticias. Ej. Strapi: https://cms.edem.es/api/noticias?populate=*&sort=fecha:desc — Ej. WordPress: https://blog.edem.es/wp-json/wp/v2/posts?_embed",
+    "endpointNoticia": "",
+    "_endpointNoticia": "Opcional. URL de UNA noticia; {id} se sustituye por el identificador. Si se deja vacío, la ficha se saca de la lista.",
+    "endpointSecciones": "",
+    "_endpointSecciones": "Opcional. URL de las categorías. Si se deja vacío, se usan las `secciones` de este archivo.",
+    "headers": {},
+    "_headers": "Cabeceras extra para la API (por ejemplo un token público de solo lectura). NO pongas aquí claves privadas: este archivo lo descarga el navegador.",
+    "cacheSegundos": 300,
+    "mapeo": {}
+  },
+  "portal": {
+    "kicker": "El diario de EDEM Times",
+    "titulo": "Actualidad<span class=\"pt\">.</span>",
+    "lead": "Lo que pasa en EDEM y en la Marina de Empresas, contado a diario por la redacción de la revista. Lo que no cabe aquí, espera al papel.",
+    "aviso": "Contenido de ejemplo para la maqueta del portal"
+  },
+  "secciones": [
+    {
+      "id": "campus",
+      "nombre": "Campus",
+      "color": "edem",
+      "desc": "Aulas, pasillos, biblioteca y todo lo que pasa entre clase y clase."
+    },
+    {
+      "id": "emprende",
+      "nombre": "Emprende",
+      "color": "lanzadera",
+      "desc": "Startups, aceleración y el pulso del muelle de Lanzadera."
+    },
+    {
+      "id": "inversion",
+      "nombre": "Inversión",
+      "color": "angels",
+      "desc": "Capital, criterio y las cifras que mira Angels antes de firmar."
+    },
+    {
+      "id": "alumni",
+      "nombre": "Alumni",
+      "color": "neutral",
+      "desc": "Los que ya salieron: dónde están y qué se llevaron de aquí."
+    },
+    {
+      "id": "agenda",
+      "nombre": "Agenda",
+      "color": "edem",
+      "desc": "Fechas, convocatorias y avisos para no llegar tarde a nada."
+    }
+  ],
+  "noticias": [
+    {
+      "id": "hackathon-2026-cierre",
+      "seccion": "campus",
+      "portada": 1,
+      "titulo": "El Hackathon de EDEM cierra con cinco proyectos y una startup que ya factura",
+      "entradilla": "48 horas, 120 alumnos y doce mentores en el edificio. El jurado premió una plataforma de logística inversa que cerró su primer cliente el lunes siguiente.",
+      "fecha": "2026-07-22",
+      "autor": "Marta Gil",
+      "autorRol": "Redacción · 2º de GDE",
+      "lectura": 6,
+      "img": "assets/img/perfil-ee.jpg",
+      "alt": "Equipo de alumnos trabajando de madrugada durante el Hackathon de EDEM",
+      "pie": "El equipo ganador, a las tres de la mañana del domingo, cuando todavía se llamaban de otra manera.",
+      "etiquetas": [
+        "Hackathon",
+        "Emprendimiento",
+        "Grados"
+      ],
+      "revista": {
+        "issue": "n2",
+        "page": 4,
+        "texto": "La crónica larga del Hackathon, con las fotos del cierre, está en el número 2 de la revista."
+      },
+      "cuerpo": [
+        {
+          "tipo": "p",
+          "texto": "El viernes a las seis de la tarde el hall de EDEM parecía una terminal de aeropuerto: 120 alumnos con mochila, alargadores y una idea a medio cocer. El domingo a las siete, cinco equipos subieron al escenario con un producto que enseñar y, en un caso, con una lista de espera de clientes."
+        },
+        {
+          "tipo": "p",
+          "texto": "El Hackathon es la actividad más exigente del calendario y también la que menos se parece a una clase. No hay temario, no hay examen y el único criterio del jurado es si aquello resuelve un problema por el que alguien pagaría. La restricción es siempre la misma: cuarenta y ocho horas y un presupuesto de cero euros."
+        },
+        {
+          "tipo": "h2",
+          "texto": "Del cartón al primer cliente"
+        },
+        {
+          "tipo": "p",
+          "texto": "El proyecto ganador, bautizado a las tres de la mañana y rebautizado dos veces antes del pitch, ataca la logística inversa del pequeño comercio: recoger devoluciones de varias tiendas en una sola ruta y devolverlas al almacén sin que cada una monte su propio circuito. El prototipo era una hoja de cálculo y un mapa; la validación, catorce llamadas a comercios del centro de València hechas el sábado por la mañana."
+        },
+        {
+          "tipo": "cita",
+          "texto": "Nos dijeron que no once veces. Las tres que nos dijeron que sí fueron las que nos enseñaron cómo tenía que ser el producto.",
+          "autor": "Portavoz del equipo ganador"
+        },
+        {
+          "tipo": "p",
+          "texto": "El lunes siguiente firmaron con una cadena local de seis tiendas. No es una ronda de financiación ni un titular de portada, pero es exactamente lo que el jurado premia: tracción, aunque sea de las pequeñas."
+        },
+        {
+          "tipo": "h2",
+          "texto": "Qué mira el jurado"
+        },
+        {
+          "tipo": "lista",
+          "items": [
+            "Que el problema exista fuera del aula: alguien tiene que haberlo contado en primera persona.",
+            "Que haya algo funcionando, aunque sea con cinta aislante.",
+            "Que el equipo sepa decir en una frase por qué lo van a hacer ellos y no otros.",
+            "Que los números del pitch se sostengan si les preguntas de dónde salen."
+          ]
+        },
+        {
+          "tipo": "destacado",
+          "texto": "La mitad de los equipos cambió de idea el sábado por la tarde. Los que ganaron fueron de los que cambiaron."
+        },
+        {
+          "tipo": "p",
+          "texto": "Los otros cuatro finalistas siguen en pie: dos han pedido tutoría con mentores de Lanzadera, uno se ha presentado a la convocatoria de otoño y el cuarto se ha disuelto amistosamente, que también es un resultado."
+        },
+        {
+          "tipo": "dato",
+          "cifra": "120",
+          "texto": "alumnos de grados y másteres participaron en la edición de este año, un 18 % más que en la anterior."
+        },
+        {
+          "tipo": "p",
+          "texto": "La próxima edición se anuncia en septiembre. Quien quiera montar equipo antes tiene la redacción de la revista para buscar compañeros: aquí se sabe todo."
+        }
+      ]
+    },
+    {
+      "id": "lanzadera-convocatoria-otono",
+      "seccion": "emprende",
+      "portada": 2,
+      "titulo": "Lanzadera abre la convocatoria de otoño: esto es lo que mira el comité antes de decir que sí",
+      "entradilla": "Hasta el 15 de septiembre. Hablamos con dos responsables de programa para entender qué hace que una candidatura pase de la primera criba.",
+      "fecha": "2026-07-20",
+      "autor": "Pablo Server",
+      "autorRol": "Redacción · Máster en Dirección",
+      "lectura": 5,
+      "img": "assets/img/eco-lanzadera.jpg",
+      "alt": "Equipo de una startup trabajando en las oficinas de Lanzadera",
+      "pie": "Planta de trabajo de Lanzadera en la Marina de Empresas.",
+      "etiquetas": [
+        "Lanzadera",
+        "Convocatoria",
+        "Startups"
+      ],
+      "cuerpo": [
+        {
+          "tipo": "p",
+          "texto": "La convocatoria de otoño de Lanzadera está abierta hasta el 15 de septiembre. Como cada año, la pregunta que más se repite entre los alumnos que se plantean presentarse no es qué papeles hay que rellenar, sino qué se mira de verdad cuando alguien lee el formulario al otro lado."
+        },
+        {
+          "tipo": "h2",
+          "texto": "El equipo, antes que la idea"
+        },
+        {
+          "tipo": "p",
+          "texto": "La primera criba es de personas. Un proyecto flojo con un equipo que ejecuta puede corregirse; una idea brillante con un equipo que no se habla, no. En la práctica eso significa dedicación completa, reparto claro de responsabilidades y alguien capaz de vender el producto sin leerlo de una diapositiva."
+        },
+        {
+          "tipo": "cita",
+          "texto": "Preferimos un equipo que ya se haya equivocado junto a uno que aún no se ha puesto a prueba.",
+          "autor": "Responsable de programa de Lanzadera"
+        },
+        {
+          "tipo": "h2",
+          "texto": "Señales de tracción, no promesas"
+        },
+        {
+          "tipo": "lista",
+          "items": [
+            "Clientes que pagan, aunque sean tres y poco.",
+            "Un producto en manos de usuarios reales, aunque esté a medias.",
+            "Métricas que el propio equipo mira cada semana, no las que se inventan para la memoria.",
+            "Una historia clara de por qué ahora y no hace dos años."
+          ]
+        },
+        {
+          "tipo": "p",
+          "texto": "Para los alumnos de EDEM hay una ventaja evidente: el edificio está al lado. Pasar por las sesiones abiertas, preguntar a las startups que ya están dentro y enseñar el proyecto antes de presentarlo cuesta un paseo de cuatro minutos."
+        },
+        {
+          "tipo": "destacado",
+          "texto": "El error más repetido: presentarse con un plan de negocio impecable y ni una sola conversación con un cliente."
+        }
+      ]
+    },
+    {
+      "id": "angels-inversiones-primer-semestre",
+      "seccion": "inversion",
+      "portada": 3,
+      "titulo": "Angels cierra el semestre con tres compañías nuevas en cartera",
+      "entradilla": "Software industrial, salud digital y una agrotech de Castellón. Repasamos qué tienen en común las tres y qué dice eso del criterio de la casa.",
+      "fecha": "2026-07-18",
+      "autor": "Lucía Arnau",
+      "autorRol": "Redacción · 4º de GDE",
+      "lectura": 4,
+      "img": "assets/img/eco-angels.jpg",
+      "alt": "Público de inversores durante el Investors Day de Angels",
+      "pie": "Investors Day de Angels en la Marina de Empresas.",
+      "etiquetas": [
+        "Angels",
+        "Inversión",
+        "Marina de Empresas"
+      ],
+      "revista": {
+        "issue": "n2",
+        "page": 14,
+        "texto": "Las métricas que mira un inversor antes que cualquier promesa, en la sección Angels del número 2."
+      },
+      "cuerpo": [
+        {
+          "tipo": "p",
+          "texto": "Tres entradas nuevas en cartera en seis meses. Vistas por separado no se parecen en nada: una vende software a fábricas, otra ordena la agenda de consultas médicas y la tercera mide el agua que se le da a un naranjo. Vistas juntas, dicen bastante."
+        },
+        {
+          "tipo": "h2",
+          "texto": "Lo que comparten"
+        },
+        {
+          "tipo": "p",
+          "texto": "Las tres facturaban antes de recibir el dinero. Ninguna vendía a consumidor final. Y en las tres el fundador viene del sector al que le vende: sabe cómo se compra ahí, no solo cómo se construye."
+        },
+        {
+          "tipo": "dato",
+          "cifra": "3 de 3",
+          "texto": "compañías con ingresos recurrentes antes de la entrada del inversor."
+        },
+        {
+          "tipo": "p",
+          "texto": "El patrón no es casual. En las sesiones abiertas del Investors Day se repite la misma idea: el capital acelera lo que ya funciona, no arranca lo que todavía no existe."
+        },
+        {
+          "tipo": "cita",
+          "texto": "El dinero no arregla un producto que nadie ha comprado. Solo hace que te des cuenta antes.",
+          "autor": "Intervención en el Investors Day"
+        }
+      ]
+    },
+    {
+      "id": "redaccion-abre-numero-3",
+      "seccion": "campus",
+      "titulo": "La redacción abre el número 3: buscamos doce manos más",
+      "entradilla": "Escribir, fotografiar, maquetar o corregir. No hace falta experiencia previa ni pertenecer a ningún grado concreto: hace falta querer contar lo que pasa aquí.",
+      "fecha": "2026-07-17",
+      "autor": "Redacción EDEM Times",
+      "autorRol": "Redacción",
+      "lectura": 3,
+      "img": "assets/img/intro-grados.jpg",
+      "alt": "Alumnos trabajando juntos en una mesa del campus",
+      "pie": "Reunión de cierre del número 2, en la sala grande.",
+      "etiquetas": [
+        "Revista",
+        "Participar"
+      ],
+      "cuerpo": [
+        {
+          "tipo": "p",
+          "texto": "El número 2 se cerró hace tres semanas y el 3 ya tiene fecha. Antes de septiembre queremos tener el equipo completo, y eso significa doce personas más repartidas entre texto, foto, diseño y edición."
+        },
+        {
+          "tipo": "h2",
+          "texto": "Qué hace falta (y qué no)"
+        },
+        {
+          "tipo": "lista",
+          "items": [
+            "No hace falta haber escrito nunca: la mitad de la redacción actual empezó así.",
+            "Sí hace falta poder venir a una reunión cada dos semanas.",
+            "Se puede entrar solo para un número y ver qué tal.",
+            "Fotógrafos: con el móvil vale para empezar; el material bueno lo presta la escuela."
+          ]
+        },
+        {
+          "tipo": "destacado",
+          "texto": "Todo lo que se publica lleva firma. Nada sale sin el nombre de quien lo ha hecho."
+        },
+        {
+          "tipo": "p",
+          "texto": "La primera reunión abierta del curso es el 12 de septiembre. Quien no pueda venir puede escribir a la redacción y le contamos por dónde empezar."
+        }
+      ]
+    },
+    {
+      "id": "cafeteria-horario-continuo",
+      "seccion": "campus",
+      "titulo": "La cafetería cambia de horario y de carta: qué pasa a partir de septiembre",
+      "entradilla": "Servicio continuo de nueve a siete, menú fijo más barato y una barra rápida para los días de examen. Lo contamos con los precios delante.",
+      "fecha": "2026-07-14",
+      "autor": "Marta Gil",
+      "autorRol": "Redacción · 2º de GDE",
+      "lectura": 3,
+      "img": "assets/img/openday-desarrollo.jpg",
+      "alt": "Zona común del campus de EDEM en hora de descanso",
+      "pie": "La zona común, a media mañana.",
+      "etiquetas": [
+        "Campus",
+        "Servicios"
+      ],
+      "cuerpo": [
+        {
+          "tipo": "p",
+          "texto": "El cambio venía pedido desde el curso pasado: entre las clases de mañana y las sesiones de tarde había un hueco en el que la cafetería cerraba justo cuando más gente quedaba en el edificio."
+        },
+        {
+          "tipo": "lista",
+          "items": [
+            "Horario continuo de 9:00 a 19:00, de lunes a viernes.",
+            "Menú fijo del día con un precio cerrado para alumnos.",
+            "Barra rápida (café y bocadillo) en época de exámenes, con cola aparte.",
+            "Zona de microondas ampliada para quien traiga la comida de casa."
+          ]
+        },
+        {
+          "tipo": "p",
+          "texto": "Queda pendiente lo que más se repitió en la encuesta de delegados: más opciones vegetarianas en el menú fijo. La dirección del servicio ha dicho que lo revisará en octubre con los datos de consumo del primer mes."
+        },
+        {
+          "tipo": "destacado",
+          "texto": "Pequeño, pero es de esas cosas que se notan todos los días."
+        }
+      ]
+    },
+    {
+      "id": "startup-alumni-ronda-semilla",
+      "seccion": "emprende",
+      "titulo": "Una startup fundada por dos alumni cierra su primera ronda semilla",
+      "entradilla": "Se conocieron en un trabajo de segundo, montaron la empresa al acabar y acaban de levantar capital para pasar de doce a treinta clientes.",
+      "fecha": "2026-07-09",
+      "autor": "Pablo Server",
+      "autorRol": "Redacción · Máster en Dirección",
+      "lectura": 5,
+      "img": "assets/img/campus-talento.jpg",
+      "alt": "Dos fundadores presentando su proyecto ante una sala",
+      "pie": "El equipo, presentando el proyecto en una sesión abierta.",
+      "etiquetas": [
+        "Alumni",
+        "Startups",
+        "Financiación"
+      ],
+      "cuerpo": [
+        {
+          "tipo": "p",
+          "texto": "La historia empieza en un trabajo de grupo de segundo que nadie recuerda con cariño. Cuatro años después, dos de aquellos cuatro acaban de cerrar su primera ronda semilla para una herramienta de gestión de turnos para hostelería."
+        },
+        {
+          "tipo": "h2",
+          "texto": "Dos años facturando antes de pedir dinero"
+        },
+        {
+          "tipo": "p",
+          "texto": "Lo llamativo del caso no es la ronda, sino lo que hay debajo: dos años vendiendo puerta a puerta en bares y restaurantes de València antes de sentarse con un solo inversor. Cuando lo hicieron, llevaban doce clientes pagando todos los meses."
+        },
+        {
+          "tipo": "cita",
+          "texto": "El dinero llegó cuando ya no era imprescindible. Justo por eso pudimos negociar.",
+          "autor": "Uno de los fundadores"
+        },
+        {
+          "tipo": "dato",
+          "cifra": "12 → 30",
+          "texto": "clientes previstos para final de año con el equipo comercial que abre la ronda."
+        },
+        {
+          "tipo": "p",
+          "texto": "El consejo que dejaron a los alumnos de la sesión fue poco romántico: antes de buscar inversor, buscar el décimo cliente. Todo lo demás llega más fácil después."
+        }
+      ]
+    },
+    {
+      "id": "beca-talento-convocatoria",
+      "seccion": "agenda",
+      "titulo": "Abierta la convocatoria de becas de talento para el curso 26/27",
+      "entradilla": "Hasta el 30 de septiembre. Estos son los tramos, los criterios y los papeles que conviene tener listos antes de empezar la solicitud.",
+      "fecha": "2026-07-06",
+      "autor": "Redacción EDEM Times",
+      "autorRol": "Redacción",
+      "lectura": 2,
+      "img": "assets/img/grado-patio.jpg",
+      "alt": "Alumnos en el patio del campus de EDEM",
+      "pie": "Patio del campus, entre clase y clase.",
+      "etiquetas": [
+        "Becas",
+        "Matrícula",
+        "Curso 26/27"
+      ],
+      "cuerpo": [
+        {
+          "tipo": "p",
+          "texto": "La convocatoria de becas de talento para el curso 26/27 está abierta desde esta semana y se cierra el 30 de septiembre, sin prórroga."
+        },
+        {
+          "tipo": "h2",
+          "texto": "Lo que se valora"
+        },
+        {
+          "tipo": "lista",
+          "items": [
+            "Expediente académico de los dos últimos cursos.",
+            "Situación económica familiar acreditada.",
+            "Trayectoria fuera del aula: deporte, voluntariado, proyectos propios.",
+            "Entrevista personal para las solicitudes que pasan la primera fase."
+          ]
+        },
+        {
+          "tipo": "p",
+          "texto": "Consejo práctico de secretaría: reunir la documentación económica antes de abrir la solicitud. Es lo que más retrasa los expedientes y lo único que no se puede resolver a última hora."
+        },
+        {
+          "tipo": "destacado",
+          "texto": "Todas las solicitudes reciben respuesta, se concedan o no."
+        }
+      ]
+    },
+    {
+      "id": "open-day-julio",
+      "seccion": "campus",
+      "titulo": "Así fue el Open Day: 600 familias, 40 alumnos guía y un campus que no paró",
+      "entradilla": "Visitas cada quince minutos, aulas abiertas y una cola en la cafetería que dio para varias conversaciones sobre notas de corte.",
+      "fecha": "2026-07-15",
+      "autor": "Redacción EDEM Times",
+      "autorRol": "Redacción",
+      "lectura": 3,
+      "img": "assets/img/openday-ux.jpg",
+      "alt": "Familias visitando un aula durante el Open Day de EDEM",
+      "pie": "Una de las aulas abiertas durante la jornada de puertas abiertas.",
+      "etiquetas": [
+        "Open Day",
+        "Grados",
+        "Campus"
+      ],
+      "cuerpo": [
+        {
+          "tipo": "p",
+          "texto": "El sábado el edificio funcionó como una estación: turnos cada quince minutos, cuarenta alumnos haciendo de guía y unas 600 familias pasando por aulas, biblioteca y el patio."
+        },
+        {
+          "tipo": "p",
+          "texto": "La pregunta más repetida no fue la nota de corte —aunque también— sino cuántas horas se dedican de verdad a los proyectos de empresa. La respuesta honesta de los guías: más de las que pone en el horario."
+        },
+        {
+          "tipo": "destacado",
+          "texto": "Cuarenta alumnos se ofrecieron voluntarios para hacer de guía. Se apuntaron sesenta."
+        },
+        {
+          "tipo": "p",
+          "texto": "La siguiente jornada de puertas abiertas será en otoño. Quien quiera hacer de guía puede escribir a la redacción y lo pasamos a quien organiza."
+        }
+      ]
+    },
+    {
+      "id": "alumni-primer-ano-fuera",
+      "seccion": "alumni",
+      "titulo": "De las aulas al comité de dirección: tres alumni cuentan su primer año fuera",
+      "entradilla": "Uno acabó en una multinacional, otra montó empresa y el tercero volvió a casa a dirigir el negocio familiar. Ninguno de los tres esperaba estar donde está.",
+      "fecha": "2026-07-11",
+      "autor": "Diego Ferrer",
+      "autorRol": "Redacción · 3º de GDE",
+      "lectura": 7,
+      "img": "assets/img/intro-ee.jpg",
+      "alt": "Antiguos alumnos de EDEM conversando en el campus",
+      "pie": "Tres promociones distintas, la misma escalera.",
+      "etiquetas": [
+        "Alumni",
+        "Carrera profesional"
+      ],
+      "cuerpo": [
+        {
+          "tipo": "p",
+          "texto": "El primer año fuera es el que nadie cuenta en las jornadas de bienvenida. Hablamos con tres antiguos alumnos que salieron hace justo doce meses para saber qué se llevaron de aquí y qué han tenido que aprender a la carrera."
+        },
+        {
+          "tipo": "h2",
+          "texto": "«Lo que más me sirvió fue perder el miedo a preguntar»"
+        },
+        {
+          "tipo": "p",
+          "texto": "El primero entró en una multinacional de gran consumo. Dice que el 80 % de lo técnico lo aprendió en los tres primeros meses de trabajo, y que lo que le distinguió del resto fue algo mucho más tonto: levantar la mano en una reunión con doce personas y decir que no había entendido algo."
+        },
+        {
+          "tipo": "cita",
+          "texto": "En clase te obligan a defender una idea delante de gente que sabe más que tú. Eso, después, no se paga con dinero.",
+          "autor": "Promoción 2025"
+        },
+        {
+          "tipo": "h2",
+          "texto": "Montar empresa sin red"
+        },
+        {
+          "tipo": "p",
+          "texto": "La segunda montó su compañía tres meses después de graduarse. Cuenta el año con una honestidad poco habitual: seis meses de euforia, cuatro de dudas serias y dos de empezar a ver números que se sostienen. Su consejo para los que están en cuarto es contraintuitivo: trabajar primero para otro, aunque solo sea un año."
+        },
+        {
+          "tipo": "h2",
+          "texto": "Volver al negocio de casa"
+        },
+        {
+          "tipo": "p",
+          "texto": "El tercero se incorporó a la empresa familiar, un fabricante con cuarenta empleados. Su reto no ha sido la estrategia sino la legitimidad: convencer a un equipo que le conoce desde niño de que las decisiones no vienen del apellido."
+        },
+        {
+          "tipo": "destacado",
+          "texto": "Los tres coinciden en lo mismo: lo que echan de menos no son las clases, es tener a veinte personas a mano para preguntarles cualquier cosa."
+        }
+      ]
+    },
+    {
+      "id": "biblioteca-24-horas",
+      "seccion": "campus",
+      "titulo": "La biblioteca abrió 24 horas en exámenes (y no fue idea de la dirección)",
+      "entradilla": "La propuesta salió de una encuesta de delegados, se probó dos semanas y se queda. Crónica de cómo se cambia algo desde dentro.",
+      "fecha": "2026-07-08",
+      "autor": "Marta Gil",
+      "autorRol": "Redacción · 2º de GDE",
+      "lectura": 4,
+      "img": "assets/img/grado-patio.jpg",
+      "alt": "Alumnos estudiando en una zona común del campus",
+      "pie": "Zona de estudio del campus, en época de exámenes.",
+      "etiquetas": [
+        "Campus",
+        "Vida de alumno"
+      ],
+      "cuerpo": [
+        {
+          "tipo": "p",
+          "texto": "Empezó como una queja de pasillo y acabó en un piloto de dos semanas. La biblioteca abrió en horario continuo durante el periodo de exámenes y la ocupación media de madrugada superó lo que nadie esperaba."
+        },
+        {
+          "tipo": "h2",
+          "texto": "De la queja al dato"
+        },
+        {
+          "tipo": "p",
+          "texto": "La diferencia entre protestar y conseguir algo cabe en una hoja de cálculo: los delegados pasaron una encuesta, midieron cuántos se quedaban hasta el cierre y con qué frecuencia, y llevaron los números a la reunión en vez de llevar la sensación."
+        },
+        {
+          "tipo": "lista",
+          "items": [
+            "312 respuestas en cuatro días.",
+            "El 64 % declaró haberse quedado hasta el cierre al menos tres veces en el último mes.",
+            "Coste real del piloto: mucho menor de lo que se temía, porque el consumo de madrugada es bajo."
+          ]
+        },
+        {
+          "tipo": "destacado",
+          "texto": "Se aprende haciendo también significa esto: si algo no funciona, se mide y se propone."
+        }
+      ]
+    },
+    {
+      "id": "investors-day-cinco-claves",
+      "seccion": "inversion",
+      "titulo": "Cinco claves del último Investors Day, contadas por quien tomaba notas",
+      "entradilla": "Nuestra redactora estuvo en la última fila con un cuaderno. Esto es lo que se repitió en las cuatro horas de sesión.",
+      "fecha": "2026-07-03",
+      "autor": "Lucía Arnau",
+      "autorRol": "Redacción · 4º de GDE",
+      "lectura": 5,
+      "img": "assets/img/campus-talento.jpg",
+      "alt": "Sala llena durante una sesión de presentación de proyectos",
+      "pie": "Sala principal, minutos antes del primer pitch.",
+      "etiquetas": [
+        "Angels",
+        "Inversión",
+        "Eventos"
+      ],
+      "cuerpo": [
+        {
+          "tipo": "p",
+          "texto": "Cuatro horas, nueve presentaciones y una sala llena. Estas son las cinco cosas que más se repitieron, ordenadas de la más obvia a la que menos se dice en voz alta."
+        },
+        {
+          "tipo": "lista",
+          "items": [
+            "Enseña el producto antes que el mercado: la diapositiva del TAM no ha salvado nunca a nadie.",
+            "Los números tienen que poder auditarse en dos preguntas.",
+            "Si el equipo no está completo, dilo tú antes de que lo pregunten.",
+            "El «por qué ahora» vale más que el «por qué nosotros».",
+            "Una ronda no es un hito: es combustible para llegar al siguiente."
+          ]
+        },
+        {
+          "tipo": "cita",
+          "texto": "Si necesitas veinte diapositivas para explicarlo, no lo has entendido todavía.",
+          "autor": "Uno de los inversores presentes"
+        },
+        {
+          "tipo": "p",
+          "texto": "La sensación general al salir: se ha subido el listón del producto y ha bajado el de la retórica. En la sala se aplaudieron más los prototipos que las proyecciones."
+        }
+      ]
+    },
+    {
+      "id": "agenda-septiembre",
+      "seccion": "agenda",
+      "titulo": "Agenda de septiembre: bienvenida, Marina Sports Day y el cierre del número 3",
+      "entradilla": "Las fechas que conviene tener apuntadas antes de que empiece el curso, incluida la última para mandar temas a la revista.",
+      "fecha": "2026-06-27",
+      "autor": "Redacción EDEM Times",
+      "autorRol": "Redacción",
+      "lectura": 2,
+      "img": "assets/img/fachada.jpg",
+      "alt": "Fachada de EDEM en la Marina de València",
+      "pie": "El edificio, esperando a septiembre.",
+      "etiquetas": [
+        "Agenda",
+        "Curso 26/27"
+      ],
+      "cuerpo": [
+        {
+          "tipo": "p",
+          "texto": "Septiembre viene cargado. Estas son las fechas confirmadas hasta ahora; iremos actualizando la lista según se cierren las demás."
+        },
+        {
+          "tipo": "lista",
+          "items": [
+            "1 de septiembre · Jornada de bienvenida para nuevos alumnos de grados.",
+            "5 de septiembre · Marina Sports Day en la Marina de València.",
+            "12 de septiembre · Reunión abierta de la redacción de EDEM Times.",
+            "15 de septiembre · Cierre de la convocatoria de otoño de Lanzadera.",
+            "26 de septiembre · Fecha límite para proponer temas del número 3."
+          ]
+        },
+        {
+          "tipo": "destacado",
+          "texto": "Para proponer un tema no hace falta traerlo escrito: basta con contarlo en la reunión abierta."
+        }
+      ]
+    },
+    {
+      "id": "secretaria-virtual-matricula",
+      "seccion": "campus",
+      "titulo": "Secretaría virtual: qué cambia en la matrícula de este curso",
+      "entradilla": "Menos papel, un solo acceso y avisos por correo en cada paso. Resumen de lo que hay que saber antes de sentarse a matricularse.",
+      "fecha": "2026-06-20",
+      "autor": "Redacción EDEM Times",
+      "autorRol": "Redacción",
+      "lectura": 3,
+      "img": "assets/img/secretaria-virtual.jpg",
+      "alt": "Pantalla de la secretaría virtual de EDEM",
+      "pie": "La nueva secretaría virtual, en pruebas desde junio.",
+      "etiquetas": [
+        "Matrícula",
+        "Campus"
+      ],
+      "cuerpo": [
+        {
+          "tipo": "p",
+          "texto": "La matrícula de este curso se hace entera desde la secretaría virtual. El cambio no es cosmético: desaparece la entrega presencial de documentación y cada trámite deja un rastro consultable."
+        },
+        {
+          "tipo": "lista",
+          "items": [
+            "Un único acceso para matrícula, expediente y certificados.",
+            "Documentación en PDF, sin copias en papel.",
+            "Aviso por correo en cada cambio de estado del expediente.",
+            "Plazos visibles en el propio panel, sin tener que buscarlos."
+          ]
+        },
+        {
+          "tipo": "p",
+          "texto": "Recomendación práctica de quienes ya la han usado en pruebas: tener los documentos escaneados antes de empezar. La sesión caduca y volver a subirlo todo es lo único verdaderamente tedioso del proceso."
+        }
+      ]
+    }
+  ]
+}

@@ -214,21 +214,9 @@ function renderKiosko() {
   $('kcount').textContent = n + (n === 1 ? ' edición' : ' ediciones');
 }
 
-function renderArticles() {
-  const latest = latestIssue();
-  $('numero-note').textContent = latest.nr + ' «' + latest.title + '» · cada artículo abre el visor por su página';
-  // el número de la edición, en grande y fantasma, detrás del sumario
-  const nr = (latest.nr.match(/\d+/) || ['1'])[0];
-  $('nghost').textContent = String(nr).padStart(2, '0');
-  // el primero va destacado, como la apertura de un sumario de revista
-  $('agrid').innerHTML = C.articles.map((a, i) =>
-    '<article class="acard rv' + (i === 0 ? ' feat' : '') + '" data-art="' + i + '" role="button" tabindex="0" aria-label="Leer «' + esc(a.title) + '» en el visor">' +
-    '<div class="im"><span class="imfall"><i data-lucide="anchor" class="lu"></i></span><img src="' + esc(a.img) + '" loading="lazy" decoding="async" onerror="this.remove()" alt=""></div>' +
-    '<div class="abody"><span class="apg" aria-hidden="true">' + String(a.page).padStart(2, '0') + '</span>' +
-    '<span class="abadge" style="background:' + color(a.color) + '">' + esc(a.cat) + '</span>' +
-    '<h3 class="disp">' + esc(a.title) + '</h3><p>' + esc(a.excerpt) + '</p>' +
-    '<div class="afoot"><span class="go">Leer en el visor <i data-lucide="arrow-right" class="lu" style="width:15px;height:15px"></i></span><span class="pnum">pág. ' + String(a.page).padStart(2, '0') + '</span></div></div></article>').join('');
-}
+/* El sumario «En este número» ya no existe: su sitio lo ocupa «Actualidad», la
+   portada del diario digital, que pinta js/news.js con data/noticias.json (o con
+   el CMS headless). */
 
 /* ---------- Conócenos: la invitación a hacer la revista ----------
    La sección se clava (.jstage sticky) y el scroll va encendiendo las formas de
@@ -505,13 +493,11 @@ document.addEventListener('click', e => {
   if (v) { e.preventDefault(); openVisor(v.dataset.visor); return; }
   const slot = e.target.closest('.coverslot[data-mag]');
   if (slot) { openVisor(slot.dataset.mag); return; }
-  const card = e.target.closest('.acard[data-art]');
-  if (card) { const a = C.articles[+card.dataset.art]; openVisor(a.issue, a.page - 1); return; }
   const open = e.target.closest('[data-open-visor]');
   if (open) { e.preventDefault(); closeMenu(); openVisor(latestIssue().id); }
 });
 document.addEventListener('keydown', e => {
-  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.coverslot[data-mag],.acard[data-art]')) {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.coverslot[data-mag]')) {
     e.preventDefault(); e.target.click();
   }
 });
@@ -1189,7 +1175,7 @@ window.addEventListener('resize', () => { if (!visor.hidden) applyMode(); });
 
 /* ================= arranque ================= */
 function renderAll() {
-  renderHero(); renderKiosko(); renderArticles(); renderJoin(); renderEcosystem(); renderFooter();
+  renderHero(); renderKiosko(); renderJoin(); renderEcosystem(); renderFooter();
   $('v-issues').innerHTML = MAGS.map(m => '<button class="vchip" role="tab" data-id="' + m.id + '" data-visor-issue="' + m.id + '">' + esc(m.chip) + '</button>').join('');
   $('v-issues').onclick = e => { const c = e.target.closest('[data-visor-issue]'); if (c) setIssue(c.dataset.visorIssue, 0); };
   lucide.createIcons();
@@ -1207,8 +1193,23 @@ async function boot() {
   } catch (_) { /* sin servidor o sin JSON: catálogo embebido */ }
   renderAll();
   mountCovers();
+  abrirVisorPorURL();
 }
 boot();
+
+/* index.html?visor=<id|ultima>&pag=<n> abre el visor directamente.
+   Lo usan las fichas del portal de noticias («Abrir en el visor») para llevar a
+   la página exacta de la revista donde se publicó la versión larga. */
+function abrirVisorPorURL() {
+  const q = new URLSearchParams(location.search);
+  const id = q.get('visor');
+  if (!id) return;
+  const m = (id === 'ultima' || id === '1') ? latestIssue() : (MAGS.find(x => x.id === id) || latestIssue());
+  const pag = Math.max(1, parseInt(q.get('pag'), 10) || 1);
+  openVisor(m.id, pag - 1);
+  // la URL se limpia: al cerrar el visor y recargar no vuelve a abrirse solo
+  history.replaceState(null, '', location.pathname + location.hash);
+}
 
 /* ============ theme-color de la barra inferior del navegador móvil ==========
    La barra inferior es UI del sistema: una página no puede volverla transparente
@@ -1250,7 +1251,7 @@ boot();
   const hero = document.querySelector('#heroPin .hero');
   // secciones con fondo propio bajo el hero, en orden de documento; el color
   // null del kiosko se interpola sobre su gradiente según la posición.
-  const zones = [['kiosko', null], ['numero', PAPER], ['conocenos', '#0e2129'], ['ecosistema', '#0e2129'], ['suscribete', PAPER]]
+  const zones = [['kiosko', null], ['actualidad', PAPER], ['conocenos', '#0e2129'], ['ecosistema', '#0e2129'], ['suscribete', PAPER]]
     .map(([id, color]) => ({ el: $(id), color }))
     .filter(z => z.el);
   const foot = document.querySelector('footer.site');

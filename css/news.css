@@ -1,0 +1,279 @@
+/* ============================================================
+   EDEM Times — news.css
+   Portal de noticias (noticias.html), ficha de noticia
+   (noticia.html) y bloque «Actualidad» de la home.
+
+   La referencia es la portada de un periódico: jerarquía por
+   tamaño y no por color, filetes en vez de cajas, y el papel de
+   la revista (--paper) como fondo de todo. El color de marca solo
+   aparece en la etiqueta de sección, en los enlaces y en el filete
+   superior de la apertura.
+   ============================================================ */
+
+/* ---------- piezas comunes a las tres vistas ---------- */
+
+/* Etiqueta de sección: la única mancha de color de una tarjeta. */
+.nbadge{align-self:flex-start;padding:5px 12px;border-radius:var(--radius-pill);color:#fff;
+  font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.nkick{font-size:10.5px;font-weight:800;letter-spacing:.18em;text-transform:uppercase}
+.nmeta{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-faint);font-weight:600;flex-wrap:wrap}
+.nmeta .sep{opacity:.5}
+
+/* --- tarjeta estándar: la unidad del flujo --- */
+.ncard{display:flex;flex-direction:column;background:var(--surface-card);
+  border:1px solid var(--border-hair);border-radius:var(--radius-lg);overflow:hidden;
+  box-shadow:var(--shadow-sm);color:inherit;
+  transition:transform var(--dur) var(--ease-standard),box-shadow var(--dur) var(--ease-standard),border-color var(--dur) var(--ease-standard)}
+.ncard:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);border-color:var(--edem-teal-200);color:inherit}
+.ncard .nim{aspect-ratio:3/2;overflow:hidden;position:relative;
+  background:linear-gradient(135deg,var(--edem-teal-800),var(--edem-teal-900))}
+.ncard .nim img{width:100%;height:100%;object-fit:cover;transition:transform var(--dur-slow) var(--ease-standard)}
+.ncard:hover .nim img{transform:scale(1.045)}
+/* sin foto la tarjeta no deja un hueco negro: se queda solo el texto */
+.ncard .nim.nofoto{display:none}
+.ncard .nbody{padding:20px 22px 22px;display:flex;flex-direction:column;gap:10px;flex:1}
+.ncard h3{font-size:21px;line-height:1.16;color:var(--text-strong);letter-spacing:-.015em}
+.ncard:hover h3{color:var(--edem-teal-700)}
+.ncard p{font-size:14.5px;line-height:1.55;color:var(--text-muted);flex:1}
+.ncard .nfoot{border-top:1px solid var(--ink-100);padding-top:11px;margin-top:2px}
+
+/* --- apertura: la noticia que manda en la portada --- */
+.ncard.lead{border-top:3px solid var(--edem-teal-500)}
+.ncard.lead .nim{aspect-ratio:16/9}
+.ncard.lead .nbody{padding:clamp(22px,2.6vw,34px)}
+.ncard.lead h2{font-size:clamp(28px,3.4vw,46px);line-height:1.02;color:var(--text-strong);letter-spacing:-.02em}
+.ncard.lead:hover h2{color:var(--edem-teal-700)}
+.ncard.lead .nlead{font-size:clamp(15.5px,1.4vw,18px);line-height:1.6;color:var(--text-muted);max-width:62ch}
+.ncard.lead .nfoot{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.ncard.lead .nby{font-size:12.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--text-body)}
+.ncard.lead .nfoot .nmeta{margin-left:auto}
+.ngo{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:700;
+  color:var(--text-link);transition:gap var(--dur)}
+.ncard:hover .ngo{gap:12px}
+.ngo .lu{width:15px;height:15px}
+
+/* --- línea de sumario: titular + miniatura, sin foto grande --- */
+.nrow{display:flex;align-items:flex-start;gap:16px;padding:16px 0;
+  border-bottom:1px solid var(--border-hair);color:inherit;transition:padding-left var(--dur) var(--ease-standard)}
+.nrow:first-child{padding-top:0}
+.nrow:hover{color:inherit;padding-left:6px}
+.nrowtxt{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.nrow h3{font-size:19px;line-height:1.18;color:var(--text-strong);letter-spacing:-.012em}
+.nrow:hover h3{color:var(--edem-teal-700)}
+.nago{font-size:12px;color:var(--text-faint);font-weight:600}
+.nthumb{width:88px;height:66px;object-fit:cover;border-radius:var(--radius-sm);flex:none}
+
+.nvacio{padding:60px 0;text-align:center;color:var(--text-muted);font-size:16px}
+
+/* ============================================================
+   1 · BLOQUE «ACTUALIDAD» DE LA HOME
+   ============================================================ */
+#actualidad{position:relative;padding:82px 0 88px;overflow:hidden}
+#actualidad .nbg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+#actualidad .wrap{position:relative;z-index:1}
+.dgrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:34px;align-items:stretch}
+.dlist{display:flex;flex-direction:column}
+/* puerta al portal: cierra la columna de titulares y se posa en el mismo
+   canto inferior que la apertura (de ahí el margen automático) */
+.dall{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:auto;
+  padding:16px 20px;border-radius:var(--radius-lg);background:var(--edem-teal-900);color:#fff;
+  font-size:14.5px;font-weight:700;transition:background var(--dur) var(--ease-standard),gap var(--dur)}
+/* aire mínimo entre el último titular y el botón, aunque la columna cuadre justa */
+.dlist .nrow:last-of-type{margin-bottom:18px}
+.dall:hover{background:var(--edem-teal-700);color:#fff;gap:20px}
+.dall .lu{width:18px;height:18px}
+
+/* ============================================================
+   2 · PORTAL DE NOTICIAS
+   ============================================================ */
+/* Cabecera del diario: filete grueso arriba, como una mancheta. */
+.npmast{padding:44px 0 30px;border-bottom:1px solid var(--border-hair);position:relative;overflow:hidden}
+.npmast .wrap{position:relative;z-index:1}
+.npmast .nbg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.npkick{display:flex;align-items:center;gap:10px;color:var(--edem-teal-700)}
+.npkick .dot{width:7px;height:7px;border-radius:50%;background:var(--lanzadera);animation:kpulse 2.6s ease-in-out infinite}
+.npmast h1{font-size:clamp(46px,7vw,96px);line-height:.9;color:var(--text-strong);margin-top:14px}
+.npmast h1 .pt{color:var(--edem-teal-500)}
+.npmast .nplead{font-size:clamp(16px,1.6vw,19px);line-height:1.62;color:var(--text-muted);max-width:56ch;margin-top:16px}
+.npdata{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:22px;
+  font-size:11.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--text-faint)}
+.npdata .pip{width:5px;height:5px;border-radius:50%;background:var(--edem-teal-300)}
+.npaviso{padding:6px 12px;border-radius:var(--radius-pill);border:1px dashed var(--border-strong);
+  color:var(--text-muted);letter-spacing:.1em}
+.npaviso[hidden]{display:none}
+
+/* --- portada: apertura + secundarias + raíl de lo último --- */
+.nportada{padding:38px 0 10px;display:grid;grid-template-columns:minmax(0,1.62fr) minmax(0,1fr);
+  gap:clamp(28px,3.4vw,48px);align-items:start}
+.nprincipal{display:flex;flex-direction:column;gap:26px}
+.nsec{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.nrail{position:sticky;top:96px;display:flex;flex-direction:column;gap:22px}
+.nrailbox{border:1px solid var(--border-hair);border-radius:var(--radius-lg);background:var(--surface-card);
+  padding:22px 22px 8px;box-shadow:var(--shadow-sm)}
+.nrailbox>.h{display:flex;align-items:center;gap:9px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  font-weight:800;color:var(--edem-teal-700);padding-bottom:14px;border-bottom:2px solid var(--ink-900)}
+.nrailbox>.h .lu{width:15px;height:15px}
+.nultimo{list-style:none}
+.nultimo li{border-bottom:1px solid var(--border-hair)}
+.nultimo li:last-child{border-bottom:0}
+.nultimo a{display:grid;gap:5px;padding:13px 0;color:inherit}
+.nultimo .uhora{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--text-faint)}
+.nultimo .utit{font-family:var(--font-display);font-weight:900;font-optical-sizing:none;font-variation-settings:'opsz' 14;
+  font-size:16px;line-height:1.2;letter-spacing:-.01em;color:var(--text-strong)}
+.nultimo a:hover .utit{color:var(--edem-teal-700)}
+.nultimo .usec{font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+
+/* promo de la revista dentro del raíl: el portal es diario, el papel es mensual */
+.nrevista{border-radius:var(--radius-lg);overflow:hidden;background:var(--edem-teal-900);color:#fff;
+  padding:26px 24px;position:relative}
+.nrevista::after{content:'';position:absolute;right:-40px;bottom:-60px;width:190px;height:190px;border-radius:50%;
+  background:radial-gradient(circle,rgba(63,166,196,.5),transparent 70%);pointer-events:none}
+.nrevista .over{color:var(--edem-teal-200)}
+.nrevista p{font-size:22px;line-height:1.15;margin:12px 0 16px;color:#fff;position:relative;z-index:1}
+.nrevista .btn{position:relative;z-index:1}
+
+/* --- barra de filtros: se queda pegada bajo la cabecera --- */
+.nflujo{padding:34px 0 90px}
+/* 69px = los 68 de la cabecera + su filete inferior: pegada justo debajo,
+   sin dejar asomar una franja de papel al desplazar */
+.nfilbar{position:sticky;top:69px;z-index:20;background:rgba(251,250,246,.94);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border-top:3px solid var(--ink-900);border-bottom:1px solid var(--border-hair);
+  padding:14px 0 12px;margin-bottom:26px}
+.nfilbar .in{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.nfiltros{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;flex:1;min-width:0}
+.nfiltros::-webkit-scrollbar{display:none}
+.nfil{--fc:var(--edem-teal-500);white-space:nowrap;padding:9px 15px;border-radius:var(--radius-pill);
+  border:1px solid var(--border-strong);background:transparent;color:var(--text-body);
+  font-size:13px;font-weight:700;cursor:pointer;transition:all var(--dur-fast)}
+.nfil:hover{border-color:var(--fc);color:var(--fc)}
+.nfil.on{background:var(--fc);border-color:var(--fc);color:#fff}
+.nfil .fnum{font-size:11px;opacity:.62;font-weight:800;margin-left:3px}
+.nfil.on .fnum{opacity:.8}
+.ncount{font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--text-faint);
+  white-space:nowrap;margin-left:auto}
+.nsecdesc{font-size:14.5px;color:var(--text-muted);line-height:1.6;margin-bottom:22px;max-width:64ch}
+.nsecdesc:empty{display:none}
+.ngrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(288px,1fr));gap:26px}
+.nmas{display:flex;justify-content:center;margin-top:38px}
+.nmas[hidden]{display:none}
+
+/* ============================================================
+   3 · FICHA DE NOTICIA
+   ============================================================ */
+/* barra de progreso de lectura, colgada de la cabecera */
+.aprogwrap{position:sticky;top:69px;z-index:50;height:3px;background:transparent}
+.aprog{height:100%;background:var(--acc,var(--edem-teal-500));transform:scaleX(0);transform-origin:left;
+  will-change:transform}
+
+/* Una sola medida manda en toda la ficha: --acol es el ancho del texto y todo
+   lo demás se calcula a partir de ahí. Antetítulo, titular, firma, cuerpo y
+   caja de la revista comparten así el mismo margen izquierdo; la foto de
+   apertura es lo único que se sale, y a propósito.
+   El +56px de los contenedores es el padding lateral de .wrap (28+28): sin
+   sumarlo, el texto de la cabecera quedaría 28px a la derecha del cuerpo. */
+.ahead{--acol:720px;padding:38px 0 26px}
+.awrap{max-width:calc(720px + 56px)}
+.amiga{display:flex;align-items:center;gap:9px;font-size:11.5px;font-weight:800;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--text-faint);margin-bottom:20px;flex-wrap:wrap}
+.amiga a{color:var(--text-muted)}
+.amiga a:hover{color:var(--edem-teal-700)}
+.ahead h1{font-size:clamp(34px,5vw,64px);line-height:1;letter-spacing:-.022em;color:var(--text-strong)}
+.aentradilla{font-size:clamp(17px,1.9vw,22px);line-height:1.55;color:var(--text-muted);margin-top:20px;max-width:60ch}
+.afirma{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:28px;padding:16px 0;
+  border-top:1px solid var(--border-hair);border-bottom:1px solid var(--border-hair)}
+.afirma-txt{display:flex;flex-direction:column;gap:2px}
+.aautor{font-size:14px;font-weight:800;color:var(--text-strong)}
+.arol{font-size:12px;color:var(--text-faint);font-weight:600}
+.afecha{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-faint);font-weight:600;flex-wrap:wrap}
+.afecha .sep{opacity:.5}
+.ashare{margin-left:auto;display:flex;align-items:center;gap:8px}
+.sbtn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;cursor:pointer;
+  border:1px solid var(--border-strong);background:transparent;color:var(--text-body);
+  transition:all var(--dur-fast)}
+.sbtn:hover{background:var(--acc,var(--edem-teal-500));border-color:var(--acc,var(--edem-teal-500));color:#fff}
+.sbtn .lu{width:17px;height:17px}
+.scopy{font-size:12px;font-weight:700;color:var(--edem-teal-700)}
+
+/* foto de apertura: más ancha que la columna de texto, que es lo que le da
+   aire a la entrada del artículo */
+.ahero{margin:6px 0 0}
+.ahero .wrap{max-width:calc(1000px + 56px)}
+.ahero img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:var(--radius-lg);display:block}
+.ahero figcaption{font-size:12.5px;color:var(--text-faint);line-height:1.5;margin-top:10px;
+  padding-left:14px;border-left:2px solid var(--border-strong);max-width:70ch}
+
+/* --- cuerpo del artículo: una sola columna, medida de lectura --- */
+.acuerpo{padding-top:42px;padding-bottom:20px}
+.acol{max-width:720px;margin-inline:auto}
+.acol p{font-size:18.5px;line-height:1.78;color:var(--text-body);margin-bottom:22px}
+/* capitular del primer párrafo, como en el papel */
+.acol p.acap::first-letter{float:left;font-family:var(--font-display);font-weight:900;font-size:76px;
+  line-height:.78;padding:6px 12px 0 0;color:var(--edem-teal-700)}
+.acol h2{font-size:clamp(24px,2.6vw,32px);line-height:1.14;color:var(--text-strong);
+  margin:40px 0 16px;letter-spacing:-.018em}
+.acol h3{font-size:19px;font-weight:800;color:var(--text-strong);margin:30px 0 12px}
+.alista{list-style:none;margin:6px 0 26px;padding:0}
+.alista li{position:relative;padding-left:26px;font-size:17px;line-height:1.68;color:var(--text-body);margin-bottom:11px}
+.alista li::before{content:'';position:absolute;left:0;top:11px;width:11px;height:2px;background:var(--acc,var(--edem-teal-500))}
+/* cita destacada: sin comillas tipográficas, con el signo de Lucide arriba */
+.acita{margin:34px 0;padding:26px 28px;border-left:3px solid var(--acc,var(--edem-teal-500));
+  background:var(--paper-deep);border-radius:0 var(--radius-lg) var(--radius-lg) 0}
+.acita .lu{width:22px;height:22px;color:var(--acc,var(--edem-teal-500));opacity:.5;margin-bottom:10px}
+.acita blockquote{font-family:var(--font-display);font-style:italic;font-weight:600;
+  font-size:clamp(20px,2.2vw,26px);line-height:1.34;color:var(--text-strong)}
+.acita figcaption{margin-top:12px;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--text-faint)}
+.afig{margin:32px 0}
+.afig img{width:100%;border-radius:var(--radius-lg);display:block}
+.afig figcaption{font-size:12.5px;color:var(--text-faint);margin-top:9px;line-height:1.5}
+.adest{font-size:clamp(21px,2.4vw,28px);line-height:1.28;color:var(--edem-teal-700);
+  margin:34px 0;padding:0 0 0 22px;border-left:3px solid var(--edem-teal-200)}
+.adato{display:flex;align-items:baseline;gap:18px;margin:32px 0;padding:22px 24px;
+  border:1px solid var(--border-hair);border-top:3px solid var(--acc,var(--edem-teal-500));
+  border-radius:0 0 var(--radius-lg) var(--radius-lg);background:var(--surface-card)}
+.adato .cifra{font-size:clamp(38px,5vw,58px);line-height:.9;color:var(--acc,var(--edem-teal-700));flex:none}
+.adato .txt{font-size:15px;line-height:1.55;color:var(--text-muted)}
+.atags{display:flex;gap:8px;flex-wrap:wrap;margin:38px 0 0;padding-top:22px;border-top:1px solid var(--border-hair)}
+.atag{padding:6px 13px;border-radius:var(--radius-pill);border:1px solid var(--border-hair);
+  background:var(--surface-card);font-size:12px;font-weight:700;color:var(--text-muted)}
+
+/* enlace al visor cuando la noticia tiene versión en papel */
+.arevista{max-width:720px;margin:10px auto 0;padding:26px 28px;border-radius:var(--radius-lg);
+  background:var(--edem-teal-900);color:#fff}
+.arevista .over{color:var(--edem-teal-200)}
+.arevista p{font-size:clamp(19px,2vw,24px);line-height:1.3;color:#fff;margin:10px 0 18px;max-width:52ch}
+
+/* --- sigue leyendo --- */
+.arel{background:var(--paper-deep);border-top:1px solid var(--border-hair);padding:60px 0 76px;margin-top:56px}
+.arel[hidden]{display:none}
+.arel .shead{margin-bottom:26px}
+.arelgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
+
+/* ---------- responsive ---------- */
+@media(max-width:1020px){
+  .nportada{grid-template-columns:1fr;gap:30px}
+  .nrail{position:static}
+  .dgrid{grid-template-columns:1fr;gap:26px}
+  .acuerpo{padding:32px 0 12px}
+  #actualidad{padding:64px 0 70px}
+}
+@media(max-width:680px){
+  .npmast{padding:30px 0 24px}
+  .nportada{padding:26px 0 4px}
+  .nsec{grid-template-columns:1fr;gap:20px}
+  .ngrid{grid-template-columns:1fr;gap:22px}
+  .nfilbar{padding:11px 0 10px}
+  .ncount{display:none}
+  .nrow{gap:12px}
+  .nthumb{width:72px;height:56px}
+  .ncard.lead .nfoot .nmeta{margin-left:0}
+  .ahead{padding:26px 0 20px}
+  .afirma{gap:12px}
+  .ashare{margin-left:0;width:100%;justify-content:flex-start;padding-top:4px}
+  .ahero img{border-radius:var(--radius-sm);aspect-ratio:4/3}
+  .acol p{font-size:17.5px;line-height:1.72}
+  .acol p.acap::first-letter{font-size:62px;padding-right:9px}
+  .acita{padding:20px 20px;margin:28px 0}
+  .adato{flex-direction:column;gap:8px}
+  .arel{padding:46px 0 56px;margin-top:40px}
+}

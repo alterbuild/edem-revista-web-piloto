@@ -20,10 +20,11 @@
 <link rel="apple-touch-icon" href="assets/edem-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="css/tokens.css?v=20260722f">
+<link rel="stylesheet" href="css/tokens.css?v=20260723">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&display=swap">
-<link rel="stylesheet" href="css/site.css?v=20260722f">
-<script src="js/icons.js?v=20260722f" defer></script>
+<link rel="stylesheet" href="css/site.css?v=20260723">
+<link rel="stylesheet" href="css/news.css?v=20260723">
+<script src="js/icons.js?v=20260723" defer></script>
 </head>
 <body>
 
@@ -34,7 +35,7 @@
     <a class="brand" href="#" data-top aria-label="EDEM Times — volver al inicio"><img src="assets/edem-logo.png" alt="EDEM"><span class="t">times<span class="pt">.</span></span></a>
     <nav class="main" aria-label="Principal">
       <a href="#kiosko">Kiosko</a>
-      <a href="#numero">En este número</a>
+      <a href="noticias.html">Actualidad</a>
       <a href="#conocenos">Conócenos</a>
       <a href="#ecosistema">Ecosistema</a>
       <a href="#suscribete">Suscríbete</a>
@@ -44,7 +45,7 @@
   </div>
   <nav class="mnav" id="mnav" aria-label="Menú móvil">
     <a href="#kiosko"><i data-lucide="library" class="lu ic"></i><span>Kiosko</span><i data-lucide="chevron-right" class="lu ch"></i></a>
-    <a href="#numero"><i data-lucide="list" class="lu ic"></i><span>En este número</span><i data-lucide="chevron-right" class="lu ch"></i></a>
+    <a href="noticias.html"><i data-lucide="newspaper" class="lu ic"></i><span>Actualidad</span><i data-lucide="chevron-right" class="lu ch"></i></a>
     <a href="#conocenos"><i data-lucide="book-marked" class="lu ic"></i><span>Conócenos</span><i data-lucide="chevron-right" class="lu ch"></i></a>
     <a href="#ecosistema"><i data-lucide="waypoints" class="lu ic"></i><span>Ecosistema</span><i data-lucide="chevron-right" class="lu ch"></i></a>
     <a href="#suscribete"><i data-lucide="mail" class="lu ic"></i><span>Suscríbete</span><i data-lucide="chevron-right" class="lu ch"></i></a>
@@ -290,7 +291,11 @@
       <p class="sub disp-i" id="hero-sub">El arte de hacer que las cosas funcionen</p>
       <p class="lead" id="hero-lead">24 páginas a toda máquina: la crónica del Hackathon desde dentro, una entrevista cruzada alumno × CEO, el radar de Lanzadera, las métricas que mira Angels y pasatiempos para el trayecto de vuelta.</p>
       <div class="acts">
-        <button class="btn pri" data-open-visor><i data-lucide="book-open" class="lu"></i> Leer en el visor</button>
+        <!-- La llamada principal del hero lleva al diario, no al visor: el papel
+             se lee cuando sale, el portal tiene algo nuevo cualquier día. El
+             visor sigue a un clic desde el botón «Leer» de la cabecera, desde el
+             kiosko y desde la propia pila de portadas de al lado. -->
+        <a class="btn pri" href="noticias.html"><i data-lucide="newspaper" class="lu"></i> Leer las noticias</a>
         <a class="btn ghost" href="#kiosko"><i data-lucide="library" class="lu"></i> Ver el kiosko</a>
       </div>
     </div>
@@ -349,17 +354,21 @@
   </div>
 </section>
 
-<!-- EN ESTE NÚMERO -->
-<section id="numero">
-  <div class="nbg" aria-hidden="true"><span class="nghost" id="nghost">02</span><span class="nrules"></span></div>
+<!-- ACTUALIDAD · las noticias destacadas del portal digital
+     Antes esta sección era el sumario del número en papel. Ahora es la portada
+     del diario: la apertura, tres titulares más y la puerta al portal completo.
+     El contenido sale de data/noticias.json (o del CMS headless, ver js/cms.js)
+     y lo pinta js/news.js. -->
+<section id="actualidad">
+  <div class="nbg" aria-hidden="true"><span class="nrules"></span></div>
   <div class="wrap">
     <div class="shead rv">
-      <span class="skick over">Sumario</span>
-      <h2 class="disp">En este número</h2>
-      <span class="note" id="numero-note">cada artículo abre el visor por su página</span>
-      <a class="more" href="#" data-open-visor>Leer completo →</a>
+      <span class="skick over">Actualidad</span>
+      <h2 class="disp">Lo último en EDEM Times</h2>
+      <span class="note" id="actualidad-note">el diario de la escuela, entre número y número</span>
+      <a class="more" href="noticias.html">Ir al portal de noticias →</a>
     </div>
-    <div class="agrid" id="agrid"></div>
+    <div class="dgrid" id="dgrid"></div>
   </div>
 </section>
 
@@ -645,6 +654,8 @@
   </div>
 </div>
 
-<script src="js/app.js?v=20260722f" defer></script>
+<script src="js/cms.js?v=20260723" defer></script>
+<script src="js/app.js?v=20260723" defer></script>
+<script src="js/news.js?v=20260723" defer></script>
 </body>
 </html>

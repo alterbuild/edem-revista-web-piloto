@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fbfaf6">
+<!-- El título, la descripción y la imagen social los reescribe js/news.js con
+     los datos de la noticia en cuanto carga. Estos valores son el respaldo
+     para cuando la ficha no existe o el JavaScript no llega a ejecutarse. -->
+<title>Noticia — EDEM Times</title>
+<meta name="description" content="Noticia del portal de actualidad de EDEM Times, la revista de EDEM Escuela de Empresarios.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="EDEM Times">
+<meta property="og:title" content="EDEM Times">
+<meta property="og:description" content="Actualidad de EDEM Escuela de Empresarios y la Marina de Empresas.">
+<meta property="og:image" content="assets/img/campus-talento.jpg">
+<meta property="og:locale" content="es_ES">
+<link rel="canonical" href="">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/edem-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="css/tokens.css?v=20260723">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&display=swap">
+<link rel="stylesheet" href="css/site.css?v=20260723">
+<link rel="stylesheet" href="css/news.css?v=20260723">
+<script src="js/icons.js?v=20260723" defer></script>
+<script src="js/cms.js?v=20260723" defer></script>
+<script src="js/news.js?v=20260723" defer></script>
+<script src="js/chrome.js?v=20260723" defer></script>
+</head>
+<body>
+
+<a class="skip" href="#art">Saltar al contenido</a>
+
+<header class="site">
+  <div class="wrap hbar">
+    <a class="brand" href="index.html" aria-label="EDEM Times — ir a la portada"><img src="assets/edem-logo.png" alt="EDEM"><span class="t">times<span class="pt">.</span></span></a>
+    <nav class="main" aria-label="Principal">
+      <a href="index.html">Portada</a>
+      <a href="noticias.html">Actualidad</a>
+      <a href="index.html#kiosko">Kiosko</a>
+      <a href="index.html#conocenos">Conócenos</a>
+      <a href="index.html#ecosistema">Ecosistema</a>
+    </nav>
+    <a class="btn pri cta" href="index.html?visor=ultima"><i data-lucide="book-open" class="lu"></i> Leer</a>
+    <button class="menubtn" id="menubtn" aria-label="Abrir menú" aria-expanded="false" aria-controls="mnav"><i data-lucide="menu" class="lu"></i></button>
+  </div>
+  <nav class="mnav" id="mnav" aria-label="Menú móvil">
+    <a href="index.html"><i data-lucide="anchor" class="lu ic"></i><span>Portada</span><i data-lucide="chevron-right" class="lu ch"></i></a>
+    <a href="noticias.html"><i data-lucide="newspaper" class="lu ic"></i><span>Actualidad</span><i data-lucide="chevron-right" class="lu ch"></i></a>
+    <a href="index.html#kiosko"><i data-lucide="library" class="lu ic"></i><span>Kiosko</span><i data-lucide="chevron-right" class="lu ch"></i></a>
+    <a href="index.html#conocenos"><i data-lucide="book-marked" class="lu ic"></i><span>Conócenos</span><i data-lucide="chevron-right" class="lu ch"></i></a>
+    <a href="index.html#ecosistema"><i data-lucide="waypoints" class="lu ic"></i><span>Ecosistema</span><i data-lucide="chevron-right" class="lu ch"></i></a>
+    <a class="btn pri mcta" href="index.html?visor=ultima"><i data-lucide="book-open" class="lu"></i> Leer</a>
+  </nav>
+</header>
+<div class="mscrim" id="mscrim" hidden></div>
+
+<!-- cuánto queda de artículo, colgado del borde de la cabecera -->
+<div class="aprogwrap" aria-hidden="true"><div class="aprog" id="aprog"></div></div>
+
+<main>
+  <!-- todo el artículo lo pinta js/news.js con la noticia de ?a=<id> -->
+  <article id="art"></article>
+
+  <section class="arel" id="arel" aria-labelledby="arel-h">
+    <div class="wrap">
+      <div class="shead">
+        <span class="skick over">Sigue leyendo</span>
+        <h2 class="disp" id="arel-h">Más del portal</h2>
+        <a class="more" href="noticias.html">Todas las noticias →</a>
+      </div>
+      <div class="arelgrid" id="arel-grid"></div>
+    </div>
+  </section>
+
+  <section id="suscribete">
+    <div class="wrap in">
+      <div class="rv">
+        <p class="over" style="color:var(--edem-teal-200)">Novedades</p>
+        <h2 class="disp" style="margin-top:10px">Recibe las noticias de <span class="disp-i">EDEM Times</span></h2>
+        <p class="desc">Un correo con lo publicado en el portal y el aviso de cada nueva edición de la revista. Nada más.</p>
+      </div>
+      <div class="rv">
+        <form id="sub-form" novalidate>
+          <label class="hp" aria-hidden="true">No rellenes este campo<input type="text" name="empresa" tabindex="-1" autocomplete="off"></label>
+          <input type="email" name="email" required placeholder="tu@email.com" aria-label="Tu email" autocomplete="email">
+          <button class="btn pri" type="submit">Suscribirme</button>
+        </form>
+        <p id="sub-msg" role="status" aria-live="polite"></p>
+        <p class="legal">Al suscribirte aceptas la <a href="https://edem.eu/privacidad/" target="_blank" rel="noopener">política de privacidad</a> de EDEM.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="pezband" aria-hidden="true"><img src="assets/pez-footer.png" alt="" width="162" height="65" loading="lazy" decoding="async"></div>
+
+<footer class="site">
+  <div class="wrap fgrid">
+    <div class="col">
+      <img class="flogo" src="assets/edem-logo-white.png" alt="EDEM">
+      <p class="tag">Empresarios formando a empresarios</p>
+      <div class="soc">
+        <a href="https://www.linkedin.com/school/edem-escuela-de-empresarios/" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg></a>
+        <a href="https://www.instagram.com/edemempresarios/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
+        <a href="https://www.youtube.com/user/EDEMEmpresariosEs" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.94 2C5.12 20 12 20 12 20s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg></a>
+      </div>
+    </div>
+    <div class="col">
+      <p class="h">EDEM Times</p>
+      <a href="index.html">Portada</a>
+      <a href="noticias.html">Actualidad</a>
+      <a href="index.html#kiosko">Kiosko de revistas</a>
+      <a href="index.html#conocenos">Participar en la revista</a>
+    </div>
+    <div class="col">
+      <p class="h">Marina de Empresas</p>
+      <a href="https://edem.eu/" target="_blank" rel="noopener">EDEM Escuela de Empresarios</a>
+      <a href="https://lanzadera.es/" target="_blank" rel="noopener">Lanzadera</a>
+      <a href="https://www.angelscapital.es/" target="_blank" rel="noopener">Angels</a>
+      <a href="https://marinadeempresas.es/" target="_blank" rel="noopener">Marina de Empresas</a>
+    </div>
+    <div class="col">
+      <p class="h">Recursos</p>
+      <a href="#suscribete">Suscríbete a las novedades</a>
+      <a href="mailto:comunicacion@edem.es">Contacto</a>
+      <a href="mailto:comunicacion@edem.es?subject=Tengo%20un%20tema%20para%20EDEM%20Times">Proponer un tema</a>
+    </div>
+  </div>
+  <div class="fbase"><div class="wrap">
+    <span>© 2026 EDEM · Escuela de Empresarios</span>
+    <span><a href="https://edem.eu/aviso-legal/" target="_blank" rel="noopener">Aviso legal</a> · <a href="https://edem.eu/privacidad/" target="_blank" rel="noopener">Privacidad</a> · <a href="https://edem.eu/politica-de-cookies/" target="_blank" rel="noopener">Cookies</a></span>
+    <span>Parte de Marina de Empresas · Lanzadera · Angels</span>
+  </div></div>
+</footer>
+
+</body>
+</html>
