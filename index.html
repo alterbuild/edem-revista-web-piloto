@@ -3,10 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- Color sólido para la barra del navegador móvil. En iOS (Safari cristal líquido)
-     evita que la barra inferior quede en modo cristal reflejando el mar azul del
-     hero (la "franja azul"): con theme-color estático la barra es sólida y neutra.
-     En Chrome/Android js/app.js lo actualiza por sección (ver barTint). -->
+<!-- Color de la barra del navegador móvil. En Chrome/Android js/app.js lo actualiza
+     por sección (ver barTint) y tiñe la barra al instante. En iOS este valor tiñe la
+     barra SUPERIOR, pero OJO: NO controla la franja tras la barra inferior flotante
+     de Safari 26 (comprobado en simulador: da igual el theme-color). Esa «franja
+     azul/blanca» se corrige por CSS, con el fondo del hero siguiendo la inmersión
+     (ver css/site.css, regla .hero). -->
 <meta name="theme-color" content="#06333f">
 <title>EDEM Times — La revista de EDEM Escuela de Empresarios</title>
 <meta name="description" content="EDEM Times, la revista de EDEM Escuela de Empresarios en Marina de Empresas. Lee todas las ediciones en el visor digital con efecto papel, descubre el kiosko y suscríbete a las novedades.">
@@ -20,11 +22,11 @@
 <link rel="apple-touch-icon" href="assets/edem-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="css/tokens.css?v=20260723c">
+<link rel="stylesheet" href="css/tokens.css?v=20260724a">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&display=swap">
-<link rel="stylesheet" href="css/site.css?v=20260723c">
-<link rel="stylesheet" href="css/news.css?v=20260723c">
-<script src="js/icons.js?v=20260723c" defer></script>
+<link rel="stylesheet" href="css/site.css?v=20260724a">
+<link rel="stylesheet" href="css/news.css?v=20260724a">
+<script src="js/icons.js?v=20260724a" defer></script>
 </head>
 <body>
 
@@ -681,9 +683,9 @@
   </div>
 </div>
 
-<script src="js/cms.js?v=20260723c" defer></script>
-<script src="js/search.js?v=20260723c" defer></script>
-<script src="js/app.js?v=20260723c" defer></script>
-<script src="js/news.js?v=20260723c" defer></script>
+<script src="js/cms.js?v=20260724a" defer></script>
+<script src="js/search.js?v=20260724a" defer></script>
+<script src="js/app.js?v=20260724a" defer></script>
+<script src="js/news.js?v=20260724a" defer></script>
 </body>
 </html>

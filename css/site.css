@@ -219,12 +219,24 @@ html.sbusca-on{overflow:hidden}
    documento. Acotadas al hero, el recálculo se queda en este subárbol — es la
    diferencia entre 60fps y un pase de diapositivas en Safari iOS. */
 .hero{--heroH:100vh;--seaP:0;--deepP:0;padding:92px 0 150px;position:sticky;top:0;overflow:hidden;
-  /* El hero es transparente: su fondo claro es el papel del <body>. Durante la
-     inmersión, .deep (inset:0) lo pinta de oscuro hasta el ALTO del hero. En
-     Safari iOS ese alto (lvh) acaba por encima del área segura inferior / barra
-     flotante, y en esa franja reaparece el papel del body, que el cristal de
-     Safari tiñe de azul. Sumamos el safe-area-inset para que .sea y .deep bajen
-     hasta el borde físico y la franja quede cubierta con el agua, no con papel. */
+  /* LA FRANJA AZUL/BLANCA de la barra inferior de Safari iOS.
+     El hero (sticky, alto = lvh) acaba justo en el borde del viewport de layout
+     (innerHeight). En iOS 26 (barra flotante «cristal líquido») queda DEBAJO una
+     franja física de ~120px —tras la barra flotante y el home indicator— que el
+     viewport de layout no cuenta. Ahí NO llegan .deep ni .sea (inset:0 se recorta
+     al alto del hero): esa franja la pinta el FONDO PROPIO del hero, extendido por
+     `viewport-fit=cover`. Con el hero transparente reaparecía el papel del body,
+     que el cristal de Safari tiñe de azul (la «franja azul»); en las secciones
+     claras se ve blanca.
+     No se arregla con safe-area-inset-bottom: con la barra flotante iOS 26 lo
+     reporta como 0 (medido en dispositivo), así que aquel `+ env(...)` sumaba
+     nada. Y el theme-color tampoco pinta esta franja (comprobado). La cura es
+     darle al hero un FONDO SÓLIDO que siga la inmersión: papel en superficie
+     (--deepP:0) y agua profunda al sumergirse (--deepP:1). Así la franja SIEMPRE
+     coincide con lo que hay encima. Es fondo de un elemento —no el theme-color—,
+     de modo que cambia sincronizado con el frame, sin el «efecto perseguidor». */
+  background-color:#fbfaf6;
+  background-color:color-mix(in srgb,#052635 calc(var(--deepP) * 100%),#fbfaf6);
   height:calc(var(--heroH) + env(safe-area-inset-bottom, 0px));display:flex;align-items:center}
 /* Viewport GRANDE (barra de Safari plegada), como el 100vh clásico de iOS y las
    secciones full-screen de apple.com: si midiera 100svh, al plegarse la barra
