@@ -86,10 +86,11 @@
 /* ============================================================
    2 · PORTAL DE NOTICIAS
    ============================================================ */
-/* Cabecera del diario: filete grueso arriba, como una mancheta. */
+/* Cabecera del diario: la mancheta va limpia, sin pauta de renglones detrás
+   —el titular a 96px ya pesa bastante—. La pauta se queda solo en el bloque
+   «Actualidad» de la home, donde el texto es más pequeño. */
 .npmast{padding:44px 0 30px;border-bottom:1px solid var(--border-hair);position:relative;overflow:hidden}
 .npmast .wrap{position:relative;z-index:1}
-.npmast .nbg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .npkick{display:flex;align-items:center;gap:10px;color:var(--edem-teal-700)}
 .npkick .dot{width:7px;height:7px;border-radius:50%;background:var(--lanzadera);animation:kpulse 2.6s ease-in-out infinite}
 .npmast h1{font-size:clamp(46px,7vw,96px);line-height:.9;color:var(--text-strong);margin-top:14px}
@@ -147,6 +148,24 @@
 .nfil.on{background:var(--fc);border-color:var(--fc);color:#fff}
 .nfil .fnum{font-size:11px;opacity:.62;font-weight:800;margin-left:3px}
 .nfil.on .fnum{opacity:.8}
+/* buscador del flujo: filtra en vivo lo que hay debajo, combinándose con la
+   sección elegida (la lupa de la cabecera busca en toda la web) */
+.nbuscar{display:flex;align-items:center;gap:8px;flex:none;width:min(280px,100%);
+  padding:0 10px 0 12px;border-radius:var(--radius-pill);border:1px solid var(--border-strong);
+  background:var(--surface-card);transition:border-color var(--dur-fast),box-shadow var(--dur-fast)}
+.nbuscar:focus-within{border-color:var(--edem-teal-500);box-shadow:0 0 0 3px rgba(0,138,173,.13)}
+.nbuscar>.lu{width:16px;height:16px;flex:none;color:var(--text-faint)}
+.nbuscar:focus-within>.lu{color:var(--edem-teal-600)}
+.nbuscar input{flex:1;min-width:0;border:0;background:none;font-family:inherit;font-size:13.5px;font-weight:600;
+  color:var(--text-strong);padding:9px 0;-webkit-appearance:none;appearance:none}
+.nbuscar input:focus{outline:none}
+.nbuscar input::placeholder{color:var(--text-faint);font-weight:500}
+.nbuscar input::-webkit-search-cancel-button{display:none}
+.nbx{width:26px;height:26px;flex:none;display:grid;place-items:center;border:0;border-radius:50%;
+  background:var(--ink-100);color:var(--text-muted);cursor:pointer;transition:all var(--dur-fast)}
+.nbx[hidden]{display:none}
+.nbx .lu{width:14px;height:14px}
+.nbx:hover{background:var(--ink-200);color:var(--text-strong)}
 .ncount{font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--text-faint);
   white-space:nowrap;margin-left:auto}
 .nsecdesc{font-size:14.5px;color:var(--text-muted);line-height:1.6;margin-bottom:22px;max-width:64ch}
@@ -253,6 +272,9 @@
   .dgrid{grid-template-columns:1fr;gap:26px}
   .acuerpo{padding:32px 0 12px}
   #actualidad{padding:64px 0 70px}
+  /* el buscador encabeza la barra y ocupa todo el ancho: al lado de los filtros
+     los cortaba a media tira y no se veía dónde acababan */
+  .nbuscar{width:100%;order:-1}
 }
 @media(max-width:680px){
   .npmast{padding:30px 0 24px}

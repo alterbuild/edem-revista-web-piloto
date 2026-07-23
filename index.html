@@ -39,6 +39,9 @@
       <a href="#ecosistema">Ecosistema</a>
       <a href="#suscribete">Suscríbete</a>
     </nav>
+    <!-- la lupa: abre el buscador de toda la web (js/search.js). Se queda en la
+         barra en todos los anchos, también con el menú recogido. -->
+    <button class="searchbtn" type="button" data-buscar aria-label="Buscar en EDEM Times" title="Buscar (⌘K)"><i data-lucide="search" class="lu"></i></button>
     <!-- Las dos puertas de la casa, juntas: el diario (que cambia cada semana) y
          la revista (que cambia cada número). «Actualidad» sale del menú de
          enlaces porque este botón ya lleva ahí y repetirlo al lado sobraba. -->
@@ -49,6 +52,7 @@
     <button class="menubtn" id="menubtn" aria-label="Abrir menú" aria-expanded="false" aria-controls="mnav"><i data-lucide="menu" class="lu"></i></button>
   </div>
   <nav class="mnav" id="mnav" aria-label="Menú móvil">
+    <a href="#" data-buscar><i data-lucide="search" class="lu ic"></i><span>Buscar</span><i data-lucide="chevron-right" class="lu ch"></i></a>
     <a href="#kiosko"><i data-lucide="library" class="lu ic"></i><span>Kiosko</span><i data-lucide="chevron-right" class="lu ch"></i></a>
     <a href="noticias.html"><i data-lucide="newspaper" class="lu ic"></i><span>Actualidad</span><i data-lucide="chevron-right" class="lu ch"></i></a>
     <a href="#conocenos"><i data-lucide="book-marked" class="lu ic"></i><span>Conócenos</span><i data-lucide="chevron-right" class="lu ch"></i></a>
@@ -660,6 +664,7 @@
 </div>
 
 <script src="js/cms.js?v=20260723" defer></script>
+<script src="js/search.js?v=20260723" defer></script>
 <script src="js/app.js?v=20260723" defer></script>
 <script src="js/news.js?v=20260723" defer></script>
 </body>

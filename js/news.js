@@ -169,19 +169,51 @@
       usadas.map(s => '<button class="nfil" type="button" data-fil="' + esc(s.id) + '" aria-pressed="false" style="--fc:' + color(s.color) + '">' +
         esc(s.nombre) + ' <span class="fnum">' + noticias.filter(n => n.seccion === s.id).length + '</span></button>').join('');
 
-    let filtro = 'todas', visibles = PASO;
+    let filtro = 'todas', visibles = PASO, consulta = '';
+
+    /* sección + texto: primero se recorta por sección y lo que quede lo ordena
+       el buscador (js/search.js), con el mismo criterio que el panel de la lupa */
+    function seleccion() {
+      const base = filtro === 'todas' ? noticias : noticias.filter(n => n.seccion === filtro);
+      return consulta && window.EdemSearch ? window.EdemSearch.filtra(base, consulta) : base;
+    }
 
     function pinta() {
-      const lista = filtro === 'todas' ? noticias : noticias.filter(n => n.seccion === filtro);
+      const lista = seleccion();
       const trozo = lista.slice(0, visibles);
-      host.innerHTML = trozo.map(n => tarjeta(n, sec, 'card')).join('');
+      host.innerHTML = trozo.length
+        ? trozo.map(n => tarjeta(n, sec, 'card')).join('')
+        : '<p class="nvacio">Ninguna noticia coincide con «' + esc(consulta) + '»' +
+          (filtro === 'todas' ? '' : ' en ' + esc(sec(filtro).nombre)) + '.</p>';
       $('np-mas').hidden = trozo.length >= lista.length;
-      $('np-count').textContent = trozo.length + ' de ' + lista.length + (lista.length === 1 ? ' noticia' : ' noticias');
+      $('np-count').textContent = consulta
+        ? lista.length + (lista.length === 1 ? ' resultado' : ' resultados')
+        : trozo.length + ' de ' + lista.length + (lista.length === 1 ? ' noticia' : ' noticias');
       const s = filtro === 'todas' ? null : sec(filtro);
-      $('np-secdesc').textContent = s ? s.desc : '';
+      $('np-secdesc').textContent = consulta ? '' : (s ? s.desc : '');
       iconos();
     }
     pinta();
+
+    /* ---- buscador en línea del flujo ---- */
+    const campo = $('np-buscar'), limpia = $('np-buscar-x');
+    if (campo) {
+      let t = 0;
+      const aplica = () => {
+        consulta = campo.value.trim();
+        visibles = PASO;
+        limpia.hidden = !campo.value;
+        pinta();
+      };
+      campo.addEventListener('input', () => { clearTimeout(t); t = setTimeout(aplica, 110); });
+      campo.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && campo.value) { e.stopPropagation(); campo.value = ''; aplica(); }
+      });
+      limpia.addEventListener('click', () => { campo.value = ''; aplica(); campo.focus(); });
+      // noticias.html?q=hackathon abre el portal ya filtrado
+      const q = new URLSearchParams(location.search).get('q');
+      if (q) { campo.value = q; aplica(); }
+    }
 
     $('np-filtros').addEventListener('click', e => {
       const b = e.target.closest('[data-fil]'); if (!b) return;

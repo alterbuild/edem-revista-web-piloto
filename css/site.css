@@ -97,7 +97,8 @@ nav.main a:hover::after{transform:scaleX(1)}
 .mnav.open a:nth-child(3){transition-delay:.12s}
 .mnav.open a:nth-child(4){transition-delay:.16s}
 .mnav.open a:nth-child(5){transition-delay:.2s}
-.mnav.open .mcta{transition-delay:.24s}
+.mnav.open a:nth-child(6){transition-delay:.24s}
+.mnav.open .mcta{transition-delay:.28s}
 .mnav a .ic{width:19px;height:19px;flex-shrink:0;color:var(--edem-teal-500)}
 .mnav a .ch{width:17px;height:17px;margin-left:auto;color:var(--ink-300,#c3cdd2);transition:transform .2s var(--ease-out)}
 .mnav a:active{background:var(--edem-teal-50)}
@@ -111,6 +112,98 @@ nav.main a:hover::after{transform:scaleX(1)}
   opacity:0;transition:opacity .26s var(--ease-out)}
 .mscrim.on{opacity:1}
 .menubtn[aria-expanded="true"]{background:var(--edem-teal-50);border-color:var(--edem-teal-200);color:var(--edem-teal-700)}
+
+/* ---------- buscador ----------
+   La lupa vive en la barra y NO se recoge en el menú: es lo único que se
+   mantiene a la vista en todos los anchos, porque en móvil es la forma rápida
+   de llegar a una noticia sin pasar por el flujo entero.
+   Se lleva el hueco elástico de la barra (margin-left:auto), así que lo que va
+   detrás —las acciones y la hamburguesa— se pega a ella; el margen negativo
+   deja 12px de aire en vez de los 26 del gap. */
+.searchbtn{margin-left:auto;margin-right:-14px;width:42px;height:42px;flex-shrink:0;cursor:pointer;
+  display:grid;place-items:center;border-radius:var(--radius-sm);border:1px solid var(--border-hair);
+  background:#fff;color:var(--text-strong);transition:all var(--dur-fast)}
+.searchbtn .lu{width:19px;height:19px}
+.searchbtn:hover{background:var(--edem-teal-50);border-color:var(--edem-teal-200);color:var(--edem-teal-700)}
+.hbar .searchbtn~.hacts,.hbar .searchbtn~.menubtn{margin-left:0}
+
+/* panel: se abre por encima de todo, anclado arriba como una paleta de comandos */
+.sbusca{position:fixed;inset:0;z-index:90;display:flex;justify-content:center;align-items:flex-start;
+  padding:max(9vh,52px) 20px 24px}
+.sbusca[hidden]{display:none}
+html.sbusca-on{overflow:hidden}
+.sbusca .scrim{position:absolute;inset:0;background:rgba(6,51,63,.44);backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);opacity:0;transition:opacity .22s var(--ease-out)}
+.sbusca.on .scrim{opacity:1}
+.spanel{position:relative;width:min(720px,100%);max-height:min(74vh,700px);display:flex;flex-direction:column;
+  background:var(--surface-page);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);overflow:hidden;
+  border-top:3px solid var(--ink-900);   /* el mismo filete grueso de la barra de filtros */
+  opacity:0;transform:translateY(-12px) scale(.985);
+  transition:opacity .2s var(--ease-out),transform .3s var(--ease-out)}
+.sbusca.on .spanel{opacity:1;transform:none}
+.sbar{display:flex;align-items:center;gap:13px;padding:13px 16px 13px 18px;border-bottom:1px solid var(--border-hair)}
+.sbar>.lu{width:20px;height:20px;color:var(--edem-teal-600);flex:none}
+.sbar input{flex:1;min-width:0;border:0;background:none;font-family:inherit;font-size:17px;font-weight:600;
+  color:var(--text-strong);padding:7px 0;-webkit-appearance:none;appearance:none}
+.sbar input:focus{outline:none}
+.sbar input::placeholder{color:var(--text-faint);font-weight:500}
+.sbar input::-webkit-search-cancel-button{display:none}
+.sx{width:34px;height:34px;flex:none;display:grid;place-items:center;border:0;border-radius:var(--radius-sm);
+  background:none;color:var(--text-faint);cursor:pointer;transition:all var(--dur-fast)}
+.sx .lu{width:18px;height:18px}
+.sx:hover{background:var(--ink-100);color:var(--text-strong)}
+.sbody{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:6px 0 10px}
+.sgrupo>.h{padding:12px 18px 6px;font-size:10.5px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--text-faint)}
+.sitem{display:flex;align-items:center;gap:13px;padding:9px 18px;color:inherit}
+.sitem .stxt{flex:1;min-width:0;display:grid;gap:3px}
+.sitem .sk{font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.sitem .st{font-family:var(--font-display);font-weight:900;font-optical-sizing:none;font-variation-settings:'opsz' 14;
+  font-size:16.5px;line-height:1.2;letter-spacing:-.01em;color:var(--text-strong);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sitem .sd{font-size:13px;line-height:1.45;color:var(--text-muted);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sitem .sthumb{width:58px;height:44px;object-fit:cover;border-radius:var(--radius-sm);flex:none}
+.sitem .sic{width:58px;height:44px;flex:none;display:grid;place-items:center;border-radius:var(--radius-sm);
+  background:var(--edem-teal-50);color:var(--edem-teal-600)}
+.sitem .sic .lu{width:18px;height:18px}
+.sitem .sgo{width:17px;height:17px;flex:none;color:var(--edem-teal-500);opacity:0;transform:translateX(-4px);
+  transition:all var(--dur-fast)}
+/* una sola marca de selección para el teclado y el ratón */
+.sitem.on{background:var(--edem-teal-50)}
+.sitem.on .st{color:var(--edem-teal-700)}
+.sitem.on .sgo{opacity:1;transform:none}
+.sitem mark{background:rgba(0,138,173,.2);color:inherit;border-radius:2px;padding:0 1px}
+.stotal{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  padding:14px 18px 4px;font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--text-faint);border-top:1px solid var(--border-hair);margin-top:8px}
+.stotal a{color:var(--edem-teal-700)}
+.stotal a:hover{color:var(--edem-teal-500)}
+/* aviso de la pasada con tolerancia a erratas */
+.snota{margin:10px 18px 2px;padding:9px 12px;border-radius:var(--radius-sm);background:var(--paper-deep);
+  border-left:3px solid var(--edem-teal-300);font-size:12.5px;line-height:1.45;color:var(--text-muted)}
+.svacio{display:grid;gap:10px;justify-items:center;text-align:center;padding:44px 24px 40px;
+  font-size:14.5px;color:var(--text-muted)}
+.svacio strong{font-size:18px;color:var(--text-strong)}
+.svacio .btn{margin-top:8px}
+.sfoot{display:flex;gap:18px;padding:10px 18px;background:var(--paper-deep);border-top:1px solid var(--border-hair);
+  font-size:11px;font-weight:700;color:var(--text-faint)}
+.sfoot kbd{font-family:inherit;font-size:10.5px;padding:2px 5px;margin-right:3px;border-radius:3px;
+  border:1px solid var(--border-strong);background:#fff;color:var(--text-muted)}
+@media(max-width:680px){
+  /* en móvil el buscador es la pantalla entera: el teclado se come media
+     ventana y un panel flotante dejaba los resultados en una rendija */
+  .sbusca{padding:0}
+  .spanel{width:100%;height:100%;max-height:none;border-radius:0;border-top:0;
+    padding-top:env(safe-area-inset-top);transform:translateY(-8px)}
+  .sbar{padding-left:14px}
+  .sfoot{display:none}
+  .sitem .sthumb,.sitem .sic{width:52px;height:40px}
+}
+@media(prefers-reduced-motion:reduce){
+  .sbusca .scrim,.spanel{transition:none}
+  .spanel{transform:none}
+}
 
 /* ---------- hero ---------- */
 /* El hero se «clava» mientras dura .heroPin; el mar sube con --seaP (0→1, lo fija js/app.js). */
