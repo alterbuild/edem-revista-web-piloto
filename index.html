@@ -20,11 +20,11 @@
 <link rel="apple-touch-icon" href="assets/edem-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="css/tokens.css?v=20260723b">
+<link rel="stylesheet" href="css/tokens.css?v=20260723c">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&display=swap">
-<link rel="stylesheet" href="css/site.css?v=20260723b">
-<link rel="stylesheet" href="css/news.css?v=20260723b">
-<script src="js/icons.js?v=20260723b" defer></script>
+<link rel="stylesheet" href="css/site.css?v=20260723c">
+<link rel="stylesheet" href="css/news.css?v=20260723c">
+<script src="js/icons.js?v=20260723c" defer></script>
 </head>
 <body>
 
@@ -316,7 +316,7 @@
       </div>
     </div>
   </div>
-  <a class="scrollcue" href="#kiosko" aria-label="Seguir bajando al kiosko"><i data-lucide="chevron-down" class="lu"></i></a>
+  <a class="scrollcue" href="#actualidad" aria-label="Seguir bajando a la actualidad"><i data-lucide="chevron-down" class="lu"></i></a>
   <!-- el pez de EDEM (el mismo del pie) cruza la dársena por debajo de la
        superficie. Va dentro de .sea a propósito: así sube con el agua cuando el
        mar cubre el hero, en vez de quedarse clavado en mitad de la pantalla. -->
@@ -344,9 +344,33 @@
       </div>
     </div>
   </div>
-  <a class="deepcue" href="#kiosko" aria-label="Seguir bajando"><i data-lucide="chevron-down" class="lu"></i></a>
+  <a class="deepcue" href="#actualidad" aria-label="Seguir bajando"><i data-lucide="chevron-down" class="lu"></i></a>
 </section>
 </div>
+
+<!-- ACTUALIDAD · las noticias destacadas del portal digital
+     Va nada más salir de la inmersión y antes del kiosko: primero lo que ha
+     pasado esta semana, después el papel. Comparte material y retícula con el
+     kiosko —fondo de fondo marino, raíl clavado a la izquierda y fichas de
+     vidrio oscuro— para que las dos secciones se lean como un solo tramo de
+     bajada en vez de como dos bloques pegados.
+     El contenido sale de data/noticias.json (o del CMS headless, ver js/cms.js)
+     y lo pinta js/news.js. -->
+<section id="actualidad">
+  <!-- los mismos adornos del kiosko, espejados (ver css/news.css) -->
+  <div class="kbg" aria-hidden="true"><span class="kglow g1"></span><span class="kglow g2"></span><span class="kdots"></span><span class="kring"></span></div>
+  <div class="wrap kwrap">
+    <div class="ksticky">
+      <div class="shead rv">
+        <span class="skick over">Actualidad</span>
+        <h2 class="disp">Lo último en EDEM Times</h2>
+      </div>
+      <p class="knote">El diario de la escuela, entre número y número.<br><span id="actualidad-note">Se actualiza cada semana.</span></p>
+      <a class="kmore" href="noticias.html"><span>Ir al portal de noticias</span><i data-lucide="arrow-right" class="lu"></i></a>
+    </div>
+    <div class="dgrid" id="dgrid"></div>
+  </div>
+</section>
 
 <!-- KIOSKO -->
 <section id="kiosko">
@@ -360,25 +384,6 @@
       <span class="kcount" id="kcount"></span>
     </div>
     <div class="kgrid" id="kgrid"></div>
-  </div>
-</section>
-
-<!-- ACTUALIDAD · las noticias destacadas del portal digital
-     Antes esta sección era el sumario del número en papel. Ahora es la portada
-     del diario: la apertura, tres titulares más y la puerta al portal completo.
-     El contenido sale de data/noticias.json (o del CMS headless, ver js/cms.js)
-     y lo pinta js/news.js. -->
-<section id="actualidad">
-  <!-- el fondo de papel (grano + luces) lo pinta css/news.css con este .nbg -->
-  <div class="nbg" aria-hidden="true"></div>
-  <div class="wrap">
-    <div class="shead rv">
-      <span class="skick over">Actualidad</span>
-      <h2 class="disp">Lo último en EDEM Times</h2>
-      <span class="note" id="actualidad-note">el diario de la escuela, entre número y número</span>
-      <a class="more" href="noticias.html">Ir al portal de noticias →</a>
-    </div>
-    <div class="dgrid" id="dgrid"></div>
   </div>
 </section>
 
@@ -664,9 +669,9 @@
   </div>
 </div>
 
-<script src="js/cms.js?v=20260723b" defer></script>
-<script src="js/search.js?v=20260723b" defer></script>
-<script src="js/app.js?v=20260723b" defer></script>
-<script src="js/news.js?v=20260723b" defer></script>
+<script src="js/cms.js?v=20260723c" defer></script>
+<script src="js/search.js?v=20260723c" defer></script>
+<script src="js/app.js?v=20260723c" defer></script>
+<script src="js/news.js?v=20260723c" defer></script>
 </body>
 </html>

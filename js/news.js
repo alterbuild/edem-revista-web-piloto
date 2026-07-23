@@ -71,8 +71,10 @@
       : '<div class="nim nofoto"></div>';
 
     if (tipo === 'row') {
+      // el antetítulo va sin color en línea: la línea de sumario solo se usa en
+      // el bloque de la home, sobre fondo marino, y allí manda el CSS
       return '<a class="nrow" href="' + esc(urlNoticia(n.id)) + '">' +
-        '<div class="nrowtxt"><span class="nkick" style="color:' + color(s.color) + '">' + esc(s.nombre) + '</span>' +
+        '<div class="nrowtxt"><span class="nkick">' + esc(s.nombre) + '</span>' +
         '<h3 class="disp">' + esc(n.titulo) + '</h3>' +
         '<span class="nago">' + esc(relativa(n.fecha)) + '</span></div>' +
         (n.img ? '<img class="nthumb" src="' + esc(n.img) + '" alt="" loading="lazy" decoding="async" onerror="this.remove()">' : '') +
@@ -123,8 +125,10 @@
       '<a class="dall" href="noticias.html"><span>Ver todas las noticias</span><i data-lucide="arrow-right" class="lu"></i></a>' +
       '</div>';
 
+    // el raíl cierra con la frescura del diario: cuántas hay lo canta ya la
+    // parrilla de al lado, y el titular no necesita una chapa que lo repita
     const nota = $('actualidad-note');
-    if (nota) nota.textContent = noticias.length + ' noticias publicadas · última, ' + relativa(noticias[0].fecha);
+    if (nota) nota.textContent = 'Última publicada, ' + relativa(noticias[0].fecha) + '.';
     iconos(); reveals();
   }
 

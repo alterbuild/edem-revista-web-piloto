@@ -553,9 +553,10 @@ onMQ(matchMedia('(min-width:861px)'), e => { if (e.matches) closeMenu(); });
 
   function set(on) { if (on !== hidden) { hidden = on; head.classList.toggle('hide', on); } }
   // solo se esconde durante el hero, que es donde estorba de verdad (está
-  // clavado y ocupa la pantalla entera). Del kiosko al pie se queda fija.
+  // clavado y ocupa la pantalla entera). De la primera sección de después
+  // —«Actualidad»— al pie se queda fija.
   function inHero() {
-    const k = $('kiosko');
+    const k = $('actualidad') || $('kiosko');
     return !k || k.getBoundingClientRect().top > head.offsetHeight;
   }
   function update() {
@@ -1246,13 +1247,15 @@ function abrirVisorPorURL() {
   const mix = (a, b, t) => '#' + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, '0')).join('');
 
   const SURF = rgb('#91cede'), DEEP = rgb('#052635');   // agua de las olas → fondo de la inmersión (.deepTint)
-  const KTOP = rgb('#062737'), KBOT = rgb('#17708a');   // extremos del gradiente del kiosko
+  const ATOP = rgb('#062737'), ABOT = rgb('#0a4152');   // extremos del gradiente de «Actualidad»
+  const KTOP = rgb('#0a4152'), KBOT = rgb('#17708a');   // extremos del gradiente del kiosko
   const PAPER = '#fbfaf6';
 
   const hero = document.querySelector('#heroPin .hero');
-  // secciones con fondo propio bajo el hero, en orden de documento; el color
-  // null del kiosko se interpola sobre su gradiente según la posición.
-  const zones = [['kiosko', null], ['actualidad', PAPER], ['conocenos', '#0e2129'], ['ecosistema', '#0e2129'], ['suscribete', PAPER]]
+  // Secciones con fondo propio bajo el hero, en orden de documento. Un par de
+  // colores en vez de uno significa degradado: se interpola según lo metido que
+  // esté el borde inferior de la pantalla en la sección.
+  const zones = [['actualidad', [ATOP, ABOT]], ['kiosko', [KTOP, KBOT]], ['conocenos', '#0e2129'], ['ecosistema', '#0e2129'], ['suscribete', PAPER]]
     .map(([id, color]) => ({ el: $(id), color }))
     .filter(z => z.el);
   const foot = document.querySelector('footer.site');
@@ -1268,7 +1271,10 @@ function abrirVisorPorURL() {
       for (let i = zones.length - 1; i >= 0; i--) {
         const r = zones[i].el.getBoundingClientRect(), top = r.top + scrollY;
         if (y >= top) {
-          c = zones[i].color || mix(KTOP, KBOT, Math.min(1, (y - top) / Math.max(1, r.height)));
+          const col = zones[i].color;
+          c = Array.isArray(col)
+            ? mix(col[0], col[1], Math.min(1, (y - top) / Math.max(1, r.height)))
+            : col;
           break;
         }
       }

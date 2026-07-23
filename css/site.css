@@ -586,18 +586,16 @@ html.sbusca-on{overflow:hidden}
    mientras las portadas desfilan al lado. */
 /* ojo: nada de overflow:hidden aquí — anularía el sticky de .ksticky.
    El recorte de los adornos lo hace .kbg. */
-/* #062737 es exactamente el color del borde inferior de la pantalla al final de
-   la inmersión (fondo del mar + .deepTint). Arrancando ahí, la junta entre los
-   beats y el kiosko no se ve: el fondo parece uno solo y sigue abriéndose. */
+/* La bajada es una sola: la inmersión acaba en #062737, «Actualidad» arranca
+   justo ahí y sube hasta #0a4152, y el kiosko toma ese mismo tono y sigue
+   subiendo hasta la superficie. Los últimos puntos vuelven a #06333f, que es el
+   fondo con el que abre «Conócenos»: así ninguna de las tres juntas se ve.
+   Si se toca un extremo hay que tocar el de al lado (ver css/news.css). */
 #kiosko{position:relative;padding:96px 0 110px;
-  background:linear-gradient(180deg,#062737 0,#083447 14%,#0f5266 52%,#17708a 100%)}
-#kiosko .kbg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+  background:linear-gradient(180deg,#0a4152 0,#0f5266 30%,#17708a 74%,#0e4c60 92%,#06333f 100%)}
+#kiosko .kbg,#actualidad .kbg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .kglow{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55}
 .kglow.g1{width:620px;height:620px;left:-160px;top:8%;background:radial-gradient(circle,#3fa6c4,transparent 68%)}
-/* franja superior intacta: garantiza que el primer tramo es exactamente el color
-   de la junta, sin que ningún halo lo aclare */
-#kiosko .kbg::after{content:'';position:absolute;left:0;right:0;top:0;height:200px;
-  background:linear-gradient(#062737,rgba(6,39,55,0))}
 .kglow.g2{width:520px;height:520px;right:-140px;bottom:-200px;background:radial-gradient(circle,rgba(232,80,45,.5),transparent 68%)}
 .kdots{position:absolute;right:4%;top:12%;width:min(30vw,340px);height:300px;
   background-image:radial-gradient(rgba(255,255,255,.35) 1.4px,transparent 1.5px);background-size:18px 18px;opacity:.5;
@@ -605,14 +603,43 @@ html.sbusca-on{overflow:hidden}
 .kring{position:absolute;left:-6%;bottom:-18%;width:min(46vw,540px);aspect-ratio:1;
   border:1.5px dashed rgba(255,255,255,.22);border-radius:50%;animation:ringspin 90s linear infinite}
 @keyframes ringspin{to{transform:rotate(360deg)}}
+/* Las dos juntas, blindadas: los primeros 200px son exactamente el color con el
+   que cierra «Actualidad» y los últimos 200px, exactamente el #06333f con el que
+   abre «Conócenos». El halo naranja y el aro caen justo en el borde de abajo y,
+   sin esta franja, marcaban el corte. Las dos bandas van en el mismo ::after
+   porque es el ÚLTIMO hijo de .kbg y pinta por encima de los halos; un ::before
+   quedaría por debajo y no taparía nada. */
+#kiosko .kbg::after{content:'';position:absolute;inset:0;
+  background:
+    linear-gradient(#0a4152,rgba(10,65,82,0) 200px),
+    linear-gradient(rgba(6,51,63,0) calc(100% - 200px),#06333f)}
 
-#kiosko .kwrap{position:relative;z-index:1;display:grid;grid-template-columns:minmax(230px,300px) 1fr;gap:56px;align-items:start}
+/* la retícula del kiosko, compartida con «Actualidad»: raíl clavado a la
+   izquierda y la parrilla desfilando al lado */
+#kiosko .kwrap,#actualidad .kwrap{position:relative;z-index:1;display:grid;grid-template-columns:minmax(230px,300px) 1fr;gap:56px;align-items:start}
 .ksticky{position:sticky;top:104px}
-#kiosko .shead{border-top-color:rgba(255,255,255,.28);margin-bottom:18px}
-#kiosko .shead h2{color:#fff}
+#kiosko .shead,#actualidad .shead{border-top-color:rgba(255,255,255,.28);margin-bottom:18px}
+#kiosko .shead h2,#actualidad .shead h2{color:#fff}
 .knote{font-size:15.5px;line-height:1.6;color:rgba(255,255,255,.72)}
 .kcount{display:inline-block;margin-top:20px;padding:7px 14px;border-radius:var(--radius-pill);
   border:1px solid rgba(255,255,255,.28);color:#fff;font-size:11.5px;font-weight:800;letter-spacing:.18em;text-transform:uppercase}
+/* Salida del raíl al portal de noticias. Es la única llamada a la acción de la
+   columna, así que va como botón y no como enlace: sólido en el teal de la casa
+   sobre el agua, esquina recta —la misma del papel y de las fichas del kiosko—
+   y la flecha en su propio disco, que se enciende y se separa al pasar por
+   encima. La sombra es la de las fichas, para que pese lo mismo que ellas. */
+.kmore{display:flex;width:fit-content;align-items:center;gap:14px;margin-top:26px;
+  padding:15px 18px 15px 24px;border-radius:3px;
+  background:var(--edem-teal-500);color:#fff;font-size:16px;font-weight:800;letter-spacing:-.005em;
+  box-shadow:0 18px 38px rgba(3,26,36,.42);
+  transition:background var(--dur) var(--ease-standard),transform var(--dur) var(--ease-standard),
+    box-shadow var(--dur) var(--ease-standard),gap var(--dur) var(--ease-standard)}
+.kmore:hover{background:var(--edem-teal-400);color:#fff;gap:20px;
+  transform:translateY(-3px);box-shadow:0 32px 64px rgba(3,26,36,.6)}
+.kmore:active{transform:translateY(0)}
+.kmore .lu{width:20px;height:20px;flex:none;padding:5px;box-sizing:content-box;border-radius:50%;
+  background:rgba(255,255,255,.16);transition:background var(--dur) var(--ease-standard)}
+.kmore:hover .lu{background:rgba(255,255,255,.28)}
 /* Las fichas del kiosko: la portada manda.
    Nada de passe-partout gris ni de hoja blanca flotando — eso peleaba con el
    arte de la cubierta. La portada va a sangre, con su propia geometría recta,
@@ -1155,9 +1182,9 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   .epanel{margin-bottom:min(18vh,150px)}
   .epanel-in{min-height:0}
   #ecosistema{padding:64px 0 70px}
-  /* el kiosko pasa a una columna: la cabecera deja de estar clavada */
+  /* el kiosko y la actualidad pasan a una columna: la cabecera deja de estar clavada */
   #kiosko{padding:72px 0 84px}
-  #kiosko .kwrap{grid-template-columns:1fr;gap:28px}
+  #kiosko .kwrap,#actualidad .kwrap{grid-template-columns:1fr;gap:28px}
   .ksticky{position:static}
   #suscribete .wrap.in{grid-template-columns:1fr}
   .fgrid{grid-template-columns:1fr 1fr}

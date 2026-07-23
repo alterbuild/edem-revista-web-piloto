@@ -58,6 +58,7 @@
 .nrow:first-child{padding-top:0}
 .nrow:hover{color:inherit;padding-left:6px}
 .nrowtxt{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.nrow .nkick{color:var(--edem-teal-700)}
 .nrow h3{font-size:19px;line-height:1.18;color:var(--text-strong);letter-spacing:-.012em}
 .nrow:hover h3{color:var(--edem-teal-700)}
 .nago{font-size:12px;color:var(--text-faint);font-weight:600}
@@ -68,29 +69,35 @@
 /* ============================================================
    1 · BLOQUE «ACTUALIDAD» DE LA HOME
    ============================================================ */
-/* Papel, no pantalla: la sección va sobre un tono de papel un punto más hondo
-   que el resto —queda como un pliego intercalado entre las dos secciones
-   oscuras que la rodean— y encima lleva dos velos muy tenues.
-   Todo es estático y sin imágenes: el navegador lo rasteriza una vez. */
-/* Los tonos van un punto POR ENCIMA del papel que se busca: el grano de encima
-   solo oscurece (~9 niveles de media), así que el resultado aterriza justo en
-   la familia de --paper-deep. Si se toca la opacidad del grano, hay que mover
-   estos tres tonos en sentido contrario. */
-#actualidad{position:relative;padding:82px 0 88px;overflow:hidden;
-  background:linear-gradient(180deg,#fdfbf5 0%,#f9f7ee 62%,#f5f2e7 100%)}
-#actualidad .nbg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-/* 1 · grano de papel: ruido fractal SVG en línea (data URI, cero peticiones) */
-#actualidad .nbg::before{content:'';position:absolute;inset:0;opacity:.55;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='0.55'/%3E%3C/svg%3E");
-  background-size:180px 180px}
-/* 2 · la luz: una claridad amplia arriba a la izquierda y un poso teal abajo a
-   la derecha, para que el papel no quede plano */
-#actualidad .nbg::after{content:'';position:absolute;inset:-12%;
+/* Ya no es papel: la sección va entre la inmersión y el kiosko, así que se
+   compone con el mismo material que el kiosko —fondo marino, raíl clavado y
+   fichas de vidrio oscuro— y las dos se leen como un solo tramo de bajada.
+   El degradado arranca en #062737, que es exactamente el color con el que acaba
+   la inmersión, y termina en #0a4152, que es con el que abre el kiosko: si se
+   toca uno de los dos extremos, hay que tocar el de al lado (ver css/site.css).
+   Ojo: nada de overflow:hidden aquí — anularía el sticky de .ksticky. El
+   recorte de los adornos lo hace .kbg. */
+#actualidad{position:relative;padding:92px 0 104px;
+  background:linear-gradient(180deg,#062737 0,#073040 34%,#0a4152 100%)}
+/* los mismos adornos del kiosko, espejados: se reconoce el material sin que las
+   dos secciones seguidas sean literalmente la misma imagen */
+#actualidad .kbg{transform:scaleX(-1)}
+/* Las dos juntas, blindadas: los primeros 200px son exactamente el color con el
+   que acaba la inmersión y los últimos 200px, exactamente el color con el que
+   abre el kiosko —que hace lo mismo por su lado—, por encima de halos, tramas y
+   aros. Sin esto, el halo naranja que la sección hereda del kiosko cae justo en
+   el borde de abajo y marca el corte. Las dos bandas van en el mismo ::after
+   porque es el ÚLTIMO hijo de .kbg y pinta por encima de los halos; un ::before
+   quedaría por debajo y no taparía nada. */
+#actualidad .kbg::after{content:'';position:absolute;inset:0;
   background:
-    radial-gradient(48% 42% at 12% 4%,rgba(255,255,255,.85),transparent 72%),
-    radial-gradient(54% 46% at 94% 98%,rgba(0,138,173,.07),transparent 74%)}
-#actualidad .wrap{position:relative;z-index:1}
-.dgrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:34px;align-items:stretch}
+    linear-gradient(#062737,rgba(6,39,55,0) 200px),
+    linear-gradient(rgba(10,65,82,0) calc(100% - 200px),#0a4152)}
+#actualidad .skick{color:var(--edem-teal-200)}
+/* el titular de esta sección sí parte en varias líneas dentro del raíl (el del
+   kiosko cabe en una): sin interlineado propio el hueco entre líneas se abría */
+#actualidad .shead h2{line-height:1.03}
+.dgrid{display:grid;grid-template-columns:minmax(0,1.42fr) minmax(0,1fr);gap:30px;align-items:stretch}
 /* la apertura estira hasta la base de la columna de titulares: las dos cierran
    en la misma línea, sin que a ninguna le sobre suelo */
 .dlead{display:flex}
@@ -107,6 +114,41 @@
 .dlist .nrow:last-of-type{margin-bottom:18px}
 .dall:hover{background:var(--edem-teal-700);color:#fff;gap:20px}
 .dall .lu{width:18px;height:18px}
+
+/* --- las piezas del diario, en el vidrio oscuro del kiosko ---
+   Misma receta que .kcard: vidrio sobre el agua, esquina recta de papel y una
+   sombra fría y larga. Cambia el material, no la maqueta: la apertura, los
+   titulares y la puerta al portal siguen siendo los del periódico. */
+#actualidad .ncard{background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.045));
+  -webkit-backdrop-filter:blur(14px) saturate(150%);backdrop-filter:blur(14px) saturate(150%);
+  border:1px solid rgba(255,255,255,.16);border-radius:3px;
+  box-shadow:0 22px 48px rgba(3,26,36,.42)}
+#actualidad .ncard:hover{border-color:rgba(255,255,255,.34);box-shadow:0 40px 84px rgba(3,26,36,.6)}
+#actualidad .ncard.lead{border-top:3px solid var(--edem-teal-300)}
+/* en la columna estrecha del raíl el titular de apertura baja un punto: a 46px
+   se comía cinco líneas y desnivelaba las dos columnas */
+#actualidad .ncard.lead h2{font-size:clamp(26px,2.5vw,36px)}
+#actualidad .ncard .nim{border-bottom:1px solid rgba(255,255,255,.16)}
+#actualidad .ncard h2,#actualidad .ncard h3{color:#fff}
+#actualidad .ncard:hover h2,#actualidad .ncard:hover h3{color:var(--edem-teal-200)}
+#actualidad .ncard p,#actualidad .ncard .nlead{color:rgba(255,255,255,.7)}
+#actualidad .ncard .nfoot{border-top-color:rgba(255,255,255,.14)}
+#actualidad .ncard .nby{color:rgba(255,255,255,.82)}
+#actualidad .nmeta{color:rgba(255,255,255,.46)}
+#actualidad .ngo{color:var(--edem-teal-200)}
+/* los titulares del sumario: el antetítulo pierde el color de sección —sobre el
+   agua el índigo de Angels no se leía— y se unifica en el teal claro del
+   kiosko, igual que el «Nº 2 · 2026» de las fichas de portada */
+#actualidad .nrow{border-bottom-color:rgba(255,255,255,.14)}
+#actualidad .nrow h3{color:#fff}
+#actualidad .nrow:hover h3{color:var(--edem-teal-200)}
+#actualidad .nrow .nkick{color:var(--edem-teal-200)}
+#actualidad .nago{color:rgba(255,255,255,.46)}
+#actualidad .nthumb{border-radius:2px}
+#actualidad .dall{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);
+  border-radius:3px;
+  -webkit-backdrop-filter:blur(14px) saturate(150%);backdrop-filter:blur(14px) saturate(150%)}
+#actualidad .dall:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.55)}
 
 /* ============================================================
    2 · PORTAL DE NOTICIAS
