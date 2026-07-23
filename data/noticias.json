@@ -25,9 +25,7 @@
   },
   "portal": {
     "kicker": "El diario de EDEM Times",
-    "titulo": "Actualidad<span class=\"pt\">.</span>",
-    "lead": "Lo que pasa en EDEM y en la Marina de Empresas, contado a diario por la redacción de la revista. Lo que no cabe aquí, espera al papel.",
-    "aviso": "Contenido de ejemplo para la maqueta del portal"
+    "titulo": "Actualidad<span class=\"pt\">.</span>"
   },
   "secciones": [
     {

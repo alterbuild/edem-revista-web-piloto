@@ -77,8 +77,7 @@ Bloques admitidos en `cuerpo`: `p` (párrafo), `h2` y `h3` (ladillos), `cita`
 
 > Las 13 noticias que trae el archivo son **contenido de ejemplo** —textos, autores y
 > declaraciones inventados— para ver el diseño con material realista. Sustitúyelas por las
-> reales antes de publicar y quita el campo `portal.aviso`, que es el que pinta el sello
-> «contenido de ejemplo» en la mancheta.
+> reales antes de publicar.
 
 ## Conectar un CMS headless
 

@@ -133,7 +133,7 @@
 
   async function portal() {
     const host = $('np-grid'); if (!host) return;
-    const { noticias, secciones, portal: cfg, origen } = await window.EdemCMS.load();
+    const { noticias, secciones, portal: cfg } = await window.EdemCMS.load();
     const sec = indexaSecciones(secciones);
 
     // la fecha de hoy, como el cabecero de un diario
@@ -145,9 +145,6 @@
 
     if (cfg && cfg.titulo) $('np-title').innerHTML = cfg.titulo;
     if (cfg && cfg.kicker) $('np-kicker').textContent = cfg.kicker;
-    if (cfg && cfg.lead) $('np-lead').textContent = cfg.lead;
-    const aviso = $('np-aviso');
-    if (aviso && cfg && cfg.aviso && origen !== 'cms') { aviso.textContent = cfg.aviso; aviso.hidden = false; }
 
     if (!noticias.length) {
       host.innerHTML = '<p class="nvacio">Todavía no hay noticias publicadas. Vuelve pronto.</p>';
