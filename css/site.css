@@ -651,13 +651,9 @@ html.sbusca-on{overflow:hidden}
 #kiosko .kacts .btn.out:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.6)}
 
 /* ---------- fondo de papel de las secciones editoriales ----------
-   La pauta de renglones la comparten el bloque «Actualidad» de la home y la
-   mancheta del portal de noticias (ver css/news.css); va dentro de un .nbg
-   que recorta. */
+   Capa de adorno que recorta lo que lleve dentro. La textura del bloque
+   «Actualidad» de la home se pinta sobre este .nbg en css/news.css. */
 .nbg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.nrules{position:absolute;left:0;right:0;bottom:0;height:56%;opacity:.5;
-  background-image:repeating-linear-gradient(var(--border-hair) 0 1px,transparent 1px 34px);
-  -webkit-mask-image:linear-gradient(transparent,#000);mask-image:linear-gradient(transparent,#000)}
 .skick{display:block;flex-basis:100%;color:var(--edem-teal-600);margin-bottom:-4px}
 
 /* ---------- tarjeta de artículo ----------

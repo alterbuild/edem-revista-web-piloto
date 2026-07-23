@@ -111,9 +111,11 @@
 
     // la apertura es la marcada con portada:1; si nadie la marca, la más nueva
     const lead = noticias.find(n => n.portada === 1) || noticias[0];
+    // seis titulares: es lo que mide la apertura al lado, así que la columna
+    // llega abajo sin dejar el hueco que quedaba con tres
     const resto = noticias.filter(n => n !== lead)
       .sort((a, b) => (b.portada ? 1 : 0) - (a.portada ? 1 : 0))
-      .slice(0, 3);
+      .slice(0, 6);
 
     host.innerHTML =
       '<div class="dlead rv">' + tarjeta(lead, sec, 'lead') + '</div>' +
