@@ -607,8 +607,25 @@ function observeReveals() {
   // suavizado tipo smoothstep: entradas y salidas sin tirones
   const step = (a, b, v) => { const t = clamp01((v - a) / (b - a)); return t * t * (3 - 2 * t); };
 
+  // Fondo sólido del hero = color de la FRANJA tras la barra inferior flotante de
+  // Safari iOS 26 (ver comentario en site.css, .hero). Va por JS y en rgb() PLANO
+  // a propósito: iOS extiende a la safe-area los rgb/hex, pero NO los color-mix()
+  // (comprobado en simulador: con color-mix la franja se quedaba clara). El color
+  // sigue la escena: papel en superficie → mar (--seaP) → profundidad (--deepP),
+  // igual que el color-mix de site.css, que queda como respaldo para no-JS/Chrome.
+  const hx = h => [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16));
+  const CREAM = hx('fbfaf6'), SEAC = hx('6fb4cb'), DEEPC = hx('052635');
+  const lerp = (a, b, t) => Math.round(a + (b - a) * t);
+  const q24 = v => Math.round(v * 24) / 24;   // cuantiza el color de la franja
+  const heroCol = (seaP, deepP) => {
+    const r = lerp(lerp(CREAM[0], SEAC[0], seaP), DEEPC[0], deepP);
+    const g = lerp(lerp(CREAM[1], SEAC[1], seaP), DEEPC[1], deepP);
+    const b = lerp(lerp(CREAM[2], SEAC[2], seaP), DEEPC[2], deepP);
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
+  };
+
   let pinTop = 0, range = 0, vh = 0, waveEnd = 0, seg = 0, enabled = true;
-  let ticking = false, prevSea = -1, prevDeep = -1, prevCue = -1;
+  let ticking = false, prevSea = -1, prevDeep = -1, prevCue = -1, prevBg = '';
   const prevPh = new Array(N).fill(null), prevOp = new Array(N).fill(null);
 
   function measure() {
@@ -646,6 +663,7 @@ function observeReveals() {
       root.style.setProperty('--seaP', '0');
       root.style.setProperty('--deepP', '0');
       root.style.setProperty('--cueP', '0');
+      root.style.backgroundColor = heroCol(0, 0); prevBg = '';
       flag('dry', false); flag('sunk', false);
       return;
     }
@@ -656,6 +674,12 @@ function observeReveals() {
     const deepP = step(waveEnd * 0.55, waveEnd * 0.98, s);
     prevSea = write('--seaP', seaP, prevSea);
     prevDeep = write('--deepP', deepP, prevDeep);
+    // El color de la franja se cuantiza (q24): cambia unas pocas veces en todo el
+    // scroll, no en cada frame. Así el repintado del fondo del hero no compite por
+    // fps con la inmersión —que ya mueve olas, burbujas y desenfoques—; la franja
+    // es fina y los saltos de color no se aprecian.
+    const bg = heroCol(q24(seaP), q24(deepP));
+    if (bg !== prevBg) { prevBg = bg; root.style.backgroundColor = bg; }
 
     // la flecha se apaga con el mismo tramo de salida del último beat, así
     // desaparece justo cuando se suelta el pin y aparece el kiosko debajo.

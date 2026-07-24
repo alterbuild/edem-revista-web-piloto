@@ -219,24 +219,31 @@ html.sbusca-on{overflow:hidden}
    documento. Acotadas al hero, el recálculo se queda en este subárbol — es la
    diferencia entre 60fps y un pase de diapositivas en Safari iOS. */
 .hero{--heroH:100vh;--seaP:0;--deepP:0;padding:92px 0 150px;position:sticky;top:0;overflow:hidden;
-  /* LA FRANJA AZUL/BLANCA de la barra inferior de Safari iOS.
-     El hero (sticky, alto = lvh) acaba justo en el borde del viewport de layout
-     (innerHeight). En iOS 26 (barra flotante «cristal líquido») queda DEBAJO una
-     franja física de ~120px —tras la barra flotante y el home indicator— que el
-     viewport de layout no cuenta. Ahí NO llegan .deep ni .sea (inset:0 se recorta
-     al alto del hero): esa franja la pinta el FONDO PROPIO del hero, extendido por
-     `viewport-fit=cover`. Con el hero transparente reaparecía el papel del body,
-     que el cristal de Safari tiñe de azul (la «franja azul»); en las secciones
-     claras se ve blanca.
-     No se arregla con safe-area-inset-bottom: con la barra flotante iOS 26 lo
-     reporta como 0 (medido en dispositivo), así que aquel `+ env(...)` sumaba
-     nada. Y el theme-color tampoco pinta esta franja (comprobado). La cura es
-     darle al hero un FONDO SÓLIDO que siga la inmersión: papel en superficie
-     (--deepP:0) y agua profunda al sumergirse (--deepP:1). Así la franja SIEMPRE
-     coincide con lo que hay encima. Es fondo de un elemento —no el theme-color—,
-     de modo que cambia sincronizado con el frame, sin el «efecto perseguidor». */
+  /* LA FRANJA AZUL/BLANCA de la barra inferior de Safari iOS 26.
+     El hero (sticky, alto = lvh) acaba en el borde del viewport de LAYOUT
+     (innerHeight). Con la barra flotante «cristal líquido» queda DEBAJO una franja
+     física de ~120px —tras la barra y el home indicator— que el layout no cuenta.
+     Medido en dispositivo: en esa franja iOS SOLO sabe pintar el `background-color`
+     del elemento del borde (el hero); el `background-image`, los gradientes y los
+     hijos absolutos (.sea, .deep, el paisaje) se recortan en innerHeight y NO
+     llegan. Tampoco el theme-color ni env(safe-area-inset-bottom) (reporta 0).
+     Por eso el contenido real (agua, barcos) NO puede extenderse ahí; lo único
+     posible es que ese `background-color` IGUALE en cada frame al contenido justo
+     encima, para que la franja sea invisible («como si la barra no estuviera»).
+     Ese color sigue la escena con --seaP/--deepP (que app.js ya anima por frame,
+     sin el «efecto perseguidor» del theme-color):
+       superficie #fbfaf6 (el mismo papel del landing) → mar #6fb4cb (--seaP)
+       → profundidad #052635 (--deepP).
+     En superficie el color es el papel del landing, así que este background-color
+     hace de fondo VISIBLE del hero (por las zonas transparentes del paisaje) SIN
+     teñir nada; en cuanto el mar sube o baja la inmersión, el paisaje/mar/deep ya
+     cubren la parte en pantalla y este color solo se ve en la franja de abajo.
+     (Intentar separarlo con un ::before no vale: en iOS ese hijo con z-index
+     negativo SECUESTRA la franja y la deja clara aunque el hero sea oscuro.) */
   background-color:#fbfaf6;
-  background-color:color-mix(in srgb,#052635 calc(var(--deepP) * 100%),#fbfaf6);
+  background-color:color-mix(in srgb,
+    #052635 calc(var(--deepP) * 100%),
+    color-mix(in srgb,#6fb4cb calc(var(--seaP) * 100%),#fbfaf6));
   height:calc(var(--heroH) + env(safe-area-inset-bottom, 0px));display:flex;align-items:center}
 /* Viewport GRANDE (barra de Safari plegada), como el 100vh clásico de iOS y las
    secciones full-screen de apple.com: si midiera 100svh, al plegarse la barra
