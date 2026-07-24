@@ -557,6 +557,24 @@ html.sbusca-on{overflow:hidden}
   .deepcue{display:none}
 }
 
+/* PERF MÓVIL (60 fps en la inmersión). En Safari iOS un `filter:blur` grande que
+   además se MUEVE se re-rasteriza en cada frame: es lo que ahogaba la inmersión y
+   los beats. En pantallas de teléfono dejamos esos desenfoques QUIETOS —se siguen
+   viendo difuminados, pero se rasterizan una sola vez— y el coste por frame
+   desaparece. En escritorio (más GPU) se mantienen animados. */
+@media (max-width:700px){
+  /* los haces de luz: quietos y con un pelín menos de blur */
+  .rays span{animation:none;filter:blur(16px)}
+  /* el pez cruza con un blur mínimo; a esta escala no se nota, pero mueve un blur
+     por toda la pantalla cada frame → se queda con el filtro fijo, sin blur */
+  .hero .pez{filter:saturate(.85)}
+  /* La cabecera sticky con backdrop-filter obliga a Safari iOS a RE-DIFUMINAR el
+     contenido que pasa por detrás en CADA frame de scroll — carísimo justo durante
+     la inmersión. En móvil la hacemos casi opaca (el papel ya es claro, apenas se
+     nota) y quitamos el blur: el scroll deja de pagar ese peaje por frame. */
+  header.site{background:rgba(251,250,246,.97);backdrop-filter:none;-webkit-backdrop-filter:none}
+}
+
 .hero .bignum{position:absolute;right:-40px;top:-60px;font-family:var(--font-display);font-weight:900;font-size:420px;line-height:.8;color:transparent;-webkit-text-stroke:2px var(--edem-teal-200);opacity:.5;pointer-events:none;user-select:none;transition:opacity .35s var(--ease-standard);animation:numdrift 15s ease-in-out infinite alternate}
 .hero .bignum.swap{opacity:0}
 @keyframes numdrift{from{transform:translateY(0)}to{transform:translateY(22px)}}
