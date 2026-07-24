@@ -291,7 +291,14 @@ html.sbusca-on{overflow:hidden}
 .heroDeck{animation:heroRise .9s .2s var(--ease-out) both}
 
 /* fondo animado */
-.heroBg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+/* El papel BEIGE del landing lo pinta esta capa (antes lo dejaba ver el <body> por
+   detrás del hero transparente). Va aquí, en un hijo, y NO en el background del
+   propio hero: ese background lo usa js/app.js para teñir la FRANJA tras la barra
+   inferior de iOS siguiendo el mar (crema→azul→oscuro). Si el beige lo pusiéramos
+   en el hero, «Tracción» y el deck se teñirían de azul al subir el mar; al ponerlo
+   en .heroBg (que se recorta en el viewport y se oculta con .sunk) el deck se queda
+   beige hasta que el agua lo cubre, y la franja sigue su color aparte. */
+.heroBg{position:absolute;inset:0;pointer-events:none;overflow:hidden;background:#fbfaf6}
 /* Paisaje flat de la Marina, anclado al horizonte (por eso xMidYMax) y en tres
    capas. Cada una se hunde a distinta velocidad con --seaP: el cielo apenas se
    mueve, los veleros del primer plano bajan el triple. Solo transform y
@@ -565,9 +572,6 @@ html.sbusca-on{overflow:hidden}
 @media (max-width:700px){
   /* los haces de luz: quietos y con un pelín menos de blur */
   .rays span{animation:none;filter:blur(16px)}
-  /* el pez cruza con un blur mínimo; a esta escala no se nota, pero mueve un blur
-     por toda la pantalla cada frame → se queda con el filtro fijo, sin blur */
-  .hero .pez{filter:saturate(.85)}
   /* La cabecera sticky con backdrop-filter obliga a Safari iOS a RE-DIFUMINAR el
      contenido que pasa por detrás en CADA frame de scroll — carísimo justo durante
      la inmersión. En móvil la hacemos casi opaca (el papel ya es claro, apenas se

@@ -140,7 +140,9 @@ function buildDeck() {
   applyDeck();
 
   const wrap = $('hero-deck-wrap');
+  let swiped = false;
   wrap.addEventListener('click', e => {
+    if (swiped) { swiped = false; e.stopPropagation(); return; }  // el swipe no abre nada
     const dot = e.target.closest('[data-deckdot]');
     if (dot) { advanceDeck(dot.dataset.deckdot); restartDeck(); return; }
     const card = e.target.closest('.deckcard');
@@ -149,6 +151,22 @@ function buildDeck() {
       e.stopPropagation(); advanceDeck(card.dataset.deck); restartDeck();
     }
   });
+  // Arrastrar el dedo sobre las portadas: izquierda = siguiente, derecha = anterior.
+  // Solo cuenta como swipe si el gesto es claramente horizontal, para no pisar el
+  // scroll vertical de la página.
+  let tx0 = 0, ty0 = 0;
+  wrap.addEventListener('touchstart', e => {
+    tx0 = e.touches[0].clientX; ty0 = e.touches[0].clientY; swiped = false; deckPaused = true;
+  }, { passive: true });
+  wrap.addEventListener('touchend', e => {
+    const t = e.changedTouches[0], dx = t.clientX - tx0, dy = t.clientY - ty0;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+      swiped = true;
+      if (dx < 0) advanceDeck(); else prevDeck();
+      restartDeck();
+    }
+    deckPaused = false;
+  }, { passive: true });
   wrap.addEventListener('mouseenter', () => { deckPaused = true; });
   wrap.addEventListener('mouseleave', () => { deckPaused = false; });
   wrap.addEventListener('focusin', () => { deckPaused = true; });
@@ -178,6 +196,15 @@ function advanceDeck(toId) {
   fly.classList.add('fly'); fly.style.zIndex = 40;
   applyDeck();
   setTimeout(() => { fly.classList.remove('fly'); applyDeck(); }, 520);
+}
+
+// «Anterior»: la última portada del montón vuelve al frente. Sin el vuelo de
+// advanceDeck (ese es para salir hacia atrás); aquí basta con recolocar y que las
+// transiciones de .deckcard (p0/p1/p2) lleven cada portada a su nuevo sitio.
+function prevDeck() {
+  if (deckOrder.length < 2) return;
+  deckOrder.unshift(deckOrder.pop());
+  applyDeck();
 }
 
 function restartDeck() {
