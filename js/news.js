@@ -80,6 +80,18 @@
         (n.img ? '<img class="nthumb" src="' + esc(n.img) + '" alt="" loading="lazy" decoding="async" onerror="this.remove()">' : '') +
         '</a>';
     }
+    if (tipo === 'titular') {
+      // el mismo sumario, pero en el portal —papel claro— el antetítulo sí lleva
+      // el color de su sección: es lo que deja leer la portada por temas de un
+      // vistazo. El estilo en línea es seguro aquí porque esta variante NO se
+      // usa en el bloque de la home, que es donde el CSS tiene que mandar.
+      return '<a class="nrow ntit" href="' + esc(urlNoticia(n.id)) + '">' +
+        '<div class="nrowtxt"><span class="nkick" style="color:' + color(s.color) + '">' + esc(s.nombre) + '</span>' +
+        '<h3 class="disp">' + esc(n.titulo) + '</h3>' +
+        '<span class="nago">' + esc(relativa(n.fecha)) + '</span></div>' +
+        (n.img ? '<img class="nthumb" src="' + esc(n.img) + '" alt="" loading="lazy" decoding="async" onerror="this.remove()">' : '') +
+        '</a>';
+    }
     if (tipo === 'lead') {
       return '<a class="ncard lead" href="' + esc(urlNoticia(n.id)) + '">' + foto +
         '<div class="nbody">' + badge +
@@ -157,23 +169,86 @@
       return;
     }
 
-    /* ---- portada: apertura + dos secundarias + raíl de lo último ---- */
+    /* ---- reparto de la portada ----
+       Las tres piezas grandes (apertura y dos secundarias) son las marcadas con
+       `portada`; si no hay marcas suficientes, mandan las más recientes. A
+       partir de ahí, cada noticia aparece UNA vez en la portada: los titulares
+       de «También hoy» y el raíl de «Lo último» se sirven de lo que queda, en
+       ese orden. Es lo que evita que el mismo titular se lea tres veces
+       mientras se baja. */
     const lead = noticias.find(n => n.portada === 1) || noticias[0];
-    const sec2 = noticias.filter(n => n !== lead && n.portada).slice(0, 2);
-    const secundarias = sec2.length === 2 ? sec2 : noticias.filter(n => n !== lead).slice(0, 2);
+    const resto = noticias.filter(n => n !== lead);
+    const marcadas = resto.filter(n => n.portada);
+    const secundarias = (marcadas.length >= 2 ? marcadas : resto).slice(0, 2);
+    /* las tres con foto grande: son las únicas que se retiran de los bloques por
+       sección de abajo, porque repetir una foto de apertura a media página es lo
+       que de verdad se nota. Los titulares sueltos sí pueden volver a salir
+       ordenados por tema: es otro eje de lectura, no una repetición. */
+    const grandes = new Set([lead].concat(secundarias).map(n => n.id));
+    const tambien = resto.filter(n => !grandes.has(n.id)).slice(0, 4);
+    const enPortada = new Set([...grandes].concat(tambien.map(n => n.id)));
+
     $('np-lead-card').innerHTML = tarjeta(lead, sec, 'lead');
     $('np-sec').innerHTML = secundarias.map(n => tarjeta(n, sec, 'card')).join('');
-    $('np-ultimo').innerHTML = noticias.slice(0, 6).map(n =>
-      '<li><a href="' + esc(urlNoticia(n.id)) + '"><span class="uhora">' + esc(relativa(n.fecha)) + '</span>' +
+    $('np-tambien').innerHTML = tambien.map(n => tarjeta(n, sec, 'titular')).join('');
+
+    /* raíl: lo último es un índice cronológico de lo que NO está arriba */
+    const ultimo = noticias.filter(n => !enPortada.has(n.id)).slice(0, 5);
+    const linea = n => '<li><a href="' + esc(urlNoticia(n.id)) + '"><span class="uhora">' + esc(relativa(n.fecha)) + '</span>' +
       '<span class="utit">' + esc(n.titulo) + '</span>' +
-      '<span class="usec" style="color:' + color(sec(n.seccion).color) + '">' + esc(sec(n.seccion).nombre) + '</span></a></li>').join('');
+      '<span class="usec" style="color:' + color(sec(n.seccion).color) + '">' + esc(sec(n.seccion).nombre) + '</span></a></li>';
+    $('np-ultimo').innerHTML = (ultimo.length ? ultimo : noticias.slice(0, 5)).map(linea).join('');
+
+    /* raíl: la agenda, si la hay. Es la sección de servicio del portal —fechas,
+       convocatorias y avisos— y en un raíl se consulta mucho mejor que perdida
+       en el flujo. Si el CMS no trae esa sección, la caja no se pinta. */
+    const agenda = noticias.filter(n => n.seccion === 'agenda').slice(0, 3);
+    const cajaAgenda = $('np-agendabox');
+    if (cajaAgenda && agenda.length) {
+      $('np-agenda').innerHTML = agenda.map(n =>
+        '<li><a href="' + esc(urlNoticia(n.id)) + '"><span class="uhora">' + esc(fechaCorta(n.fecha)) + '</span>' +
+        '<span class="utit">' + esc(n.titulo) + '</span></a></li>').join('');
+      cajaAgenda.hidden = false;
+    }
 
     /* ---- filtro por sección ---- */
     const usadas = secciones.filter(s => noticias.some(n => n.seccion === s.id));
+    const cuenta = id => noticias.filter(n => n.seccion === id).length;
     $('np-filtros').innerHTML =
       '<button class="nfil on" type="button" data-fil="todas" aria-pressed="true">Todas <span class="fnum">' + noticias.length + '</span></button>' +
       usadas.map(s => '<button class="nfil" type="button" data-fil="' + esc(s.id) + '" aria-pressed="false" style="--fc:' + color(s.color) + '">' +
-        esc(s.nombre) + ' <span class="fnum">' + noticias.filter(n => n.seccion === s.id).length + '</span></button>').join('');
+        esc(s.nombre) + ' <span class="fnum">' + cuenta(s.id) + '</span></button>').join('');
+
+    const total = $('np-total');
+    if (total) total.textContent = noticias.length + ' noticias · ' + usadas.length + ' secciones';
+
+    /* ---- el diario por secciones (vista en reposo) ----
+       Una columna por sección, con su filete grueso arriba: la destacada con
+       foto y debajo el resto en titulares. Se pinta una sola vez, porque no
+       depende ni del filtro ni de la búsqueda. */
+    const bloques = $('np-secciones');
+    if (bloques) {
+      bloques.innerHTML = usadas.map(s => {
+        const items = noticias.filter(n => n.seccion === s.id && !grandes.has(n.id));
+        if (!items.length) return '';
+        const dest = items[0], lista = items.slice(1, 4);
+        const c = color(s.color);
+        return '<section class="nsecblock rv" style="--sc:' + c + '">' +
+          '<div class="h"><span class="nm">' + esc(s.nombre) + '</span>' +
+          '<button class="all" type="button" data-fil="' + esc(s.id) + '">Ver las ' + cuenta(s.id) +
+          ' <i data-lucide="arrow-right" class="lu"></i></button></div>' +
+          '<p class="d">' + esc(s.desc || '') + '</p>' +
+          '<a class="dest" href="' + esc(urlNoticia(dest.id)) + '">' +
+          (dest.img ? '<img src="' + esc(dest.img) + '" alt="' + esc(dest.alt || '') + '" loading="lazy" decoding="async" onerror="this.remove()">' : '') +
+          '<h3 class="disp">' + esc(dest.titulo) + '</h3>' +
+          '<p>' + esc(dest.entradilla) + '</p>' +
+          '<span class="nago">' + esc(relativa(dest.fecha)) + '</span></a>' +
+          (lista.length ? '<ul class="tt">' + lista.map(n =>
+            '<li><a href="' + esc(urlNoticia(n.id)) + '"><span class="utit">' + esc(n.titulo) + '</span>' +
+            '<span class="nago">' + esc(relativa(n.fecha)) + '</span></a></li>').join('') + '</ul>' : '') +
+          '</section>';
+      }).join('');
+    }
 
     let filtro = 'todas', visibles = PASO, consulta = '';
 
@@ -184,7 +259,23 @@
       return consulta && window.EdemSearch ? window.EdemSearch.filtra(base, consulta) : base;
     }
 
+    /* Dos vistas bajo la misma barra: en reposo el diario por secciones; en
+       cuanto se filtra o se busca, la rejilla plana de resultados con «cargar
+       más». Cambiar de vista es cambiar cuál de las dos está oculta. */
     function pinta() {
+      const filtrando = filtro !== 'todas' || !!consulta;
+
+      if (bloques) bloques.hidden = filtrando;
+      host.hidden = !filtrando;
+
+      if (!filtrando) {
+        $('np-mas').hidden = true;
+        $('np-secdesc').textContent = '';
+        $('np-count').textContent = noticias.length + ' noticias en ' + usadas.length + ' secciones';
+        iconos(); reveals();
+        return;
+      }
+
       const lista = seleccion();
       const trozo = lista.slice(0, visibles);
       host.innerHTML = trozo.length
@@ -221,26 +312,35 @@
       if (q) { campo.value = q; aplica(); }
     }
 
-    $('np-filtros').addEventListener('click', e => {
-      const b = e.target.closest('[data-fil]'); if (!b) return;
-      filtro = b.dataset.fil; visibles = PASO;
+    /* un solo camino para elegir sección: lo usan la barra de filtros y los
+       «Ver las N» de cada bloque, así que la barra siempre refleja lo que se
+       está viendo, se haya pulsado donde se haya pulsado */
+    function aplicaFiltro(id) {
+      filtro = id; visibles = PASO;
       document.querySelectorAll('.nfil').forEach(x => {
-        x.classList.toggle('on', x === b);
-        x.setAttribute('aria-pressed', String(x === b));
+        const on = x.dataset.fil === id;
+        x.classList.toggle('on', on);
+        x.setAttribute('aria-pressed', String(on));
       });
       pinta();
       // el foco se queda en el filtro, pero la rejilla debe verse desde arriba
       const caja = $('np-flujo');
       if (caja) caja.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    $('np-filtros').addEventListener('click', e => {
+      const b = e.target.closest('[data-fil]'); if (!b) return;
+      aplicaFiltro(b.dataset.fil);
+    });
+    if (bloques) bloques.addEventListener('click', e => {
+      const b = e.target.closest('[data-fil]'); if (!b) return;
+      aplicaFiltro(b.dataset.fil);
     });
     $('np-mas').addEventListener('click', () => { visibles += PASO; pinta(); });
 
     // hash de sección: noticias.html#emprende abre ya filtrado
     const h = decodeURIComponent(location.hash.slice(1));
-    if (h && usadas.some(s => s.id === h)) {
-      const b = document.querySelector('[data-fil="' + CSS.escape(h) + '"]');
-      if (b) b.click();
-    }
+    if (h && usadas.some(s => s.id === h)) aplicaFiltro(h);
     reveals();
   }
 
@@ -260,6 +360,57 @@
       case 'dato': return '<div class="adato"><span class="cifra disp">' + esc(b.cifra) + '</span><span class="txt">' + esc(b.texto) + '</span></div>';
       default: return '<p>' + esc(b.texto) + '</p>';
     }
+  }
+
+  /* ---- arranque en versalitas: las tres primeras palabras del cuerpo ----
+     Se marca sobre el primer nodo de texto para no tocar un enlace o una
+     negrita que empiece el párrafo. Si la primera palabra es muy corta
+     («El», «A») se coge una más, que si no la entrada queda coja. */
+  function entradilla(p) {
+    const t = p.firstChild;
+    if (!t || t.nodeType !== 3) return;
+    const crudo = t.nodeValue.trimStart();
+    const palabras = crudo.split(/\s+/);
+    const n = palabras[0].length <= 3 ? 4 : 3;
+    if (palabras.length <= n) return;
+    // el corte se busca sobre el texto original para respetar sus espacios
+    const m = new RegExp('^(?:\\S+\\s+){' + (n - 1) + '}\\S+').exec(crudo);
+    if (!m) return;
+    const span = document.createElement('span');
+    span.className = 'aentrada';
+    span.textContent = m[0];
+    p.replaceChild(document.createTextNode(crudo.slice(m[0].length)), t);
+    p.insertBefore(span, p.firstChild);
+  }
+
+  /* ---- destino del botón «volver» ----
+     Si la visita llegó desde el propio portal, el clic deshace ese paso con
+     history.back() (así se conserva el scroll y el filtro que tuviera la
+     lista) y este destino solo hace de red. Si se entró en frío —enlace
+     compartido, buscador, marcador— no hay nada que deshacer y lleva a la
+     sección de la noticia, que es el paso anterior de la ruta de las migas. */
+  function destinoVuelta(sec) {
+    const previa = interna(document.referrer);
+    if (previa) {
+      const f = previa.pathname.split('/').pop() || 'index.html';
+      if (f === 'noticias.html') return 'noticias.html';
+      if (f === 'noticia.html') return previa.href;
+      if (f === 'index.html') return 'index.html';
+    }
+    return 'noticias.html#' + sec.id;
+  }
+  // referrer del mismo sitio: solo entonces tiene sentido retroceder
+  function interna(ref) {
+    if (!ref) return null;
+    try { const u = new URL(ref, location.href); return u.origin === location.origin ? u : null; }
+    catch { return null; }
+  }
+  function volver() {
+    const btn = $('avolver'); if (!btn) return;
+    btn.addEventListener('click', () => {
+      if (interna(document.referrer) && history.length > 1) history.back();
+      else location.href = btn.dataset.href;
+    });
   }
 
   async function ficha() {
@@ -293,10 +444,21 @@
     if (n.img) meta('meta[property="og:image"]', 'content', new URL(n.img, location.href).href);
     meta('link[rel="canonical"]', 'href', location.href);
 
+    const atras = destinoVuelta(sec);
+
     host.innerHTML =
       '<header class="ahead"><div class="wrap awrap">' +
-        '<nav class="amiga" aria-label="Migas"><a href="index.html">Portada</a><span>›</span>' +
-        '<a href="noticias.html#' + esc(sec.id) + '" style="color:' + c + '">' + esc(sec.nombre) + '</a></nav>' +
+        '<div class="aruta">' +
+          '<button class="avolver" type="button" id="avolver" data-href="' + esc(atras) + '">' +
+            '<i data-lucide="arrow-left" class="lu"></i><span>Volver</span></button>' +
+          '<nav class="amiga" aria-label="Ruta de navegación">' +
+            '<a href="index.html">Portada</a><span aria-hidden="true">›</span>' +
+            '<a href="noticias.html">Actualidad</a><span aria-hidden="true">›</span>' +
+            '<a href="noticias.html#' + esc(sec.id) + '" style="color:' + c + '">' + esc(sec.nombre) + '</a>' +
+            '<span aria-hidden="true">›</span>' +
+            '<span class="actual" aria-current="page">' + esc(n.titulo) + '</span>' +
+          '</nav>' +
+        '</div>' +
         '<h1 class="disp">' + esc(n.titulo) + '</h1>' +
         '<p class="aentradilla">' + esc(n.entradilla) + '</p>' +
         '<div class="afirma">' +
@@ -326,8 +488,9 @@
 
     /* primer párrafo con capitular, como en el papel */
     const p1 = host.querySelector('.acol > p');
-    if (p1 && !p1.classList.contains('adest')) p1.classList.add('acap');
+    if (p1 && !p1.classList.contains('adest')) { p1.classList.add('acap'); entradilla(p1); }
 
+    volver();
     compartir(n);
     await relacionadas(n);
     iconos();

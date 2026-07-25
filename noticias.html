@@ -16,15 +16,15 @@
 <link rel="apple-touch-icon" href="assets/edem-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="css/tokens.css?v=20260724k">
+<link rel="stylesheet" href="css/tokens.css?v=20260725b">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&display=swap">
-<link rel="stylesheet" href="css/site.css?v=20260724k">
-<link rel="stylesheet" href="css/news.css?v=20260724k">
-<script src="js/icons.js?v=20260724k" defer></script>
-<script src="js/cms.js?v=20260724k" defer></script>
-<script src="js/search.js?v=20260724k" defer></script>
-<script src="js/news.js?v=20260724k" defer></script>
-<script src="js/chrome.js?v=20260724k" defer></script>
+<link rel="stylesheet" href="css/site.css?v=20260725b">
+<link rel="stylesheet" href="css/news.css?v=20260725b">
+<script src="js/icons.js?v=20260725b" defer></script>
+<script src="js/cms.js?v=20260725b" defer></script>
+<script src="js/search.js?v=20260725b" defer></script>
+<script src="js/news.js?v=20260725b" defer></script>
+<script src="js/chrome.js?v=20260725b" defer></script>
 </head>
 <body>
 
@@ -60,39 +60,63 @@
 
 <main>
 
-<!-- MANCHETA: la cabecera del diario -->
+<!-- MANCHETA: la cabecera del diario.
+     Compacta y a una línea de datos, como el cabecero de un semanario: el
+     titular ya no se come la primera pantalla y la portada empieza arriba. -->
 <section class="npmast">
-  <div class="wrap">
-    <span class="npkick over"><span class="dot"></span><span id="np-kicker">El diario de EDEM Times</span></span>
-    <h1 class="disp" id="np-title">Actualidad<span class="pt">.</span></h1>
+  <div class="wrap npmastin">
+    <div class="npmasttxt">
+      <span class="npkick over"><span class="dot"></span><span id="np-kicker">El diario de EDEM Times</span></span>
+      <h1 class="disp" id="np-title">Actualidad<span class="pt">.</span></h1>
+    </div>
     <div class="npdata">
       <span id="np-hoy"></span>
       <span class="pip" aria-hidden="true"></span>
       <span>Marina de Empresas · València</span>
+      <span class="pip" aria-hidden="true"></span>
+      <span id="np-total"></span>
     </div>
   </div>
 </section>
 
-<!-- PORTADA: apertura + secundarias + raíl de lo último -->
+<!-- PORTADA: tres columnas separadas por filetes, como la portada de un
+     semanario — apertura + secundarias | también hoy | raíl de servicio. -->
 <section id="np-portada" class="wrap nportada">
   <div class="nprincipal">
     <div id="np-lead-card"></div>
     <div class="nsec" id="np-sec"></div>
   </div>
-  <aside class="nrail" aria-label="Lo último y la revista">
-    <div class="nrailbox">
-      <p class="h"><i data-lucide="clock" class="lu"></i> Lo último</p>
-      <ul class="nultimo" id="np-ultimo"></ul>
-    </div>
-    <div class="nrevista">
-      <p class="over">La revista</p>
-      <p class="disp">Lo que no cabe aquí, sale en papel<span class="pt">.</span></p>
-      <a class="btn pri" href="index.html#kiosko"><i data-lucide="library" class="lu"></i> Ver el kiosko</a>
+
+  <!-- columna de titulares: lo que no cabe en la apertura pero sí en la portada -->
+  <div class="ntambien">
+    <p class="ncolh">También hoy</p>
+    <div id="np-tambien"></div>
+  </div>
+
+  <aside class="nrail" aria-label="Lo último, agenda y la revista">
+    <!-- el filete de la columna lo lleva .nrail, que se estira hasta abajo;
+         lo que se queda clavado al desplazar es este envoltorio -->
+    <div class="nrailin">
+      <div class="nrailbox">
+        <p class="h"><i data-lucide="clock" class="lu"></i> Lo último</p>
+        <ul class="nultimo" id="np-ultimo"></ul>
+      </div>
+      <!-- la agenda se pinta sola si la sección existe y tiene noticias -->
+      <div class="nrailbox" id="np-agendabox" hidden>
+        <p class="h"><i data-lucide="calendar-days" class="lu"></i> En la agenda</p>
+        <ul class="nultimo" id="np-agenda"></ul>
+      </div>
+      <div class="nrevista">
+        <p class="over">La revista</p>
+        <p class="disp">Lo que no cabe aquí, sale en papel<span class="pt">.</span></p>
+        <a class="btn pri" href="index.html#kiosko"><i data-lucide="library" class="lu"></i> Ver el kiosko</a>
+      </div>
     </div>
   </aside>
 </section>
 
-<!-- FLUJO: todas las noticias, filtradas por sección -->
+<!-- FLUJO: en reposo, el diario por secciones; al filtrar o buscar, la rejilla
+     plana de resultados. Las dos vistas comparten la barra de arriba. -->
 <section id="np-flujo" class="nflujo">
   <div class="nfilbar">
     <div class="wrap in">
@@ -109,7 +133,8 @@
   </div>
   <div class="wrap">
     <p class="nsecdesc" id="np-secdesc"></p>
-    <div class="ngrid" id="np-grid"></div>
+    <div class="nsecciones" id="np-secciones"></div>
+    <div class="ngrid" id="np-grid" hidden></div>
     <div class="nmas" id="np-mas" hidden><button class="btn out" type="button">Cargar más noticias</button></div>
   </div>
 </section>

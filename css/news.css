@@ -12,36 +12,47 @@
 
 /* ---------- piezas comunes a las tres vistas ---------- */
 
-/* Etiqueta de sección: la única mancha de color de una tarjeta. */
-.nbadge{align-self:flex-start;padding:5px 12px;border-radius:var(--radius-pill);color:#fff;
-  font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+/* Etiqueta de sección: la única mancha de color de una tarjeta. Esquina casi
+   recta, no píldora: en una página de filetes una cápsula desentona. */
+.nbadge{align-self:flex-start;padding:4px 9px;border-radius:var(--radius-xs);color:#fff;
+  font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
 .nkick{font-size:10.5px;font-weight:800;letter-spacing:.18em;text-transform:uppercase}
 .nmeta{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-faint);font-weight:600;flex-wrap:wrap}
 .nmeta .sep{opacity:.5}
+/* titular de sumario: el mismo tipo del papel, aquí compartido por el raíl,
+   la agenda y las columnas de sección */
+.utit{font-family:var(--font-display);font-weight:900;font-optical-sizing:none;font-variation-settings:'opsz' 14;
+  line-height:1.2;letter-spacing:-.01em;color:var(--text-strong)}
 
-/* --- tarjeta estándar: la unidad del flujo --- */
-.ncard{display:flex;flex-direction:column;background:var(--surface-card);
-  border:1px solid var(--border-hair);border-radius:var(--radius-lg);overflow:hidden;
-  box-shadow:var(--shadow-sm);color:inherit;
-  transition:transform var(--dur) var(--ease-standard),box-shadow var(--dur) var(--ease-standard),border-color var(--dur) var(--ease-standard)}
-.ncard:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);border-color:var(--edem-teal-200);color:inherit}
-.ncard .nim{aspect-ratio:3/2;overflow:hidden;position:relative;
+/* --- tarjeta estándar: la unidad del flujo ---
+   No es una caja: es una columna de periódico. Filete fino arriba, el papel de
+   la página como fondo y la foto pegada al texto. Al quitar el marco, la
+   sombra y el radio, lo que ordena la página son los filetes y los tamaños,
+   que es exactamente como se lee una portada impresa.
+   El bloque «Actualidad» de la home vuelve a vestirla de vidrio oscuro más
+   abajo: allí sí es una ficha sobre el agua. */
+.ncard{display:flex;flex-direction:column;background:none;
+  border:0;border-top:1px solid var(--ink-900);border-radius:0;
+  box-shadow:none;color:inherit;padding-top:14px;
+  transition:color var(--dur) var(--ease-standard)}
+.ncard:hover{color:inherit}
+.ncard .nim{aspect-ratio:3/2;overflow:hidden;position:relative;margin-bottom:15px;
   background:linear-gradient(135deg,var(--edem-teal-800),var(--edem-teal-900))}
 .ncard .nim img{width:100%;height:100%;object-fit:cover;transition:transform var(--dur-slow) var(--ease-standard)}
 .ncard:hover .nim img{transform:scale(1.045)}
 /* sin foto la tarjeta no deja un hueco negro: se queda solo el texto */
 .ncard .nim.nofoto{display:none}
-.ncard .nbody{padding:20px 22px 22px;display:flex;flex-direction:column;gap:10px;flex:1}
-.ncard h3{font-size:21px;line-height:1.16;color:var(--text-strong);letter-spacing:-.015em}
+.ncard .nbody{padding:0;display:flex;flex-direction:column;gap:10px;flex:1}
+.ncard h3{font-size:20px;line-height:1.16;color:var(--text-strong);letter-spacing:-.015em}
 .ncard:hover h3{color:var(--edem-teal-700)}
 .ncard p{font-size:14.5px;line-height:1.55;color:var(--text-muted);flex:1}
-.ncard .nfoot{border-top:1px solid var(--ink-100);padding-top:11px;margin-top:2px}
+.ncard .nfoot{border-top:1px solid var(--border-hair);padding-top:11px;margin-top:2px}
 
 /* --- apertura: la noticia que manda en la portada --- */
-.ncard.lead{border-top:3px solid var(--edem-teal-500)}
-.ncard.lead .nim{aspect-ratio:16/9}
-.ncard.lead .nbody{padding:clamp(22px,2.6vw,34px)}
-.ncard.lead h2{font-size:clamp(28px,3.4vw,46px);line-height:1.02;color:var(--text-strong);letter-spacing:-.02em}
+.ncard.lead{border-top:3px solid var(--ink-900);padding-top:17px}
+.ncard.lead .nim{aspect-ratio:16/9;margin-bottom:20px}
+.ncard.lead .nbody{padding:0}
+.ncard.lead h2{font-size:clamp(28px,3vw,44px);line-height:1.02;color:var(--text-strong);letter-spacing:-.02em}
 .ncard.lead:hover h2{color:var(--edem-teal-700)}
 .ncard.lead .nlead{font-size:clamp(15.5px,1.4vw,18px);line-height:1.6;color:var(--text-muted);max-width:62ch}
 .ncard.lead .nfoot{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
@@ -64,7 +75,7 @@
 .nago{font-size:12px;color:var(--text-faint);font-weight:600}
 .nthumb{width:88px;height:66px;object-fit:cover;border-radius:var(--radius-sm);flex:none}
 
-.nvacio{padding:60px 0;text-align:center;color:var(--text-muted);font-size:16px}
+.nvacio{padding-block:60px;text-align:center;color:var(--text-muted);font-size:16px}
 
 /* ============================================================
    1 · BLOQUE «ACTUALIDAD» DE LA HOME
@@ -110,12 +121,18 @@
    Misma receta que .kcard: vidrio sobre el agua, esquina recta de papel y una
    sombra fría y larga. Cambia el material, no la maqueta: la apertura, los
    titulares y la puerta al portal siguen siendo los del periódico. */
+/* Aquí la tarjeta SÍ es una caja: se le devuelve el marco, el relleno y el
+   levantarse al pasar por encima que la versión de papel ya no tiene. */
 #actualidad .ncard{background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.045));
   -webkit-backdrop-filter:blur(14px) saturate(150%);backdrop-filter:blur(14px) saturate(150%);
-  border:1px solid rgba(255,255,255,.16);border-radius:3px;
-  box-shadow:0 22px 48px rgba(3,26,36,.42)}
-#actualidad .ncard:hover{border-color:rgba(255,255,255,.34);box-shadow:0 40px 84px rgba(3,26,36,.6)}
-#actualidad .ncard.lead{border-top:3px solid var(--edem-teal-300)}
+  border:1px solid rgba(255,255,255,.16);border-radius:3px;overflow:hidden;padding-top:0;
+  box-shadow:0 22px 48px rgba(3,26,36,.42);
+  transition:transform var(--dur) var(--ease-standard),box-shadow var(--dur) var(--ease-standard),border-color var(--dur) var(--ease-standard)}
+#actualidad .ncard .nim{margin-bottom:0}
+#actualidad .ncard .nbody{padding:20px 22px 22px}
+#actualidad .ncard.lead .nbody{padding:clamp(22px,2.6vw,34px)}
+#actualidad .ncard:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.34);box-shadow:0 40px 84px rgba(3,26,36,.6)}
+#actualidad .ncard.lead{border-top:3px solid var(--edem-teal-300);padding-top:0}
 /* en la columna estrecha del raíl el titular de apertura baja un punto: a 46px
    se comía cinco líneas y desnivelaba las dos columnas */
 #actualidad .ncard.lead h2{font-size:clamp(26px,2.5vw,36px)}
@@ -144,43 +161,73 @@
 /* ============================================================
    2 · PORTAL DE NOTICIAS
    ============================================================ */
-/* Cabecera del diario: la mancheta va limpia, sin pauta de renglones detrás
-   —el titular a 96px ya pesa bastante—. La pauta se queda solo en el bloque
-   «Actualidad» de la home, donde el texto es más pequeño. */
-.npmast{padding:44px 0 30px;border-bottom:1px solid var(--border-hair);position:relative;overflow:hidden}
-.npmast .wrap{position:relative;z-index:1}
+/* Mancheta: el cabecero de un semanario, no una portada de revista. El rótulo
+   y la línea de datos comparten renglón —título a la izquierda, fecha y cifras
+   apoyadas en la misma base—, y debajo cierra el filete grueso. Así la portada
+   empieza dentro de la primera pantalla en vez de detrás de un titular de 96px. */
+.npmast{padding:30px 0 0;position:relative}
+.npmastin{display:flex;align-items:flex-end;justify-content:space-between;gap:18px 30px;flex-wrap:wrap;
+  padding-bottom:16px;border-bottom:3px solid var(--ink-900)}
 .npkick{display:flex;align-items:center;gap:10px;color:var(--edem-teal-700)}
 .npkick .dot{width:7px;height:7px;border-radius:50%;background:var(--lanzadera);animation:kpulse 2.6s ease-in-out infinite}
-.npmast h1{font-size:clamp(46px,7vw,96px);line-height:.9;color:var(--text-strong);margin-top:14px}
+.npmast h1{font-size:clamp(40px,4.4vw,62px);line-height:.92;color:var(--text-strong);margin-top:10px}
 .npmast h1 .pt{color:var(--edem-teal-500)}
-/* la mancheta va al grano: rótulo, cabecera y la línea de fecha */
-.npdata{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:20px;
+/* la línea de datos: fecha, plaza y cuánto hay publicado */
+.npdata{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-bottom:5px;
   font-size:11.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--text-faint)}
 .npdata .pip{width:5px;height:5px;border-radius:50%;background:var(--edem-teal-300)}
+.npdata #np-total{color:var(--edem-teal-700)}
 
-/* --- portada: apertura + secundarias + raíl de lo último --- */
-.nportada{padding:38px 0 10px;display:grid;grid-template-columns:minmax(0,1.62fr) minmax(0,1fr);
-  gap:clamp(28px,3.4vw,48px);align-items:start}
-.nprincipal{display:flex;flex-direction:column;gap:26px}
-.nsec{display:grid;grid-template-columns:1fr 1fr;gap:24px}
-.nrail{position:sticky;top:96px;display:flex;flex-direction:column;gap:22px}
-.nrailbox{border:1px solid var(--border-hair);border-radius:var(--radius-lg);background:var(--surface-card);
-  padding:22px 22px 8px;box-shadow:var(--shadow-sm)}
+/* --- portada a tres columnas ---
+   Apertura y secundarias | titulares del día | raíl de servicio, separadas por
+   filetes verticales. El gutter no es `gap`: es el relleno de cada columna, y
+   el filete cae justo en medio, que es como se compone una página de periódico
+   y lo que deja las tres columnas ópticamente a la misma distancia. */
+/* OJO con el `padding`: .nportada también es .wrap, así que aquí solo se toca
+   el vertical. Con la forma corta (`padding:30px 0 44px`) se borraban los 28px
+   laterales que .wrap declara después de su propia forma corta, y en cuanto la
+   pantalla era más ancha que el contenedor el raíl se pegaba al borde. */
+.nportada{--ng:clamp(20px,1.9vw,30px);
+  padding-block:30px 44px;display:grid;
+  grid-template-columns:minmax(0,1.62fr) minmax(0,.92fr) minmax(0,.94fr);
+  gap:0;align-items:stretch}
+.nprincipal{display:flex;flex-direction:column;gap:26px;padding-right:var(--ng)}
+.nsec{display:grid;grid-template-columns:1fr 1fr;gap:var(--ng)}
+.ntambien{padding:0 var(--ng);border-left:1px solid var(--border-strong)}
+.nrail{padding-left:var(--ng);border-left:1px solid var(--border-strong)}
+.nrailin{position:sticky;top:96px}
+
+/* cabecera de columna: el mismo filete de las secciones, en pequeño */
+.ncolh{font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:800;color:var(--text-strong);
+  border-bottom:2px solid var(--ink-900);padding-bottom:11px}
+/* Titulares del día: solo texto. Aquí la miniatura estorbaba —dejaba el
+   titular en una medida de cuatro palabras y lo partía en cinco líneas—, así
+   que esta columna se lee como el sumario de un periódico: sección en color,
+   titular y cuándo se publicó. Las fotos se quedan donde pesan: la apertura,
+   las secundarias y las destacadas de cada sección. */
+.ntambien .nrow{padding:15px 0}
+.ntambien .nrow:first-child{padding-top:15px}
+.ntambien .nrow:last-child{border-bottom:0}
+.ntambien .nrow h3{font-size:17.5px}
+.ntambien .nthumb{display:none}
+
+/* raíl: cajas sin caja. Rótulo con filete debajo y la lista colgando de él. */
+.nrailbox{border:0;border-radius:0;background:none;padding:0;box-shadow:none;margin-bottom:30px}
 .nrailbox>.h{display:flex;align-items:center;gap:9px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;
-  font-weight:800;color:var(--edem-teal-700);padding-bottom:14px;border-bottom:2px solid var(--ink-900)}
+  font-weight:800;color:var(--edem-teal-700);padding-bottom:11px;border-bottom:2px solid var(--ink-900)}
 .nrailbox>.h .lu{width:15px;height:15px}
+.nrailbox[hidden]{display:none}
 .nultimo{list-style:none}
 .nultimo li{border-bottom:1px solid var(--border-hair)}
 .nultimo li:last-child{border-bottom:0}
 .nultimo a{display:grid;gap:5px;padding:13px 0;color:inherit}
 .nultimo .uhora{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--text-faint)}
-.nultimo .utit{font-family:var(--font-display);font-weight:900;font-optical-sizing:none;font-variation-settings:'opsz' 14;
-  font-size:16px;line-height:1.2;letter-spacing:-.01em;color:var(--text-strong)}
+.nultimo .utit{font-size:15.5px}
 .nultimo a:hover .utit{color:var(--edem-teal-700)}
 .nultimo .usec{font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
 
 /* promo de la revista dentro del raíl: el portal es diario, el papel es mensual */
-.nrevista{border-radius:var(--radius-lg);overflow:hidden;background:var(--edem-teal-900);color:#fff;
+.nrevista{border-radius:0;overflow:hidden;background:var(--edem-teal-900);color:#fff;
   padding:26px 24px;position:relative}
 .nrevista::after{content:'';position:absolute;right:-40px;bottom:-60px;width:190px;height:190px;border-radius:50%;
   background:radial-gradient(circle,rgba(63,166,196,.5),transparent 70%);pointer-events:none}
@@ -228,9 +275,40 @@
   white-space:nowrap;margin-left:auto}
 .nsecdesc{font-size:14.5px;color:var(--text-muted);line-height:1.6;margin-bottom:22px;max-width:64ch}
 .nsecdesc:empty{display:none}
-.ngrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(288px,1fr));gap:26px}
+.ngrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(288px,1fr));gap:30px 26px}
+.ngrid[hidden]{display:none}
 .nmas{display:flex;justify-content:center;margin-top:38px}
 .nmas[hidden]{display:none}
+
+/* --- el diario por secciones ---
+   La vista en reposo del flujo: una columna por sección, cada una bajo su
+   filete grueso, con la destacada arriba y el resto en titulares. Es la banda
+   de secciones de un semanario, y sustituye a la parrilla plana de tarjetas
+   iguales, que no decía a qué tema pertenecía cada cosa ni dónde seguir.
+   En cuanto se filtra o se busca, esta vista se oculta y aparece .ngrid. */
+.nsecciones{display:grid;grid-template-columns:repeat(auto-fill,minmax(216px,1fr));gap:40px 26px}
+.nsecciones[hidden]{display:none}
+.nsecblock>.h{display:flex;align-items:baseline;gap:10px;
+  border-top:3px solid var(--ink-900);padding-top:11px}
+.nsecblock .nm{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--sc)}
+.nsecblock .all{margin-left:auto;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;
+  border:0;background:none;padding:0;cursor:pointer;font:inherit;font-size:11.5px;font-weight:700;
+  color:var(--text-faint);transition:color var(--dur-fast),gap var(--dur-fast)}
+.nsecblock .all:hover{color:var(--sc);gap:8px}
+.nsecblock .all .lu{width:13px;height:13px}
+.nsecblock .d{font-size:12.5px;line-height:1.5;color:var(--text-faint);margin:9px 0 15px}
+.nsecblock .dest{display:block;color:inherit}
+.nsecblock .dest img{width:100%;aspect-ratio:3/2;object-fit:cover;margin-bottom:12px}
+.nsecblock .dest h3{font-size:18px;line-height:1.16;color:var(--text-strong);letter-spacing:-.012em}
+.nsecblock .dest:hover h3{color:var(--sc)}
+.nsecblock .dest p{font-size:13.5px;line-height:1.52;color:var(--text-muted);margin-top:8px}
+.nsecblock .dest .nago{display:block;margin-top:9px}
+.nsecblock .tt{list-style:none;margin-top:16px;border-top:1px solid var(--border-hair)}
+.nsecblock .tt li{border-bottom:1px solid var(--border-hair)}
+.nsecblock .tt a{display:block;padding:11px 0;color:inherit}
+.nsecblock .tt .utit{display:block;font-size:15px}
+.nsecblock .tt a:hover .utit{color:var(--sc)}
+.nsecblock .tt .nago{display:block;margin-top:5px}
 
 /* ============================================================
    3 · FICHA DE NOTICIA
@@ -248,10 +326,31 @@
    sumarlo, el texto de la cabecera quedaría 28px a la derecha del cuerpo. */
 .ahead{--acol:720px;padding:38px 0 26px}
 .awrap{max-width:calc(720px + 56px)}
+/* fila de navegación: botón de vuelta + ruta completa hasta la propia noticia.
+   La ruta va en una sola línea con scroll horizontal propio: con el titular
+   dentro, partirla en dos renglones deja el rastro más confuso que verlo
+   cortado. El último tramo es la página actual, así que no es enlace. */
+.aruta{display:flex;align-items:center;gap:14px;margin-bottom:20px;min-width:0}
+.avolver{flex:none;display:inline-flex;align-items:center;gap:7px;cursor:pointer;
+  padding:7px 14px 7px 11px;border-radius:var(--radius-pill);
+  border:1px solid var(--border-strong);background:var(--surface-card);
+  font:inherit;font-size:12.5px;font-weight:700;color:var(--text-body);
+  transition:background var(--dur-fast),border-color var(--dur-fast),color var(--dur-fast)}
+.avolver .lu{width:15px;height:15px;transition:transform var(--dur-fast)}
+.avolver:hover{background:var(--acc,var(--edem-teal-500));border-color:var(--acc,var(--edem-teal-500));color:#fff}
+.avolver:hover .lu{transform:translateX(-2px)}
+.avolver:focus-visible{outline:2px solid var(--acc,var(--edem-teal-500));outline-offset:2px}
 .amiga{display:flex;align-items:center;gap:9px;font-size:11.5px;font-weight:800;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--text-faint);margin-bottom:20px;flex-wrap:wrap}
+  text-transform:uppercase;color:var(--text-faint);min-width:0;overflow-x:auto;
+  padding-bottom:2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.amiga::-webkit-scrollbar{display:none}
+.amiga>*{flex:none;white-space:nowrap}
 .amiga a{color:var(--text-muted)}
-.amiga a:hover{color:var(--edem-teal-700)}
+.amiga a:hover{color:var(--edem-teal-700);text-decoration:underline;text-underline-offset:3px}
+/* el titular como último tramo: en minúsculas y recortado, para que la ruta
+   siga leyéndose como rastro y no como un segundo titular */
+.amiga .actual{color:var(--text-faint);text-transform:none;letter-spacing:.02em;font-weight:700;
+  font-size:12.5px;max-width:34ch;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto}
 .ahead h1{font-size:clamp(34px,5vw,64px);line-height:1;letter-spacing:-.022em;color:var(--text-strong)}
 .aentradilla{font-size:clamp(17px,1.9vw,22px);line-height:1.55;color:var(--text-muted);margin-top:20px;max-width:60ch}
 .afirma{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:28px;padding:16px 0;
@@ -281,9 +380,27 @@
 .acuerpo{padding-top:42px;padding-bottom:20px}
 .acol{max-width:720px;margin-inline:auto}
 .acol p{font-size:18.5px;line-height:1.78;color:var(--text-body);margin-bottom:22px}
-/* capitular del primer párrafo, como en el papel */
-.acol p.acap::first-letter{float:left;font-family:var(--font-display);font-weight:900;font-size:76px;
-  line-height:.78;padding:6px 12px 0 0;color:var(--edem-teal-700)}
+/* Capitular del primer párrafo, como en el papel.
+   Estaba a ojo (76px sueltos) y caía entre dos y tres líneas: ni el remate de
+   arriba coincidía con la altura de mayúscula del texto ni el pie se apoyaba
+   en ninguna base, y colgaba sobre la línea siguiente. Ahora las medidas
+   salen de la métrica real de las dos fuentes:
+     · altura de mayúscula de la Bodoni = .75em · su ascendente = 1.13em
+     · altura de mayúscula de la Archivo = .686em
+   Para abrazar tres líneas la capitular necesita 2×1.78em + .686em ≈ 78.5px
+   de altura de mayúscula → 78.5/.75 ≈ 5.66em. El line-height (.884) es lo que
+   sienta la base de la letra sobre la tercera línea y, de paso, deja la caja
+   flotante por debajo de la cuarta, que si no también se sangraría.
+   El peso baja de 900 a 600: en negro extremo la Bodoni empasta los remates a
+   este tamaño y la letra se veía como un borrón. */
+.acol p.acap::first-letter{float:left;font-family:var(--font-display);font-weight:600;
+  font-size:5.66em;line-height:.884;margin:4px .075em 0 0;
+  font-variant-caps:normal;   /* si no, hereda las versalitas de la entradilla */
+  color:var(--acc,var(--edem-teal-700));-webkit-font-smoothing:antialiased}
+/* las primeras palabras en versalitas atan la capitular al texto: sin ellas
+   la letra quedaba suelta al lado de un párrafo cualquiera */
+.acol p.acap .aentrada{font-weight:700;letter-spacing:.04em;color:var(--text-strong);
+  font-variant-caps:all-small-caps}
 .acol h2{font-size:clamp(24px,2.6vw,32px);line-height:1.14;color:var(--text-strong);
   margin:40px 0 16px;letter-spacing:-.018em}
 .acol h3{font-size:19px;font-weight:800;color:var(--text-strong);margin:30px 0 12px}
@@ -324,21 +441,43 @@
 .arelgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
 
 /* ---------- responsive ---------- */
+/* portátiles y tabletas anchas: el raíl se descuelga y baja a pie de portada,
+   pero la apertura y los titulares del día aguantan en dos columnas */
+@media(max-width:1180px){
+  .nportada{grid-template-columns:minmax(0,1.65fr) minmax(0,.9fr)}
+  .nrail{grid-column:1/-1;border-left:0;padding-left:0;padding-top:26px;margin-top:30px;
+    border-top:1px solid var(--border-strong);
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0 var(--ng)}
+  .nrailin{position:static;display:contents}
+  .nrevista{align-self:start}
+}
 @media(max-width:1020px){
-  .nportada{grid-template-columns:1fr;gap:30px}
+  .nportada{grid-template-columns:1fr;padding-bottom:34px}
+  .nprincipal{padding-right:0}
+  .ntambien{padding:26px 0 0;border-left:0;border-top:1px solid var(--border-strong);margin-top:4px}
   .nrail{position:static}
   .dgrid{grid-template-columns:1fr;gap:26px}
-  .acuerpo{padding:32px 0 12px}
+  /* padding-block, no la forma corta: .acuerpo es un .wrap y `padding:32px 0`
+     le borraba los 20-28px laterales, con el cuerpo pegado al borde en móvil */
+  .acuerpo{padding-block:32px 12px}
   #actualidad{padding:64px 0 70px}
   /* el buscador encabeza la barra y ocupa todo el ancho: al lado de los filtros
      los cortaba a media tira y no se veía dónde acababan */
   .nbuscar{width:100%;order:-1}
 }
 @media(max-width:680px){
-  .npmast{padding:30px 0 24px}
-  .nportada{padding:26px 0 4px}
+  .npmast{padding:24px 0 0}
+  .npmastin{padding-bottom:13px}
+  /* la línea de datos cabe en dos renglones en vez de tres: menos espaciado
+     entre letras y los puntos de separación fuera, que colgaban al final de
+     cada línea sin separar ya nada */
+  .npdata{font-size:10.5px;letter-spacing:.1em;gap:6px 9px}
+  .npdata .pip{display:none}
+  .npdata>span:not(:last-child)::after{content:' ·';color:var(--edem-teal-300)}
+  .nportada{padding-block:24px 28px}
   .nsec{grid-template-columns:1fr;gap:20px}
-  .ngrid{grid-template-columns:1fr;gap:22px}
+  .nsecciones{grid-template-columns:1fr;gap:32px}
+  .ngrid{grid-template-columns:1fr;gap:26px}
   .nfilbar{padding:11px 0 10px}
   .ncount{display:none}
   .nrow{gap:12px}
@@ -349,7 +488,15 @@
   .ashare{margin-left:0;width:100%;justify-content:flex-start;padding-top:4px}
   .ahero img{border-radius:var(--radius-sm);aspect-ratio:4/3}
   .acol p{font-size:17.5px;line-height:1.72}
-  .acol p.acap::first-letter{font-size:62px;padding-right:9px}
+  /* en móvil la capitular baja a dos líneas: con tres se comía media pantalla.
+     Mismo cálculo con el cuerpo de 17.5px/1.72 → 1.72em + .686em ≈ 42px de
+     altura de mayúscula → 42/.75 ≈ 3.2em */
+  .acol p.acap::first-letter{font-size:3.2em;line-height:1.016;margin:2px .07em 0 0}
+  .aruta{flex-wrap:wrap;gap:11px}
+  /* el titular como último tramo no cabe y se quedaba cortado contra el borde:
+     en móvil la ruta llega hasta la sección y el titular ya está justo debajo */
+  .amiga{width:100%}
+  .amiga .actual,.amiga span:nth-last-of-type(2){display:none}   /* el tramo y su «›» */
   .acita{padding:20px 20px;margin:28px 0}
   .adato{flex-direction:column;gap:8px}
   .arel{padding:46px 0 56px;margin-top:40px}

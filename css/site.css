@@ -1399,3 +1399,54 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
 /* barrido de luz durante el giro: la cara que se levanta se sombrea
    y la que aterriza llega sombreada y se aclara al posarse */
 .leaf .face .shade{transition:opacity .82s var(--ease-standard)}
+
+/* ============================================================
+   ESCALA EN PANTALLAS DE ORDENADOR
+   ============================================================ */
+/* En un monitor FHD —y sobre todo en uno con el escalado del sistema al 125 o
+   150 %, que deja un viewport de 1280–1536 px— la maqueta se veía «con zoom»:
+   el contenido cabía en 1200 px con dos palmos de papel a los lados y todos los
+   titulares llegaban al tope de su clamp. Se corrige por los dos lados a la vez:
+   el contenedor se ensancha para que la página ocupe la pantalla y los tamaños
+   de display bajan un escalón. El cuerpo de texto NO se toca: 16–17px es la
+   medida cómoda de lectura y encogerlo solo cansaría la vista.
+
+   Todo va dentro de min-width, así que por debajo de 1024 px la maqueta es
+   exactamente la de antes: esto no toca el móvil ni la tableta.
+
+   Va al final del archivo a propósito: así gana a las reglas de arriba sin
+   tener que subir la especificidad de cada selector. */
+@media(min-width:1024px){
+  :root{--container:1300px}
+
+  /* portada: el titular de bienvenida era el que más se notaba */
+  .hero h1{font-size:clamp(58px,6.4vw,98px)}
+  .hero .sub{font-size:clamp(21px,2vw,26px)}
+  .hero p.lead{font-size:16.5px}
+
+  /* cabeceras de sección */
+  .shead h2{font-size:clamp(28px,2.8vw,36px)}
+
+  /* el recorrido de la revista y sus rótulos a pantalla completa */
+  .jtitle{font-size:clamp(40px,5.2vw,74px)}
+  .jrole .jt{font-size:clamp(22px,2.1vw,29px)}
+  .beat .bl{font-size:clamp(34px,5.2vw,72px)}
+  .beat .bl.big{font-size:clamp(40px,7vw,98px)}
+  .beat .bs{font-size:clamp(15px,1.4vw,18px)}
+  .beat-cta .ctabrand img{height:clamp(42px,5.4vw,78px)}
+  .beat-cta .ctabrand .t{font-size:clamp(46px,6vw,86px)}
+
+  /* ecosistema y cierre */
+  .ehead .role{font-size:clamp(28px,3vw,42px)}
+  #suscribete h2{font-size:clamp(28px,2.8vw,34px)}
+
+  /* kiosko a pantalla completa */
+  .dshero h1{font-size:clamp(52px,5.8vw,80px)}
+  .dshero .sub{font-size:clamp(19px,1.9vw,23px)}
+}
+
+/* monitores de verdad grandes: el contenedor da otro paso, pero se para en
+   1400 px — más allá la línea de texto se hace incómoda de seguir */
+@media(min-width:1680px){
+  :root{--container:1400px}
+}
