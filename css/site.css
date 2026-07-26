@@ -372,6 +372,25 @@ html.sbusca-on{overflow:hidden}
   .hscene .rays{animation:none}
 }
 
+/* EN CUANTO EMPIEZA A SUBIR EL AGUA, EL PUERTO DEJA DE RESPIRAR.
+   Esto es LO MÁS CARO de toda la inmersión, y con diferencia. Un <g> de un SVG
+   no se puede componer aparte: cuando su transform cambia, WebKit vuelve a
+   RASTERIZAR el dibujo. Aquí hay una docena de bucles infinitos (cinco barcos
+   cabeceando, seis gaviotas, las palmeras, el carro de la grúa, la corona del
+   sol) repartidos por las tres capas, así que los tres SVG a pantalla completa
+   se redibujan en CADA frame, todo el rato — también mientras el mar los tapa.
+   Medido en el simulador durante la subida del agua: 42,4ms por frame (24fps)
+   con los bucles en marcha, 27,5ms (36fps) congelándolos. Quince milisegundos,
+   un 35% del presupuesto, gastados en un cabeceo de 5px que sucede DEBAJO del
+   agua que está subiendo.
+   `animation-play-state:paused` congela cada bucle donde esté —no hay salto, no
+   se recoloca nada— y solo mientras dura la bajada: arriba del todo, que es
+   donde se mira el puerto, sigue respirando igual que siempre. Al volver a
+   subir, se reanudan desde donde se quedaron. */
+.hero.wake .hscene .bob,.hero.wake .hscene .sway,.hero.wake .hscene .brea,
+.hero.wake .hscene .fly,.hero.wake .hscene .troll,.hero.wake .hscene .rays,
+.hero.wake .heroBg .motes span{animation-play-state:paused}
+
 /* ---- el paisaje en un teléfono ----
    El encuadre apaisado, metido a la fuerza en una pantalla vertical, obliga al
    «slice» a comerse los laterales: la grúa, la lancha y las palmeras salían

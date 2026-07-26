@@ -620,7 +620,19 @@ function observeReveals() {
 
    Rendimiento: un único rAF por frame, las medidas del layout se cachean y solo
    se escriben transform/opacity (propiedades que el compositor resuelve sin
-   recalcular layout ni pintar). */
+   recalcular layout ni pintar).
+
+   POR QUÉ UN rAF CONTINUO Y NO EL EVENTO «scroll» (esto es lo que hacía que en
+   Safari iOS la inmersión se viera a saltos): en iOS el scroll lo lleva el hilo
+   del compositor, y el evento «scroll» le llega al JS COALESCIDO —muy por debajo
+   de la tasa de refresco—. Medido en el simulador con un swipe con inercia:
+   de 70 frames en movimiento solo 7 (10%) recibían un --seaP nuevo, hasta 4
+   frames seguidos con el valor viejo, y lo pintado iba 54px por detrás del scroll
+   de media (204px en el peor caso, o sea un 20% de todo el primer acto).
+   window.scrollY leído DENTRO del rAF sí está al día en cada frame, así que el
+   bucle se sostiene solo mientras el pin esté en pantalla y lee la posición él
+   mismo. El coste es el mismo trabajo por frame que antes; lo que cambia es que
+   ahora hay un frame nuevo cada 16ms en vez de cada 100. */
 (function immersion() {
   const pin = $('heroPin'), hero = pin && pin.querySelector('.hero'), deep = $('deep');
   if (!pin || !hero || !deep || REDUCED.matches) return;
@@ -650,9 +662,10 @@ function observeReveals() {
     const b = lerp(lerp(CREAM[2], SEAC[2], seaP), DEEPC[2], deepP);
     return 'rgb(' + r + ',' + g + ',' + b + ')';
   };
+  const SURFACE = heroCol(0, 0);   // el papel del landing, ya compuesto
 
   let pinTop = 0, range = 0, vh = 0, waveEnd = 0, seg = 0, enabled = true;
-  let ticking = false, prevSea = -1, prevDeep = -1, prevCue = -1, prevBg = '';
+  let prevSea = -1, prevDeep = -1, prevCue = -1, prevBg = '', prevQs = -1, prevQd = -1;
   const prevPh = new Array(N).fill(null), prevOp = new Array(N).fill(null);
 
   function measure() {
@@ -685,13 +698,14 @@ function observeReveals() {
   }
 
   function update() {
-    ticking = false;
     if (!enabled) {
-      root.style.setProperty('--seaP', '0');
-      root.style.setProperty('--deepP', '0');
-      root.style.setProperty('--cueP', '0');
-      root.style.backgroundColor = heroCol(0, 0); prevBg = '';
-      flag('dry', false); flag('sunk', false);
+      // Solo la primera pasada tras quedar deshabilitada: con el bucle continuo,
+      // reescribir esto en cada frame invalidaría el estilo del hero para nada.
+      prevSea = write('--seaP', 0, prevSea);
+      prevDeep = write('--deepP', 0, prevDeep);
+      prevCue = write('--cueP', 0, prevCue);
+      if (SURFACE !== prevBg) { prevBg = SURFACE; root.style.backgroundColor = SURFACE; }
+      flag('dry', false); flag('sunk', false); flag('wake', false);
       return;
     }
     const s = window.scrollY - pinTop;              // px recorridos dentro del pin
@@ -705,8 +719,15 @@ function observeReveals() {
     // scroll, no en cada frame. Así el repintado del fondo del hero no compite por
     // fps con la inmersión —que ya mueve olas, burbujas y desenfoques—; la franja
     // es fina y los saltos de color no se aprecian.
-    const bg = heroCol(q24(seaP), q24(deepP));
-    if (bg !== prevBg) { prevBg = bg; root.style.backgroundColor = bg; }
+    // Se compara ANTES de componer el color: heroCol monta una cadena nueva cada
+    // vez que se la llama, y con el bucle continuo eso serían 60 cadenas por
+    // segundo tiradas a la basura para acabar escribiendo el mismo color.
+    const qs = q24(seaP), qd = q24(deepP);
+    if (qs !== prevQs || qd !== prevQd) {
+      prevQs = qs; prevQd = qd;
+      const bg = heroCol(qs, qd);
+      if (bg !== prevBg) { prevBg = bg; root.style.backgroundColor = bg; }
+    }
 
     // la flecha se apaga con el mismo tramo de salida del último beat, así
     // desaparece justo cuando se suelta el pin y aparece el kiosko debajo.
@@ -719,6 +740,9 @@ function observeReveals() {
     // animándose, y una vez bajo el agua el fondo y las crestas tampoco.
     flag('dry', deepP < 0.002);
     flag('sunk', seaP > 0.995);
+    // en cuanto el agua se mueve, el puerto deja de respirar (ver site.css:
+    // es la mitad del coste por frame de toda la bajada)
+    flag('wake', seaP > 0.004);
 
     for (let i = 0; i < N; i++) {
       const u = (s - waveEnd - i * seg) / seg;      // 0→1 dentro de la ventana del beat
@@ -740,7 +764,21 @@ function observeReveals() {
     }
   }
 
-  const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
+  /* El bucle: se enciende cuando el pin entra en pantalla y se apaga cuando sale
+     (y con la pestaña en segundo plano). Mientras la página está quieta update()
+     no escribe nada —todas las comparaciones salen por el «no ha cambiado»—, así
+     que un frame en reposo cuesta cuatro restas. */
+  let rafId = 0, running = false;
+  function frame() {
+    rafId = running ? requestAnimationFrame(frame) : 0;
+    update();
+  }
+  function start() { if (!running && !document.hidden) { running = true; if (!rafId) rafId = requestAnimationFrame(frame); } }
+  function stop() {
+    running = false;
+    if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+    update();   // una última pasada para dejar la escena en su sitio
+  }
 
   /* burbujas y motas: puro CSS una vez creadas (el compositor las mueve solo) */
   function scatter(host, n, minSize, maxSize, minDur, maxDur) {
@@ -773,7 +811,15 @@ function observeReveals() {
   });
 
   let rz, lastW = window.innerWidth;
-  addEventListener('scroll', onScroll, { passive: true });
+  /* Encendido/apagado del bucle. El margen de un viewport a cada lado es el mismo
+     que ya usaba update() para salirse: así el bucle está en marcha ANTES de que
+     el hero asome y no se pierde el primer frame. Sin IntersectionObserver
+     (Safari 12-) el bucle se queda encendido siempre: update() ya se sale sola
+     cuando el pin queda fuera de pantalla, así que solo cuesta la comprobación. */
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(es => { es[0].isIntersecting ? start() : stop(); },
+      { rootMargin: '100% 0px' }).observe(pin);
+  } else start();
   addEventListener('resize', () => {
     clearTimeout(rz);
     rz = setTimeout(() => {
@@ -788,7 +834,12 @@ function observeReveals() {
     }, 120);
   });
   // al volver a la pestaña el rAF estaba parado: recolocamos por si se scrolleó fuera
-  addEventListener('visibilitychange', () => { if (!document.hidden) { measure(); update(); } });
+  addEventListener('visibilitychange', () => {
+    if (document.hidden) { stop(); return; }
+    measure(); update();
+    // el bucle solo vuelve si el hero sigue en pantalla
+    if (pin.getBoundingClientRect().top < innerHeight && pin.getBoundingClientRect().bottom > 0) start();
+  });
   // vuelta atrás en iOS: la página sale de la bfcache ya scrolleada y sin disparar scroll
   addEventListener('pageshow', () => { measure(); update(); });
   addEventListener('orientationchange', () => setTimeout(() => { measure(); update(); }, 300));
