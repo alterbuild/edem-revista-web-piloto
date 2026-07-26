@@ -16,17 +16,17 @@
 <link rel="apple-touch-icon" href="assets/edem-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="css/tokens.css?v=20260726e">
+<link rel="stylesheet" href="css/tokens.css?v=20260727b">
 <!-- Archivo: solo el eje de peso (ver index.html). Las cursivas del sitio son de
      Bodoni y font-stretch solo se usa dentro de las revistas. -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&display=swap">
-<link rel="stylesheet" href="css/site.css?v=20260726e">
-<link rel="stylesheet" href="css/news.css?v=20260726e">
-<script src="js/icons.js?v=20260726e" defer></script>
-<script src="js/cms.js?v=20260726e" defer></script>
-<script src="js/search.js?v=20260726e" defer></script>
-<script src="js/news.js?v=20260726e" defer></script>
-<script src="js/chrome.js?v=20260726e" defer></script>
+<link rel="stylesheet" href="css/site.css?v=20260727b">
+<link rel="stylesheet" href="css/news.css?v=20260727b">
+<script src="js/icons.js?v=20260727b" defer></script>
+<script src="js/cms.js?v=20260727b" defer></script>
+<script src="js/search.js?v=20260727b" defer></script>
+<script src="js/news.js?v=20260727b" defer></script>
+<script src="js/chrome.js?v=20260727b" defer></script>
 </head>
 <body>
 
@@ -81,19 +81,15 @@
   </div>
 </section>
 
-<!-- PORTADA: tres columnas separadas por filetes, como la portada de un
-     semanario — apertura + secundarias | también hoy | raíl de servicio. -->
+<!-- PORTADA: tres columnas separadas por filetes verticales — apertura |
+     secundarias | raíl de servicio — y una banda de cuatro que cierra por
+     debajo de las dos primeras. El raíl baja entero por la derecha. -->
 <section id="np-portada" class="wrap nportada">
-  <div class="nprincipal">
-    <div id="np-lead-card"></div>
-    <div class="nsec" id="np-sec"></div>
-  </div>
+  <div class="nprincipal" id="np-lead-card"></div>
 
-  <!-- columna de titulares: lo que no cabe en la apertura pero sí en la portada -->
-  <div class="ntambien">
-    <p class="ncolh">También hoy</p>
-    <div id="np-tambien"></div>
-  </div>
+  <!-- columna central: las secundarias, con el titular a la izquierda y su foto
+       a la derecha, separadas entre sí por un filete -->
+  <div class="nsec" id="np-sec"></div>
 
   <aside class="nrail" aria-label="Lo último, agenda y la revista">
     <!-- el filete de la columna lo lleva .nrail, que se estira hasta abajo;
@@ -115,6 +111,10 @@
       </div>
     </div>
   </aside>
+
+  <!-- banda de cierre: cuatro noticias con la foto arriba, bajo el filete que
+       cruza la apertura y las secundarias -->
+  <div class="nbanda" id="np-banda"></div>
 </section>
 
 <!-- FLUJO: en reposo, el diario por secciones; al filtrar o buscar, la rejilla

@@ -3,7 +3,10 @@
   "_campos": {
     "id": "identificador para la URL: noticia.html?a=ID. Solo minúsculas, números y guiones.",
     "seccion": "id de una de las `secciones` de más abajo",
-    "portada": "1 = apertura del portal y de la home · 2 y 3 = destacadas secundarias · sin campo = va al flujo por fecha",
+    "portada": "1 = apertura del portal y de la home · 2, 3 y 4 = las secundarias de la columna central · sin campo = va a la banda de cierre y al flujo, por fecha",
+    "lectura": "NO hace falta ponerlo: los minutos de lectura se calculan solos contando las palabras del `cuerpo` (200 por minuto). Este campo solo se usa como reserva cuando la noticia llega sin cuerpo, que pasa con algunos CMS.",
+    "img": "foto de la noticia: apertura de la ficha, tarjetas y miniatura de los sumarios del portal. `alt` la describe y `pie` es el pie de foto de la ficha.",
+    "imgMini": "opcional: la misma foto ya recortada en pequeño para los sumarios (50-60px). Si no está, se usa `img`.",
     "cuerpo": "lista de bloques. Tipos: p (párrafo), h2 (ladillo), cita {texto, autor}, img {src, alt, pie}, lista {items}, destacado (frase suelta), dato {cifra, texto}",
     "revista": "opcional: enlaza la noticia con una página de la revista en el visor {issue, page, texto}"
   },
@@ -20,6 +23,10 @@
     "_endpointSecciones": "Opcional. URL de las categorías. Si se deja vacío, se usan las `secciones` de este archivo.",
     "headers": {},
     "_headers": "Cabeceras extra para la API (por ejemplo un token público de solo lectura). NO pongas aquí claves privadas: este archivo lo descarga el navegador.",
+    "baseMedios": "",
+    "_baseMedios": "Opcional. Se antepone a las rutas de imagen relativas que devuelva el CMS (Strapi autoalojado sirve /uploads/foto.jpg). Ej.: https://cms.edem.es",
+    "miniatura": "",
+    "_miniatura": "Opcional. Plantilla para pedir la foto en pequeño en las listas de sumario del portal (se pintan a 50-60px). `{url}` se sustituye por la imagen de la noticia; si no lleva {url}, se añade al final. Ej. Contentful: \"{url}?w=160&h=160&fit=fill\" · Cloudinary/imgproxy: la cola de parámetros que use tu CDN. Solo hace falta si el CMS no devuelve ya una versión reducida (Strapi y WordPress sí la dan y se cogen solas).",
     "cacheSegundos": 300,
     "mapeo": {}
   },

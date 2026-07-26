@@ -10,8 +10,12 @@
    Modelo normalizado (lo único que el render conoce):
      { portal, secciones:[{id,nombre,color,desc}],
        noticias:[{ id, seccion, portada, titulo, entradilla, fecha,
-                   autor, autorRol, lectura, img, alt, pie,
+                   autor, autorRol, lectura, img, imgMini, alt, pie,
                    etiquetas[], cuerpo[], revista }] }
+
+   `imgMini` es la misma foto en pequeño, para las listas de sumario del portal
+   (se pintan a 50-60px). Siempre viene rellena: si el CMS no ofrece una
+   versión reducida, cae en `img`, así que el render nunca tiene que preguntar.
 
    Bloques de `cuerpo`: p · h2 · cita · lista · img · destacado · dato
 
@@ -71,6 +75,7 @@
       autorRol: 'autorRol|author_role',
       lectura: 'lectura|readingTime',
       img: 'img|imagen|image|cover',
+      imgMini: 'imgMini|miniatura|thumbnail|thumb',
       alt: 'alt|imagenAlt',
       pie: 'pie|caption',
       etiquetas: 'etiquetas|tags',
@@ -92,6 +97,9 @@
       autorRol: 'attributes.autorRol|autorRol',
       lectura: 'attributes.lectura|lectura',
       img: 'attributes.imagen.data.attributes.url|imagen.url|attributes.img|img',
+      // Strapi genera solo los formatos que el original permite: si la foto es
+      // pequeña puede no haber `small` y hay que bajar a `thumbnail`
+      imgMini: 'attributes.imagen.data.attributes.formats.small.url|imagen.formats.small.url|attributes.imagen.data.attributes.formats.thumbnail.url|imagen.formats.thumbnail.url',
       alt: 'attributes.imagen.data.attributes.alternativeText|imagen.alternativeText|attributes.alt',
       pie: 'attributes.imagen.data.attributes.caption|imagen.caption|attributes.pie',
       etiquetas: 'attributes.etiquetas|etiquetas',
@@ -111,6 +119,7 @@
       autorRol: '_embedded.author.0.description',
       lectura: 'acf.lectura',
       img: '_embedded.wp:featuredmedia.0.source_url|jetpack_featured_media_url',
+      imgMini: '_embedded.wp:featuredmedia.0.media_details.sizes.medium.source_url|_embedded.wp:featuredmedia.0.media_details.sizes.thumbnail.source_url',
       alt: '_embedded.wp:featuredmedia.0.alt_text',
       pie: '_embedded.wp:featuredmedia.0.caption.rendered',
       etiquetas: 'acf.etiquetas',
@@ -130,6 +139,9 @@
       autorRol: 'fields.autorRol',
       lectura: 'fields.lectura',
       img: 'fields.imagen.fields.file.url|fields.img',
+      // Contentful no publica derivados: la miniatura se pide por URL con
+      // `cms.miniatura` (ver más abajo), p. ej. "{url}?w=160&h=160&fit=fill"
+      imgMini: 'fields.miniatura.fields.file.url',
       alt: 'fields.imagen.fields.description',
       pie: 'fields.pie',
       etiquetas: 'fields.etiquetas',
@@ -149,6 +161,7 @@
       autorRol: 'autor.rol|autorRol',
       lectura: 'lectura',
       img: 'imagen.url|img',
+      imgMini: 'imagen.miniatura.url|miniatura.url',
       alt: 'imagen.alt|alt',
       pie: 'pie',
       etiquetas: 'etiquetas',
@@ -285,7 +298,19 @@
 
   const COLORES = new Set(['edem', 'lanzadera', 'angels', 'neutral']);
 
-  function normalizaNoticia(raw, map, base) {
+  /* URL de un medio, venga como venga del CMS: objeto asset, cadena suelta,
+     protocol-relative (Contentful sirve así: //images.ctfassets.net/…) o ruta
+     relativa a la que hay que anteponer `baseMedios`. */
+  function medio(v, base) {
+    if (isObj(v)) v = pick(v, 'url|src|source_url|fields.file.url');
+    let u = txt(v);
+    if (!u) return '';
+    if (u.startsWith('//')) return 'https:' + u;
+    if (base && !/^(https?:|data:|\/)/.test(u)) return base.replace(/\/$/, '') + '/' + u;
+    return u;
+  }
+
+  function normalizaNoticia(raw, map, base, plantillaMini) {
     if (!isObj(raw)) return null;
     const g = k => pick(raw, map[k]);
 
@@ -294,12 +319,19 @@
     if (isObj(sec)) sec = pick(sec, 'id|slug|nombre|name|attributes.slug|fields.slug');
     if (Array.isArray(sec)) sec = sec[0] && (sec[0].slug || sec[0].id || sec[0]);
 
-    let img = g('img');
-    if (isObj(img)) img = pick(img, 'url|src|source_url|fields.file.url');
-    img = txt(img);
-    // Contentful sirve los assets con URL protocol-relative (//images.ctfassets…)
-    if (img.startsWith('//')) img = 'https:' + img;
-    if (base && img && !/^(https?:|data:|\/)/.test(img)) img = base.replace(/\/$/, '') + '/' + img;
+    const img = medio(g('img'), base);
+
+    /* Miniatura para las listas de sumario del portal. Orden: la versión
+       reducida que declare el preajuste (los formatos de Strapi, los tamaños de
+       WordPress…); si no la hay, la plantilla `cms.miniatura` construye la URL
+       con la API de imágenes del CMS; y si tampoco, la foto grande, que es lo
+       que pasaba antes de existir este campo. Nunca queda vacío si hay `img`. */
+    let imgMini = medio(g('imgMini'), base);
+    if (!imgMini && img && plantillaMini) {
+      imgMini = plantillaMini.includes('{url}')
+        ? plantillaMini.replace('{url}', img)
+        : img + plantillaMini;   // forma corta: solo la cola de parámetros
+    }
 
     let etiquetas = g('etiquetas');
     if (typeof etiquetas === 'string') etiquetas = etiquetas.split(',').map(s => s.trim());
@@ -325,6 +357,7 @@
       autorRol: txt(g('autorRol')),
       lectura: Number(g('lectura')) || 0,
       img,
+      imgMini: imgMini || img,
       alt: stripHtml(g('alt')),
       pie: stripHtml(g('pie')),
       etiquetas,
@@ -415,7 +448,7 @@
       cacheSet(clave, bruto, seg);
     }
 
-    const noticias = listaDe(bruto, map.lista).map(n => normalizaNoticia(n, map, base)).filter(Boolean).sort(ORDEN);
+    const noticias = listaDe(bruto, map.lista).map(n => normalizaNoticia(n, map, base, cfg.miniatura)).filter(Boolean).sort(ORDEN);
     if (!noticias.length) throw new Error('El CMS no ha devuelto noticias reconocibles');
 
     let secciones = (json.secciones || []).map(normalizaSeccion).filter(Boolean);
@@ -475,7 +508,7 @@
         const url = cfg.endpointNoticia.replace('{id}', encodeURIComponent(id));
         const bruto = await pideJSON(url, cfg);
         const item = map.item ? pick(bruto, map.item) : bruto;
-        const uno = normalizaNoticia(Array.isArray(item) ? item[0] : item, map, cfg.baseMedios || '');
+        const uno = normalizaNoticia(Array.isArray(item) ? item[0] : item, map, cfg.baseMedios || '', cfg.miniatura);
         if (uno) return uno;
       } catch (e) { console.warn('[EDEM Times] ficha del CMS no disponible, se busca en la lista:', e.message); }
     }

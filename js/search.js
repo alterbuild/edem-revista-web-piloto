@@ -165,7 +165,9 @@
           tipo: 'noticia', grupo: 'Noticias',
           titulo: n.titulo, desc: n.entradilla, kick: s.nombre, color: s.color,
           url: 'noticia.html?a=' + encodeURIComponent(n.id),
-          img: n.img, fecha: n.fecha, cuerpo: cuerpoTexto(n),
+          // la ficha del panel pinta la foto a 58×44: si el CMS sirve una versión
+          // reducida (n.imgMini), es la que toca pedir
+          img: n.imgMini || n.img, fecha: n.fecha, cuerpo: cuerpoTexto(n),
           h: hayNoticia(n)
         });
       });

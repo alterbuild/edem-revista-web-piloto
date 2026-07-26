@@ -93,6 +93,8 @@ usa el render. Se activa desde el bloque `cms` de `data/noticias.json`:
   "endpointNoticia": "https://cms.edem.es/api/noticias?filters[slug][$eq]={id}&populate=*",
   "endpointSecciones": "https://cms.edem.es/api/secciones",
   "headers": { "Authorization": "Bearer <token público de solo lectura>" },
+  "baseMedios": "https://cms.edem.es",
+  "miniatura": "",
   "cacheSegundos": 300,
   "mapeo": { "titulo": "attributes.headline" }
 }
@@ -101,6 +103,12 @@ usa el render. Se activa desde el bloque `cms` de `data/noticias.json`:
 - **`tipo`** carga un preajuste de mapeo (dónde está la lista y cómo se llama cada campo en
   esa API). **`mapeo`** sobrescribe campo a campo lo que haga falta; acepta rutas con punto
   (`attributes.imagen.data.attributes.url`) y varias alternativas separadas por `|`.
+- **Imágenes**: `baseMedios` completa las rutas relativas y las URL protocol-relative se
+  arreglan solas. Los sumarios del portal (raíl, «También hoy» y las columnas de sección)
+  pintan la foto a 50-60px, así que el modelo trae también **`imgMini`**: los preajustes de
+  Strapi y WordPress la sacan de los formatos que ya genera el CMS, y para los que sirven
+  una sola URL está **`cms.miniatura`**, una plantilla del tipo `"{url}?w=160&h=160&fit=fill"`.
+  Si no hay ninguna de las dos, se usa la foto grande y no se rompe nada.
 - El **cuerpo** se normaliza venga como venga: bloques propios, rich text de Strapi/Hygraph,
   HTML de WordPress o texto plano. El HTML se convierte a bloques con lista blanca de
   etiquetas, así que nada de lo que se pegue en el editor se inyecta tal cual en la página.

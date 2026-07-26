@@ -23,6 +23,10 @@
    la agenda y las columnas de sección */
 .utit{font-family:var(--font-display);font-weight:900;font-optical-sizing:none;font-variation-settings:'opsz' 14;
   line-height:1.2;letter-spacing:-.01em;color:var(--text-strong)}
+/* Los titulares los escribe quien publique en el CMS: en columnas de sumario
+   tan estrechas, una palabra larga (una URL, un hashtag, «Emprendimiento»)
+   se salía de su caja y se metía en la de al lado. Que parta antes que eso. */
+.utit,.nrow h3,.ncard h2,.ncard h3,.nsecblock .dest h3{overflow-wrap:break-word}
 
 /* --- tarjeta estándar: la unidad del flujo ---
    No es una caja: es una columna de periódico. Filete fino arriba, el papel de
@@ -52,7 +56,9 @@
 .ncard.lead{border-top:3px solid var(--ink-900);padding-top:17px}
 .ncard.lead .nim{aspect-ratio:16/9;margin-bottom:20px}
 .ncard.lead .nbody{padding:0}
-.ncard.lead h2{font-size:clamp(28px,3vw,44px);line-height:1.02;color:var(--text-strong);letter-spacing:-.02em}
+/* la apertura ya no ocupa media portada, así que el titular baja de 44 a 38: en
+   la columna nueva, a 44 un titular largo se iba a cinco líneas */
+.ncard.lead h2{font-size:clamp(28px,2.7vw,38px);line-height:1.04;color:var(--text-strong);letter-spacing:-.02em}
 .ncard.lead:hover h2{color:var(--edem-teal-700)}
 .ncard.lead .nlead{font-size:clamp(15.5px,1.4vw,18px);line-height:1.6;color:var(--text-muted);max-width:62ch}
 .ncard.lead .nfoot{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
@@ -62,6 +68,25 @@
   color:var(--text-link);transition:gap var(--dur)}
 .ncard:hover .ngo{gap:12px}
 .ngo .lu{width:15px;height:15px}
+
+/* --- secundaria: el titular a la izquierda y la foto a la derecha ---
+   La foto va ANTES en el HTML y row-reverse la coloca a la derecha: así, cuando
+   la tarjeta se apila en móvil (flex-direction:column), la foto sube arriba
+   sola, sin `order` ni un orden de lectura distinto del que ve el navegador. */
+.hcard{flex-direction:row-reverse;gap:clamp(14px,1.5vw,20px);align-items:flex-start}
+.hcard .nim{flex:0 0 40%;aspect-ratio:3/2;margin-bottom:0}
+.hcard .nbody{gap:9px}
+.hcard h3{font-size:18px}
+/* la entradilla se corta en tres líneas: en esta columna es el pie del titular,
+   no un resumen, y con seis líneas la tarjeta se comía la foto de al lado */
+.hcard p{font-size:14px;line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+
+/* --- la de la banda de cierre: foto arriba, titular y minutos --- */
+.bcard .nim{aspect-ratio:3/2;margin-bottom:13px}
+.bcard .nbody{gap:8px}
+.bcard h3{font-size:17px;line-height:1.18}
+.bcard .nago{margin-top:auto;padding-top:4px}
 
 /* --- línea de sumario: titular + miniatura, sin foto grande --- */
 .nrow{display:flex;align-items:flex-start;gap:16px;padding:16px 0;
@@ -74,6 +99,16 @@
 .nrow:hover h3{color:var(--edem-teal-700)}
 .nago{font-size:12px;color:var(--text-faint);font-weight:600}
 .nthumb{width:88px;height:66px;object-fit:cover;border-radius:var(--radius-sm);flex:none}
+
+/* --- miniatura de sumario: la foto al lado del titular ---
+   La pieza que hace que en el portal ninguna noticia se quede en texto pelado:
+   una foto pequeña y cuadrada a la derecha del titular, como en las listas de
+   un diario digital. Cuadrada a propósito —el recorte 3/2 a este tamaño no se
+   lee— y con fondo de reserva para que la línea no baile mientras carga.
+   El texto va en .utxt para que el titular pueda partir sin empujar la foto. */
+.nmini{width:var(--mini,60px);height:var(--mini,60px);object-fit:cover;flex:none;
+  border-radius:var(--radius-xs);background:var(--ink-100)}
+.utxt{flex:1;min-width:0;display:grid;gap:5px;align-content:start}
 
 .nvacio{padding-block:60px;text-align:center;color:var(--text-muted);font-size:16px}
 
@@ -179,37 +214,59 @@
 .npdata #np-total{color:var(--edem-teal-700)}
 
 /* --- portada a tres columnas ---
-   Apertura y secundarias | titulares del día | raíl de servicio, separadas por
-   filetes verticales. El gutter no es `gap`: es el relleno de cada columna, y
-   el filete cae justo en medio, que es como se compone una página de periódico
-   y lo que deja las tres columnas ópticamente a la misma distancia. */
+   Apertura | secundarias | raíl de servicio, con una banda de cuatro que cierra
+   por debajo de las dos primeras columnas. El raíl baja entero por la derecha,
+   así que el filete vertical que lo separa cruza también la banda.
+   El gutter no es `gap`: es el relleno de cada columna, y el filete cae justo
+   en medio, que es como se compone una página de periódico y lo que deja las
+   columnas ópticamente a la misma distancia. */
 /* OJO con el `padding`: .nportada también es .wrap, así que aquí solo se toca
    el vertical. Con la forma corta (`padding:30px 0 44px`) se borraban los 28px
    laterales que .wrap declara después de su propia forma corta, y en cuanto la
    pantalla era más ancha que el contenedor el raíl se pegaba al borde. */
 .nportada{--ng:clamp(20px,1.9vw,30px);
   padding-block:30px 44px;display:grid;
-  grid-template-columns:minmax(0,1.62fr) minmax(0,.92fr) minmax(0,.94fr);
-  gap:0;align-items:stretch}
-.nprincipal{display:flex;flex-direction:column;gap:26px;padding-right:var(--ng)}
-.nsec{display:grid;grid-template-columns:1fr 1fr;gap:var(--ng)}
-.ntambien{padding:0 var(--ng);border-left:1px solid var(--border-strong)}
-.nrail{padding-left:var(--ng);border-left:1px solid var(--border-strong)}
+  grid-template-columns:minmax(0,1.42fr) minmax(0,1.3fr) minmax(0,.95fr);
+  gap:0;align-items:start}
+/* la apertura también se estira: el aire que sobre cae entre la entradilla y la
+   firma, que así se apoya en el mismo filete que cierra la columna de al lado.
+   Cada columna absorbe su propio sobrante y ninguna deja un hueco al final. */
+.nprincipal{grid-column:1;grid-row:1;padding-right:var(--ng);align-self:stretch;display:flex}
+.nprincipal>.ncard{flex:1}
+/* La columna central se estira hasta donde llegue la apertura y reparte el aire
+   que sobra ENTRE las dos secundarias, no debajo: si no, la columna acababa a
+   media altura y quedaba un hueco muerto entre la última y el filete de la
+   banda. Así el sobrante se lee como el aire de un periódico —cae antes del
+   filete que separa las dos— y las dos columnas cierran en la misma línea. */
+.nsec{grid-column:2;grid-row:1;padding:0 var(--ng);border-left:1px solid var(--border-strong);
+  display:flex;flex-direction:column;align-self:stretch;justify-content:space-between}
+/* el raíl ocupa las dos filas: es la columna que baja hasta el final */
+.nrail{grid-column:3;grid-row:1/3;padding-left:var(--ng);border-left:1px solid var(--border-strong);
+  align-self:stretch}
 .nrailin{position:sticky;top:96px}
+/* banda de cierre: cruza la apertura y las secundarias, nunca el raíl */
+/* El margen derecho es el mismo que el de la columna central: la banda cierra
+   una calle antes del filete del raíl, no pegada a él. Va en `margin` y no en
+   `padding` para que el filete de arriba se pare en el mismo sitio que las
+   fotos, en vez de morir contra el filete vertical. */
+.nbanda{grid-column:1/3;grid-row:2;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  column-gap:calc(var(--ng)*2);margin-top:34px;margin-right:var(--ng);
+  border-top:1px solid var(--ink-900)}
+/* con pocas noticias la banda se queda sin material: sin esto quedaría el
+   filete suelto cruzando la portada */
+.nbanda:empty{display:none}
+/* Las cuatro miden EXACTAMENTE lo mismo (1fr cada una) y el filete que las
+   separa se pinta en el centro del hueco, no como relleno de la tarjeta: así
+   fue como se descuadraron antes —las de los extremos, sin relleno exterior,
+   sacaban una foto más ancha que las del medio—. El filete grueso de arriba lo
+   pone la banda, así que la tarjeta no repite el suyo. */
+.nbanda .ncard{position:relative;border-top:0;padding:18px 0 0}
+.nbanda .ncard::before{content:'';position:absolute;top:18px;bottom:0;left:calc(var(--ng)*-1);
+  border-left:1px solid var(--border-hair)}
+.nbanda .ncard:first-child::before{display:none}
 
-/* cabecera de columna: el mismo filete de las secciones, en pequeño */
-.ncolh{font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:800;color:var(--text-strong);
-  border-bottom:2px solid var(--ink-900);padding-bottom:11px}
-/* Titulares del día: solo texto. Aquí la miniatura estorbaba —dejaba el
-   titular en una medida de cuatro palabras y lo partía en cinco líneas—, así
-   que esta columna se lee como el sumario de un periódico: sección en color,
-   titular y cuándo se publicó. Las fotos se quedan donde pesan: la apertura,
-   las secundarias y las destacadas de cada sección. */
-.ntambien .nrow{padding:15px 0}
-.ntambien .nrow:first-child{padding-top:15px}
-.ntambien .nrow:last-child{border-bottom:0}
-.ntambien .nrow h3{font-size:17.5px}
-.ntambien .nthumb{display:none}
+/* dos secundarias en la columna central, separadas por su filete */
+.nsec>.ncard+.ncard{margin-top:24px}
 
 /* raíl: cajas sin caja. Rótulo con filete debajo y la lista colgando de él. */
 .nrailbox{border:0;border-radius:0;background:none;padding:0;box-shadow:none;margin-bottom:30px}
@@ -220,7 +277,9 @@
 .nultimo{list-style:none}
 .nultimo li{border-bottom:1px solid var(--border-hair)}
 .nultimo li:last-child{border-bottom:0}
-.nultimo a{display:grid;gap:5px;padding:13px 0;color:inherit}
+.nultimo a{display:flex;align-items:flex-start;gap:13px;padding:13px 0;color:inherit}
+/* .uhora es la fecha de la agenda («6 JUL»), que sí es un rótulo: en «Lo
+   último» el pie son los minutos de lectura y van en .nago, sin versalitas */
 .nultimo .uhora{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--text-faint)}
 .nultimo .utit{font-size:15.5px}
 .nultimo a:hover .utit{color:var(--edem-teal-700)}
@@ -305,10 +364,13 @@
 .nsecblock .dest .nago{display:block;margin-top:9px}
 .nsecblock .tt{list-style:none;margin-top:16px;border-top:1px solid var(--border-hair)}
 .nsecblock .tt li{border-bottom:1px solid var(--border-hair)}
-.nsecblock .tt a{display:block;padding:11px 0;color:inherit}
+/* Las columnas de sección son estrechas (216px de mínimo), así que aquí la
+   miniatura baja a 50px: es la mayor que deja al titular una medida legible. */
+.nsecblock .tt a{display:flex;align-items:flex-start;gap:11px;padding:11px 0;color:inherit;--mini:50px}
 .nsecblock .tt .utit{display:block;font-size:15px}
 .nsecblock .tt a:hover .utit{color:var(--sc)}
 .nsecblock .tt .nago{display:block;margin-top:5px}
+.nsecblock .tt .utxt{gap:0}
 
 /* ============================================================
    3 · FICHA DE NOTICIA
@@ -387,19 +449,21 @@
    salen de la métrica real de las dos fuentes:
      · altura de mayúscula de la Bodoni = .75em · su ascendente = 1.13em
      · altura de mayúscula de la Archivo = .686em
-   Para abrazar tres líneas la capitular necesita 2×1.78em + .686em ≈ 78.5px
-   de altura de mayúscula → 78.5/.75 ≈ 5.66em. El line-height (.884) es lo que
-   sienta la base de la letra sobre la tercera línea y, de paso, deja la caja
-   flotante por debajo de la cuarta, que si no también se sangraría.
-   El peso baja de 900 a 600: en negro extremo la Bodoni empasta los remates a
-   este tamaño y la letra se veía como un borrón. */
-.acol p.acap::first-letter{float:left;font-family:var(--font-display);font-weight:600;
-  font-size:5.66em;line-height:.884;margin:4px .075em 0 0;
+   Para abrazar dos líneas la capitular necesita 1.78em + .686em ≈ 45.6px
+   de altura de mayúscula → 45.6/.75 ≈ 3.29em. El line-height (1.014) es lo que
+   sienta la base de la letra sobre la segunda línea y, de paso, deja la caja
+   flotante por encima de la tercera, que si no también se sangraría.
+   A este tamaño la Bodoni ya aguanta el negro sin empastar los remates, así que
+   el peso sube a 700. */
+.acol p.acap::first-letter{float:left;font-family:var(--font-display);font-weight:700;
+  font-size:3.29em;line-height:1.014;margin:3px .075em 0 0;
   font-variant-caps:normal;   /* si no, hereda las versalitas de la entradilla */
   color:var(--acc,var(--edem-teal-700));-webkit-font-smoothing:antialiased}
 /* las primeras palabras en versalitas atan la capitular al texto: sin ellas
-   la letra quedaba suelta al lado de un párrafo cualquiera */
-.acol p.acap .aentrada{font-weight:700;letter-spacing:.04em;color:var(--text-strong);
+   la letra quedaba suelta al lado de un párrafo cualquiera. En peso normal:
+   la única negrita del cuerpo es la capitular, y las versalitas ya se
+   distinguen por el interletrado y el color más oscuro */
+.acol p.acap .aentrada{font-weight:400;letter-spacing:.04em;color:var(--text-strong);
   font-variant-caps:all-small-caps}
 .acol h2{font-size:clamp(24px,2.6vw,32px);line-height:1.14;color:var(--text-strong);
   margin:40px 0 16px;letter-spacing:-.018em}
@@ -442,10 +506,14 @@
 
 /* ---------- responsive ---------- */
 /* portátiles y tabletas anchas: el raíl se descuelga y baja a pie de portada,
-   pero la apertura y los titulares del día aguantan en dos columnas */
+   pero la apertura y las secundarias aguantan en dos columnas */
 @media(max-width:1180px){
-  .nportada{grid-template-columns:minmax(0,1.65fr) minmax(0,.9fr)}
-  .nrail{grid-column:1/-1;border-left:0;padding-left:0;padding-top:26px;margin-top:30px;
+  .nportada{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}
+  /* sin raíl al lado, la columna central y la banda llegan las dos hasta el
+     margen de la página: ni la una se queda corta ni la otra se pasa */
+  .nsec{padding-right:0}
+  .nbanda{margin-right:0}
+  .nrail{grid-column:1/-1;grid-row:3;border-left:0;padding-left:0;padding-top:26px;margin-top:30px;
     border-top:1px solid var(--border-strong);
     display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0 var(--ng)}
   .nrailin{position:static;display:contents}
@@ -453,9 +521,17 @@
 }
 @media(max-width:1020px){
   .nportada{grid-template-columns:1fr;padding-bottom:34px}
-  .nprincipal{padding-right:0}
-  .ntambien{padding:26px 0 0;border-left:0;border-top:1px solid var(--border-strong);margin-top:4px}
-  .nrail{position:static}
+  .nprincipal{grid-column:1;padding-right:0}
+  /* en una sola columna las secundarias pierden su filete vertical y se
+     descuelgan de la apertura con el suyo horizontal */
+  .nsec{grid-column:1;grid-row:2;padding:0;border-left:0;margin-top:26px}
+  /* la banda pasa a dos columnas: el filete vertical solo va entre las dos de
+     cada fila, y la segunda fila cuelga de su propio filete horizontal */
+  .nbanda{grid-column:1;grid-row:3;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .nbanda .ncard:nth-child(odd)::before{display:none}
+  .nbanda .ncard:nth-child(n+3){border-top:1px solid var(--border-hair);margin-top:24px;padding-top:22px}
+  .nbanda .ncard:nth-child(n+3)::before{top:22px}
+  .nrail{grid-row:4;position:static}
   .dgrid{grid-template-columns:1fr;gap:26px}
   /* padding-block, no la forma corta: .acuerpo es un .wrap y `padding:32px 0`
      le borraba los 20-28px laterales, con el cuerpo pegado al borde en móvil */
@@ -475,13 +551,24 @@
   .npdata .pip{display:none}
   .npdata>span:not(:last-child)::after{content:' ·';color:var(--edem-teal-300)}
   .nportada{padding-block:24px 28px}
-  .nsec{grid-template-columns:1fr;gap:20px}
+  /* la secundaria se apila: la foto sube arriba sola (va antes en el HTML) */
+  .hcard{flex-direction:column;gap:0}
+  .hcard .nim{flex:none;width:100%;margin-bottom:14px}
+  .hcard p{-webkit-line-clamp:4}
+  /* la banda pasa a una columna: fuera los filetes verticales, cada noticia
+     cuelga del suyo horizontal */
+  .nbanda{grid-template-columns:1fr;margin-top:26px}
+  .nbanda .ncard{padding:20px 0 0}
+  .nbanda .ncard::before{display:none}
+  .nbanda .ncard+.ncard{border-top:1px solid var(--border-hair);margin-top:0;padding-top:20px}
   .nsecciones{grid-template-columns:1fr;gap:32px}
   .ngrid{grid-template-columns:1fr;gap:26px}
   .nfilbar{padding:11px 0 10px}
   .ncount{display:none}
   .nrow{gap:12px}
   .nthumb{width:72px;height:56px}
+  /* el raíl y las columnas de sección también caen a una sola columna */
+  .nultimo a,.nsecblock .tt a{--mini:72px}
   .ncard.lead .nfoot .nmeta{margin-left:0}
   .ahead{padding:26px 0 20px}
   .afirma{gap:12px}

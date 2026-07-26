@@ -46,10 +46,36 @@
   /* ---------- helpers de modelo ---------- */
   const urlNoticia = id => 'noticia.html?a=' + encodeURIComponent(id);
 
+  // ojo con el `trim`: ''.split(/\s+/) devuelve [''], que es 1, y sin él cada
+  // bloque sin texto (una foto, un dato) sumaba una palabra de propina
+  const cuentaPalabras = s => { const t = String(s || '').trim(); return t ? t.split(/\s+/).length : 0; };
   function palabras(n) {
-    return (n.cuerpo || []).reduce((t, b) => t + (b.texto || '').split(/\s+/).length + (b.items || []).join(' ').split(/\s+/).length, 0);
+    return (n.cuerpo || []).reduce((t, b) => t + cuentaPalabras(b.texto) + cuentaPalabras((b.items || []).join(' ')), 0);
   }
-  const minutos = n => n.lectura || Math.max(1, Math.round(palabras(n) / 200));
+  /* Minutos de lectura: SIEMPRE contados sobre el cuerpo (200 palabras/minuto,
+     que es la media de lectura en pantalla). El campo `lectura` solo entra
+     cuando no hay cuerpo que contar, que es lo que pasa con los CMS cuyo
+     endpoint de lista devuelve las noticias sin el texto completo. */
+  const minutos = n => {
+    const p = palabras(n);
+    return p ? Math.max(1, Math.round(p / 200)) : (Number(n.lectura) || 1);
+  };
+  // etiqueta de sumario: en las listas de la portada manda cuánto cuesta leer
+  // la noticia, no cuándo se publicó (la fecha ya va en la ficha y en la meta)
+  const lectura = n => minutos(n) + ' min de lectura';
+
+  /* miniatura de sumario: la foto pequeña que acompaña al titular en las listas
+     del portal (raíl, agenda y columnas de sección). Sin pie ni alt: el titular
+     que va al lado ya cuenta la noticia, así que para un lector de pantalla es
+     decoración. Si la imagen no carga, se quita y la línea se queda a texto. */
+  // `imgMini` es la versión reducida que sirva el CMS; con el JSON local es la
+  // misma foto (ver js/cms.js), así que aquí basta con pedir siempre la pequeña
+  const mini = n => n.imgMini || n.img;
+  function miniatura(n) {
+    return mini(n)
+      ? '<img class="nmini" src="' + esc(mini(n)) + '" alt="" loading="lazy" decoding="async" onerror="this.remove()">'
+      : '';
+  }
 
   function indexaSecciones(secciones) {
     const m = {};
@@ -58,12 +84,19 @@
   }
 
   /* ---------- tarjetas ----------
-     Tres formatos, los mismos que usa cualquier portada de periódico:
-     `lead` (apertura a toda página), `card` (la unidad del flujo) y `row`
-     (línea de sumario, sin foto grande). */
+     Los formatos de una portada de periódico:
+     `lead`   apertura a toda columna, con la foto arriba
+     `sec`    secundaria de la columna central: titular a la izquierda, foto a
+              la derecha (en móvil se apila y la foto sube arriba, lo hace el CSS)
+     `banda`  la de la banda de cierre: foto arriba, titular y poco más
+     `card`   la unidad del flujo, con entradilla
+     `row`    línea de sumario del bloque de la home */
   function tarjeta(n, sec, tipo) {
     const s = sec(n.seccion);
     const badge = '<span class="nbadge" style="background:' + color(s.color) + '">' + esc(s.nombre) + '</span>';
+    // antetítulo en el color de su sección: es lo que deja leer la portada por
+    // temas de un vistazo, y pesa menos que la chapa de la apertura
+    const kick = '<span class="nkick" style="color:' + color(s.color) + '">' + esc(s.nombre) + '</span>';
     const meta = '<span class="nmeta"><time datetime="' + esc(n.fecha) + '">' + esc(fechaLarga(n.fecha)) + '</time>' +
       '<span class="sep">·</span><span class="nread">' + minutos(n) + ' min</span></span>';
     const foto = n.img
@@ -76,21 +109,31 @@
       return '<a class="nrow" href="' + esc(urlNoticia(n.id)) + '">' +
         '<div class="nrowtxt"><span class="nkick">' + esc(s.nombre) + '</span>' +
         '<h3 class="disp">' + esc(n.titulo) + '</h3>' +
-        '<span class="nago">' + esc(relativa(n.fecha)) + '</span></div>' +
-        (n.img ? '<img class="nthumb" src="' + esc(n.img) + '" alt="" loading="lazy" decoding="async" onerror="this.remove()">' : '') +
+        '<span class="nago">' + esc(lectura(n)) + '</span></div>' +
+        (mini(n) ? '<img class="nthumb" src="' + esc(mini(n)) + '" alt="" loading="lazy" decoding="async" onerror="this.remove()">' : '') +
         '</a>';
     }
-    if (tipo === 'titular') {
-      // el mismo sumario, pero en el portal —papel claro— el antetítulo sí lleva
-      // el color de su sección: es lo que deja leer la portada por temas de un
-      // vistazo. El estilo en línea es seguro aquí porque esta variante NO se
-      // usa en el bloque de la home, que es donde el CSS tiene que mandar.
-      return '<a class="nrow ntit" href="' + esc(urlNoticia(n.id)) + '">' +
-        '<div class="nrowtxt"><span class="nkick" style="color:' + color(s.color) + '">' + esc(s.nombre) + '</span>' +
+    /* Secundaria de la columna central. La foto va PRIMERO en el HTML y el CSS
+       la manda a la derecha con row-reverse: así, cuando en móvil la tarjeta se
+       apila, la foto queda arriba sin tocar el orden del documento. Los estilos
+       en línea del antetítulo son seguros aquí porque esta variante no se usa
+       en el bloque de la home, que es donde el CSS tiene que mandar. */
+    if (tipo === 'sec') {
+      return '<a class="ncard hcard" href="' + esc(urlNoticia(n.id)) + '">' + foto +
+        '<div class="nbody">' + kick +
         '<h3 class="disp">' + esc(n.titulo) + '</h3>' +
-        '<span class="nago">' + esc(relativa(n.fecha)) + '</span></div>' +
-        (n.img ? '<img class="nthumb" src="' + esc(n.img) + '" alt="" loading="lazy" decoding="async" onerror="this.remove()">' : '') +
-        '</a>';
+        '<p>' + esc(n.entradilla) + '</p>' +
+        '<span class="nago">' + esc(lectura(n)) + '</span>' +
+        '</div></a>';
+    }
+    // banda de cierre: foto, antetítulo y titular. Sin entradilla, que a cuatro
+    // columnas no se lee y lo que se busca ahí es barrer titulares.
+    if (tipo === 'banda') {
+      return '<a class="ncard bcard" href="' + esc(urlNoticia(n.id)) + '">' + foto +
+        '<div class="nbody">' + kick +
+        '<h3 class="disp">' + esc(n.titulo) + '</h3>' +
+        '<span class="nago">' + esc(lectura(n)) + '</span>' +
+        '</div></a>';
     }
     if (tipo === 'lead') {
       return '<a class="ncard lead" href="' + esc(urlNoticia(n.id)) + '">' + foto +
@@ -170,33 +213,38 @@
     }
 
     /* ---- reparto de la portada ----
-       Las tres piezas grandes (apertura y dos secundarias) son las marcadas con
-       `portada`; si no hay marcas suficientes, mandan las más recientes. A
-       partir de ahí, cada noticia aparece UNA vez en la portada: los titulares
-       de «También hoy» y el raíl de «Lo último» se sirven de lo que queda, en
-       ese orden. Es lo que evita que el mismo titular se lea tres veces
-       mientras se baja. */
+       La apertura y las tres secundarias de la columna central salen de las
+       marcadas con `portada`, por orden de marca, y lo que falte lo completan
+       las más recientes. Tres y no dos: es lo que llena la columna hasta donde
+       llega la apertura, en vez de dejar medio palmo de aire entre las dos.
+       A partir de ahí, cada noticia aparece UNA vez en la portada: la banda de
+       cierre y el raíl de «Lo último» se sirven de lo que queda, en ese orden.
+       Es lo que evita que el mismo titular se lea tres veces mientras se baja. */
     const lead = noticias.find(n => n.portada === 1) || noticias[0];
     const resto = noticias.filter(n => n !== lead);
-    const marcadas = resto.filter(n => n.portada);
-    const secundarias = (marcadas.length >= 2 ? marcadas : resto).slice(0, 2);
-    /* las tres con foto grande: son las únicas que se retiran de los bloques por
-       sección de abajo, porque repetir una foto de apertura a media página es lo
-       que de verdad se nota. Los titulares sueltos sí pueden volver a salir
-       ordenados por tema: es otro eje de lectura, no una repetición. */
+    const marcadas = resto.filter(n => n.portada).sort((a, b) => a.portada - b.portada);
+    const secundarias = marcadas.concat(resto.filter(n => !n.portada)).slice(0, 3);
+    /* las cuatro con foto grande: son las únicas que se retiran de los bloques
+       por sección de abajo, porque repetir una foto de apertura a media página
+       es lo que de verdad se nota. Los titulares sueltos sí pueden volver a
+       salir ordenados por tema: es otro eje de lectura, no una repetición. */
     const grandes = new Set([lead].concat(secundarias).map(n => n.id));
-    const tambien = resto.filter(n => !grandes.has(n.id)).slice(0, 4);
-    const enPortada = new Set([...grandes].concat(tambien.map(n => n.id)));
+    const banda = resto.filter(n => !grandes.has(n.id)).slice(0, 4);
+    const enPortada = new Set([...grandes].concat(banda.map(n => n.id)));
 
     $('np-lead-card').innerHTML = tarjeta(lead, sec, 'lead');
-    $('np-sec').innerHTML = secundarias.map(n => tarjeta(n, sec, 'card')).join('');
-    $('np-tambien').innerHTML = tambien.map(n => tarjeta(n, sec, 'titular')).join('');
+    $('np-sec').innerHTML = secundarias.map(n => tarjeta(n, sec, 'sec')).join('');
+    $('np-banda').innerHTML = banda.map(n => tarjeta(n, sec, 'banda')).join('');
 
     /* raíl: lo último es un índice cronológico de lo que NO está arriba */
     const ultimo = noticias.filter(n => !enPortada.has(n.id)).slice(0, 5);
-    const linea = n => '<li><a href="' + esc(urlNoticia(n.id)) + '"><span class="uhora">' + esc(relativa(n.fecha)) + '</span>' +
+    // sección arriba, titular y los minutos debajo: el antetítulo es lo que
+    // ordena la lista de un vistazo y los minutos son el pie, no el rótulo
+    const linea = n => '<li><a href="' + esc(urlNoticia(n.id)) + '"><span class="utxt">' +
+      '<span class="usec" style="color:' + color(sec(n.seccion).color) + '">' + esc(sec(n.seccion).nombre) + '</span>' +
       '<span class="utit">' + esc(n.titulo) + '</span>' +
-      '<span class="usec" style="color:' + color(sec(n.seccion).color) + '">' + esc(sec(n.seccion).nombre) + '</span></a></li>';
+      '<span class="nago">' + esc(lectura(n)) + '</span></span>' +
+      miniatura(n) + '</a></li>';
     $('np-ultimo').innerHTML = (ultimo.length ? ultimo : noticias.slice(0, 5)).map(linea).join('');
 
     /* raíl: la agenda, si la hay. Es la sección de servicio del portal —fechas,
@@ -206,8 +254,10 @@
     const cajaAgenda = $('np-agendabox');
     if (cajaAgenda && agenda.length) {
       $('np-agenda').innerHTML = agenda.map(n =>
-        '<li><a href="' + esc(urlNoticia(n.id)) + '"><span class="uhora">' + esc(fechaCorta(n.fecha)) + '</span>' +
-        '<span class="utit">' + esc(n.titulo) + '</span></a></li>').join('');
+        '<li><a href="' + esc(urlNoticia(n.id)) + '"><span class="utxt">' +
+        '<span class="uhora">' + esc(fechaCorta(n.fecha)) + '</span>' +
+        '<span class="utit">' + esc(n.titulo) + '</span></span>' +
+        miniatura(n) + '</a></li>').join('');
       cajaAgenda.hidden = false;
     }
 
@@ -242,10 +292,12 @@
           (dest.img ? '<img src="' + esc(dest.img) + '" alt="' + esc(dest.alt || '') + '" loading="lazy" decoding="async" onerror="this.remove()">' : '') +
           '<h3 class="disp">' + esc(dest.titulo) + '</h3>' +
           '<p>' + esc(dest.entradilla) + '</p>' +
-          '<span class="nago">' + esc(relativa(dest.fecha)) + '</span></a>' +
+          '<span class="nago">' + esc(lectura(dest)) + '</span></a>' +
           (lista.length ? '<ul class="tt">' + lista.map(n =>
-            '<li><a href="' + esc(urlNoticia(n.id)) + '"><span class="utit">' + esc(n.titulo) + '</span>' +
-            '<span class="nago">' + esc(relativa(n.fecha)) + '</span></a></li>').join('') + '</ul>' : '') +
+            '<li><a href="' + esc(urlNoticia(n.id)) + '"><span class="utxt">' +
+            '<span class="utit">' + esc(n.titulo) + '</span>' +
+            '<span class="nago">' + esc(lectura(n)) + '</span></span>' +
+            miniatura(n) + '</a></li>').join('') + '</ul>' : '') +
           '</section>';
       }).join('');
     }
