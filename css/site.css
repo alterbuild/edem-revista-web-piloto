@@ -386,10 +386,18 @@ html.sbusca-on{overflow:hidden}
    `animation-play-state:paused` congela cada bucle donde esté —no hay salto, no
    se recoloca nada— y solo mientras dura la bajada: arriba del todo, que es
    donde se mira el puerto, sigue respirando igual que siempre. Al volver a
-   subir, se reanudan desde donde se quedaron. */
-.hero.wake .hscene .bob,.hero.wake .hscene .sway,.hero.wake .hscene .brea,
-.hero.wake .hscene .fly,.hero.wake .hscene .troll,.hero.wake .hscene .rays,
-.hero.wake .heroBg .motes span{animation-play-state:paused}
+   subir, se reanudan desde donde se quedaron.
+
+   SOLO EN TELÉFONO. En un ordenador esto no hacía falta —ahí sobra GPU y el
+   paisaje iba fluido— y además se notaba: la pantalla es grande, el puerto
+   ocupa medio cuadro y verlo congelarse de golpe al empezar a bajar se lee como
+   un tirón, justo lo contrario de lo que se buscaba. En escritorio el puerto
+   respira durante toda la bajada, como siempre. */
+@media (max-width:700px){
+  .hero.wake .hscene .bob,.hero.wake .hscene .sway,.hero.wake .hscene .brea,
+  .hero.wake .hscene .fly,.hero.wake .hscene .troll,.hero.wake .hscene .rays,
+  .hero.wake .heroBg .motes span{animation-play-state:paused}
+}
 
 /* ---- el paisaje en un teléfono ----
    El encuadre apaisado, metido a la fuerza en una pantalla vertical, obliga al
@@ -610,6 +618,26 @@ html.sbusca-on{overflow:hidden}
      la portada que sale volando del mazo (.deckcard.fly), que no tiene nada que
      ver y sí debe animarse. */
   .hscene .fly,.hscene .bob.b4,.hscene .bob.b5{animation:none}
+
+  /* EL PUERTO YA NO SE APARTA AL SUBIR EL AGUA: SE QUEDA Y EL MAR LO CUBRE.
+     Este era el último trozo del dibujo que cambiaba en cada frame del scroll.
+     Los barcos salían de cuadro con --seaP, y esos transforms van sobre <g> de
+     SVG: no se componen aparte, así que cada frame de la subida obligaba a
+     rasterizar otra vez las tres capas del paisaje a pantalla completa. Con los
+     bucles ya congelados (arriba), quitar esto deja el SVG COMPLETAMENTE quieto
+     durante la bajada: se dibuja una vez y a partir de ahí solo se compone.
+     Lo que sí se mantiene es el paralaje de las capas enteras (.hscene lleva su
+     translate3d) y el desvanecido del cielo y del primer término: son transform
+     y opacity sobre <div>, que el compositor mueve sin redibujar nada.
+     En escritorio los barcos siguen zarpando como siempre. */
+  .hscene .left,.hscene .right,.hscene .up,.hscene .far2{transform:none}
+  .hscene .quay{opacity:1}
+}
+/* Las gaviotas sí conservan su recolocación de móvil —entran en el encuadre y
+   bajan sobre la dársena, ver el bloque de 680px—, pero ya sin el tramo que
+   dependía de --seaP: se quedan en el sitio al que las traía ese ajuste. */
+@media (max-width:680px){
+  .hscene .left.far2{transform:translate(350px,150px)}
 }
 
 .hero .bignum{position:absolute;right:-40px;top:-60px;font-family:var(--font-display);font-weight:900;font-size:420px;line-height:.8;color:transparent;-webkit-text-stroke:2px var(--edem-teal-200);opacity:.5;pointer-events:none;user-select:none;transition:opacity .35s var(--ease-standard);animation:numdrift 15s ease-in-out infinite alternate}

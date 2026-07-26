@@ -765,20 +765,45 @@ function observeReveals() {
   }
 
   /* El bucle: se enciende cuando el pin entra en pantalla y se apaga cuando sale
-     (y con la pestaña en segundo plano). Mientras la página está quieta update()
-     no escribe nada —todas las comparaciones salen por el «no ha cambiado»—, así
-     que un frame en reposo cuesta cuatro restas. */
-  let rafId = 0, running = false;
+     (o con la pestaña en segundo plano).
+
+     Y SE DUERME SOLO EN CUANTO EL SCROLL SE PARA. Un rAF que no se apaga nunca
+     es un frame de trabajo cada 16ms para siempre, aunque nadie toque la página:
+     con la versión de eventos «scroll» una página quieta no gastaba NADA, y esa
+     diferencia se nota en un portátil (el ventilador de un mac con la portada
+     abierta y sin tocar). Tras IDLE frames sin que scrollY se mueva, el bucle se
+     para y queda un listener de «scroll» de guardia para volver a encenderlo.
+     Ese despertar cuesta un frame de retraso en el primer movimiento —el mismo
+     que tenía ANTES en todos—, y a partir de ahí ya va sincronizado frame a
+     frame, que es lo que arregla los saltos de iOS. */
+  const IDLE = 20;   // ~1/3 de segundo quieto
+  let rafId = 0, running = false, idleFrames = 0, lastY = -1;
   function frame() {
-    rafId = running ? requestAnimationFrame(frame) : 0;
+    const y = window.scrollY;
+    idleFrames = y === lastY ? idleFrames + 1 : 0;
+    lastY = y;
+    if (running && idleFrames < IDLE) rafId = requestAnimationFrame(frame);
+    else { rafId = 0; running = false; }
     update();
   }
-  function start() { if (!running && !document.hidden) { running = true; if (!rafId) rafId = requestAnimationFrame(frame); } }
+  function start() {
+    if (document.hidden) return;
+    idleFrames = 0;
+    if (!running) { running = true; if (!rafId) rafId = requestAnimationFrame(frame); }
+  }
   function stop() {
     running = false;
     if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
     update();   // una última pasada para dejar la escena en su sitio
   }
+  // el guardia: barato (no hace nada más que rearmar el bucle) y pasivo
+  let armed = false;
+  function arm() {
+    if (armed) return;
+    armed = true;
+    addEventListener('scroll', () => { if (inView) start(); }, { passive: true });
+  }
+  let inView = false;
 
   /* burbujas y motas: puro CSS una vez creadas (el compositor las mueve solo) */
   function scatter(host, n, minSize, maxSize, minDur, maxDur) {
@@ -817,9 +842,11 @@ function observeReveals() {
      (Safari 12-) el bucle se queda encendido siempre: update() ya se sale sola
      cuando el pin queda fuera de pantalla, así que solo cuesta la comprobación. */
   if ('IntersectionObserver' in window) {
-    new IntersectionObserver(es => { es[0].isIntersecting ? start() : stop(); },
-      { rootMargin: '100% 0px' }).observe(pin);
-  } else start();
+    new IntersectionObserver(es => {
+      inView = es[0].isIntersecting;
+      if (inView) { arm(); start(); } else stop();
+    }, { rootMargin: '100% 0px' }).observe(pin);
+  } else { inView = true; arm(); start(); }
   addEventListener('resize', () => {
     clearTimeout(rz);
     rz = setTimeout(() => {
@@ -837,8 +864,7 @@ function observeReveals() {
   addEventListener('visibilitychange', () => {
     if (document.hidden) { stop(); return; }
     measure(); update();
-    // el bucle solo vuelve si el hero sigue en pantalla
-    if (pin.getBoundingClientRect().top < innerHeight && pin.getBoundingClientRect().bottom > 0) start();
+    if (inView) start();   // el bucle solo vuelve si el hero sigue en pantalla
   });
   // vuelta atrás en iOS: la página sale de la bfcache ya scrolleada y sin disparar scroll
   addEventListener('pageshow', () => { measure(); update(); });
