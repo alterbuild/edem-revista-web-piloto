@@ -78,6 +78,10 @@ nav.main a:hover::after{transform:scaleX(1)}
 /* las dos acciones de la cabecera: portal de noticias y visor */
 .hbar .hacts{margin-left:auto;display:flex;align-items:center;gap:10px;flex-shrink:0}
 .hbar .hacts .btn{padding:11px 18px;font-size:14px;white-space:nowrap}
+/* dónde estás: en la barra solo lo puede cantar este botón, porque el enlace de
+   la página actual no se pinta (ver js/shell.js). El botón de «Noticias» en el
+   portal se queda relleno en vez de perfilado. */
+.hbar .hacts .btn.out[aria-current="page"]{background:var(--edem-teal-50);color:var(--edem-teal-700);border-color:var(--edem-teal-200)}
 .menubtn{display:none;margin-left:auto;width:44px;height:44px;border-radius:var(--radius-sm);border:1px solid var(--border-hair);background:#fff;color:var(--text-strong);place-items:center;cursor:pointer}
 .menubtn .lu{width:20px;height:20px}
 /* menú móvil: panel que se despliega sobre la página, con velo detrás */
@@ -91,14 +95,20 @@ nav.main a:hover::after{transform:scaleX(1)}
   padding:15px 24px;font-size:16.5px;font-weight:600;color:var(--text-body);background:none;border:0;cursor:pointer;
   opacity:0;transform:translate3d(0,-6px,0);transition:opacity .3s var(--ease-out),transform .3s var(--ease-out),background .18s}
 .mnav.open a,.mnav.open button{opacity:1;transform:none}
-/* entrada escalonada de cada línea */
-.mnav.open a:nth-child(1){transition-delay:.04s}
-.mnav.open a:nth-child(2){transition-delay:.08s}
-.mnav.open a:nth-child(3){transition-delay:.12s}
-.mnav.open a:nth-child(4){transition-delay:.16s}
-.mnav.open a:nth-child(5){transition-delay:.2s}
-.mnav.open a:nth-child(6){transition-delay:.24s}
-.mnav.open .mcta{transition-delay:.28s}
+/* Entrada escalonada de cada línea. Los enlaces los pinta js/shell.js y son
+   entre cinco y siete según la página (el de la página en la que estás no se
+   pinta), de ahí que la escalera llegue hasta ocho. El botón de leer queda
+   siempre el último y se excluye de la cuenta: en el portal de noticias también
+   es un <a> y si no se caía en el escalón que le tocara por posición. */
+.mnav.open a:not(.mcta):nth-child(1){transition-delay:.04s}
+.mnav.open a:not(.mcta):nth-child(2){transition-delay:.08s}
+.mnav.open a:not(.mcta):nth-child(3){transition-delay:.12s}
+.mnav.open a:not(.mcta):nth-child(4){transition-delay:.16s}
+.mnav.open a:not(.mcta):nth-child(5){transition-delay:.2s}
+.mnav.open a:not(.mcta):nth-child(6){transition-delay:.24s}
+.mnav.open a:not(.mcta):nth-child(7){transition-delay:.28s}
+.mnav.open a:not(.mcta):nth-child(8){transition-delay:.32s}
+.mnav.open .mcta{transition-delay:.36s}
 .mnav a .ic{width:19px;height:19px;flex-shrink:0;color:var(--edem-teal-500)}
 .mnav a .ch{width:17px;height:17px;margin-left:auto;color:var(--ink-300,#c3cdd2);transition:transform .2s var(--ease-out)}
 .mnav a:active{background:var(--edem-teal-50)}
@@ -315,6 +325,18 @@ html.sbusca-on{overflow:hidden}
 .hscene svg{width:100%;height:100%;display:block}
 /* el cielo necesita más margen: el sol asoma por encima del borde del viewBox */
 .hscene.sky{--par:-34px;height:min(96vh,max(900px,45vw));opacity:calc(1 - var(--seaP) * .55)}
+/* El cielo NO recorta. Su caja acaba a media pantalla (arriba del todo del hero
+   queda aire), y el sol —que con la inmersión se va hacia arriba, ver .up— se
+   cortaba en seco contra ese borde invisible: a 1400×620 le cercenaba 84px de
+   corona con la inmersión al 22%, un filo recto en mitad del cielo. Con overflow
+   visible el único recorte es el de .heroBg, o sea el borde real del hero, que
+   con el hero clavado es el borde de la pantalla: el sol se va de cuadro en vez
+   de partirse. Lo que sobra a los lados lo sigue recortando .heroBg, que mide
+   exactamente lo mismo de ancho. */
+.hscene.sky svg{overflow:visible}
+/* y el sol se apaga nada más salir de cuadro, para no verlo cruzar por debajo
+   de la cabecera translúcida */
+.hscene .sun{opacity:calc(1 - var(--seaP) * 4)}
 .hscene.far{--par:26px}
 .hscene.near{--par:78px;opacity:calc(1 - var(--seaP) * .35)}
 /* entrada: el paisaje se levanta una vez con la página, como el resto del hero */
@@ -640,9 +662,6 @@ html.sbusca-on{overflow:hidden}
   .hscene .left.far2{transform:translate(350px,150px)}
 }
 
-.hero .bignum{position:absolute;right:-40px;top:-60px;font-family:var(--font-display);font-weight:900;font-size:420px;line-height:.8;color:transparent;-webkit-text-stroke:2px var(--edem-teal-200);opacity:.5;pointer-events:none;user-select:none;transition:opacity .35s var(--ease-standard);animation:numdrift 15s ease-in-out infinite alternate}
-.hero .bignum.swap{opacity:0}
-@keyframes numdrift{from{transform:translateY(0)}to{transform:translateY(22px)}}
 
 /* pila de portadas rotatoria */
 .heroDeck{position:relative;display:flex;flex-direction:column;align-items:center;gap:22px}
@@ -1112,12 +1131,17 @@ html.sbusca-on{overflow:hidden}
 
 /* ---------- pie ---------- */
 footer.site{background:var(--ink-900);color:var(--ink-300)}
-.fgrid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:40px;padding-top:56px;padding-bottom:56px}
+/* Marca + cuatro columnas de enlaces (las pinta js/shell.js desde content.json).
+   La de la marca manda menos que antes porque ahora hay una columna más. */
+.fgrid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1.15fr 1fr;gap:30px;padding-top:56px;padding-bottom:56px}
 footer.site img.flogo{height:22px}
 footer.site .tag{font-family:var(--font-display);font-style:italic;font-size:21px;color:#fff;margin-top:14px}
 footer.site .col p.h{font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:800;color:var(--ink-400);margin-bottom:14px}
 footer.site .col a,footer.site .col button.aslink{display:block;color:var(--ink-300);font-size:14.5px;padding:4px 0;background:none;border:0;cursor:pointer;text-align:left;width:100%}
 footer.site .col a:hover,footer.site .col button.aslink:hover{color:var(--edem-teal-200)}
+/* en el pie sí se pinta el enlace de la página actual —hace de mapa del sitio—,
+   marcado en blanco para que se vea dónde estás */
+footer.site .col a[aria-current="page"]{color:#fff;font-weight:600}
 .soc{display:flex;gap:10px;margin-top:20px}
 footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.16);display:grid;place-items:center;color:var(--ink-200);transition:all var(--dur-fast)}
 .soc a:hover{background:var(--edem-teal-500);border-color:var(--edem-teal-500);color:#fff}
@@ -1287,7 +1311,6 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   .hscene{height:min(46vh,360px)}
   .hscene.sky{height:min(70vh,560px)}
   .beat .kicker{margin-bottom:14px}
-  .hero .bignum{font-size:260px;right:-30px;top:-40px;opacity:.35}
   /* Conócenos deja de estar clavado: una columna, con todas las formas de
      participar abiertas (tres tarjetas cerradas no se entienden sin el scroll) */
   #conocenos{height:auto}
@@ -1364,7 +1387,6 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   .heroCopy .acts .btn.ghost{display:none}   /* una sola llamada a la acción: el kiosko ya está en el menú */
   .deck{width:min(168px,40%)}
   .deckcap .ct{font-size:17px}
-  .hero .bignum{display:none}
   .beat{padding:0 18px}
   .beat .bs{margin-top:16px}
   .shead .more{margin-left:0;flex-basis:100%}

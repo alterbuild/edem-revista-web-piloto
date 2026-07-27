@@ -16,17 +16,19 @@
 <link rel="apple-touch-icon" href="assets/edem-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="css/tokens.css?v=20260727b">
+<link rel="stylesheet" href="css/tokens.css?v=20260727e">
 <!-- Archivo: solo el eje de peso (ver index.html). Las cursivas del sitio son de
      Bodoni y font-stretch solo se usa dentro de las revistas. -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&display=swap">
-<link rel="stylesheet" href="css/site.css?v=20260727b">
-<link rel="stylesheet" href="css/news.css?v=20260727b">
-<script src="js/icons.js?v=20260727b" defer></script>
-<script src="js/cms.js?v=20260727b" defer></script>
-<script src="js/search.js?v=20260727b" defer></script>
-<script src="js/news.js?v=20260727b" defer></script>
-<script src="js/chrome.js?v=20260727b" defer></script>
+<link rel="stylesheet" href="css/site.css?v=20260727e">
+<link rel="stylesheet" href="css/news.css?v=20260727e">
+<script src="js/icons.js?v=20260727e" defer></script>
+<script src="js/cms.js?v=20260727e" defer></script>
+<script src="js/search.js?v=20260727e" defer></script>
+<script src="js/news.js?v=20260727e" defer></script>
+<!-- shell.js va antes: pinta la cabecera y el pie comunes (content.json → chrome) -->
+<script src="js/shell.js?v=20260727e" defer></script>
+<script src="js/chrome.js?v=20260727e" defer></script>
 </head>
 <body>
 
@@ -35,12 +37,8 @@
 <header class="site">
   <div class="wrap hbar">
     <a class="brand" href="index.html" aria-label="EDEM Times — ir a la portada"><img src="assets/edem-logo.png" alt="EDEM"><span class="t">times<span class="pt">.</span></span></a>
-    <nav class="main" aria-label="Principal">
-      <a href="index.html">Portada</a>
-      <a href="index.html#kiosko">Kiosko</a>
-      <a href="index.html#conocenos">Conócenos</a>
-      <a href="index.html#ecosistema">Ecosistema</a>
-    </nav>
+    <!-- los enlaces los pinta js/shell.js con content.json → chrome.nav -->
+    <nav class="main" id="hnav" aria-label="Principal"></nav>
     <button class="searchbtn" type="button" data-buscar aria-label="Buscar en EDEM Times" title="Buscar (⌘K)"><i data-lucide="search" class="lu"></i></button>
     <div class="hacts">
       <a class="btn out" href="noticias.html" aria-current="page"><i data-lucide="newspaper" class="lu"></i> Noticias</a>
@@ -48,13 +46,8 @@
     </div>
     <button class="menubtn" id="menubtn" aria-label="Abrir menú" aria-expanded="false" aria-controls="mnav"><i data-lucide="menu" class="lu"></i></button>
   </div>
+  <!-- shell.js mete aquí los enlaces, delante del botón de leer -->
   <nav class="mnav" id="mnav" aria-label="Menú móvil">
-    <a href="#" data-buscar><i data-lucide="search" class="lu ic"></i><span>Buscar</span><i data-lucide="chevron-right" class="lu ch"></i></a>
-    <a href="index.html"><i data-lucide="anchor" class="lu ic"></i><span>Portada</span><i data-lucide="chevron-right" class="lu ch"></i></a>
-    <a href="noticias.html" aria-current="page"><i data-lucide="newspaper" class="lu ic"></i><span>Actualidad</span><i data-lucide="chevron-right" class="lu ch"></i></a>
-    <a href="index.html#kiosko"><i data-lucide="library" class="lu ic"></i><span>Kiosko</span><i data-lucide="chevron-right" class="lu ch"></i></a>
-    <a href="index.html#conocenos"><i data-lucide="book-marked" class="lu ic"></i><span>Conócenos</span><i data-lucide="chevron-right" class="lu ch"></i></a>
-    <a href="index.html#ecosistema"><i data-lucide="waypoints" class="lu ic"></i><span>Ecosistema</span><i data-lucide="chevron-right" class="lu ch"></i></a>
     <a class="btn pri mcta" href="index.html?visor=ultima"><i data-lucide="book-open" class="lu"></i> Leer</a>
   </nav>
 </header>
@@ -68,15 +61,12 @@
 <section class="npmast">
   <div class="wrap npmastin">
     <div class="npmasttxt">
-      <span class="npkick over"><span class="dot"></span><span id="np-kicker">El diario de EDEM Times</span></span>
       <h1 class="disp" id="np-title">Actualidad<span class="pt">.</span></h1>
     </div>
     <div class="npdata">
       <span id="np-hoy"></span>
       <span class="pip" aria-hidden="true"></span>
       <span>Marina de Empresas · València</span>
-      <span class="pip" aria-hidden="true"></span>
-      <span id="np-total"></span>
     </div>
   </div>
 </section>
@@ -164,44 +154,8 @@
 
 <div class="pezband" aria-hidden="true"><img src="assets/pez-footer.png" alt="" width="162" height="65" loading="lazy" decoding="async"></div>
 
-<footer class="site">
-  <div class="wrap fgrid">
-    <div class="col">
-      <img class="flogo" src="assets/edem-logo-white.png" alt="EDEM">
-      <p class="tag">Empresarios formando a empresarios</p>
-      <div class="soc">
-        <a href="https://www.linkedin.com/school/edem-escuela-de-empresarios/" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg></a>
-        <a href="https://www.instagram.com/edemempresarios/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
-        <a href="https://www.youtube.com/user/EDEMEmpresariosEs" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.94 2C5.12 20 12 20 12 20s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg></a>
-      </div>
-    </div>
-    <div class="col">
-      <p class="h">EDEM Times</p>
-      <a href="index.html">Portada</a>
-      <a href="noticias.html">Actualidad</a>
-      <a href="index.html#kiosko">Kiosko de revistas</a>
-      <a href="index.html#conocenos">Participar en la revista</a>
-    </div>
-    <div class="col">
-      <p class="h">Marina de Empresas</p>
-      <a href="https://edem.eu/" target="_blank" rel="noopener">EDEM Escuela de Empresarios</a>
-      <a href="https://lanzadera.es/" target="_blank" rel="noopener">Lanzadera</a>
-      <a href="https://www.angelscapital.es/" target="_blank" rel="noopener">Angels</a>
-      <a href="https://marinadeempresas.es/" target="_blank" rel="noopener">Marina de Empresas</a>
-    </div>
-    <div class="col">
-      <p class="h">Recursos</p>
-      <a href="#suscribete">Suscríbete a las novedades</a>
-      <a href="mailto:comunicacion@edem.es">Contacto</a>
-      <a href="mailto:comunicacion@edem.es?subject=Tengo%20un%20tema%20para%20EDEM%20Times">Proponer un tema</a>
-    </div>
-  </div>
-  <div class="fbase"><div class="wrap">
-    <span>© 2026 EDEM · Escuela de Empresarios</span>
-    <span><a href="https://edem.eu/aviso-legal/" target="_blank" rel="noopener">Aviso legal</a> · <a href="https://edem.eu/privacidad/" target="_blank" rel="noopener">Privacidad</a> · <a href="https://edem.eu/politica-de-cookies/" target="_blank" rel="noopener">Cookies</a></span>
-    <span>Parte de Marina de Empresas · Lanzadera · Angels</span>
-  </div></div>
-</footer>
+<!-- el pie entero lo pinta js/shell.js con content.json → chrome.footer -->
+<footer class="site" id="sitefoot"></footer>
 
 </body>
 </html>

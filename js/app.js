@@ -80,22 +80,17 @@ const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)');
 let C = DEFAULTS;
 let MAGS = DEFAULTS.issues;
 
-const SOC_SVG = {
-  linkedin: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>',
-  instagram: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>',
-  youtube: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.94 2C5.12 20 12 20 12 20s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>'
-};
 
 /* ================= render de la home ================= */
 function latestIssue() { return MAGS.find(m => m.id === C.site.latest) || MAGS[0]; }
 
-/* El hero ya no pinta antetítulo ni chips (ver el comentario en index.html): el
-   número lo canta el pie de la pila de portadas. Los campos `kicker` y `chips`
-   de content.json siguen ahí y no molestan — simplemente no se leen. */
+/* El hero ya no pinta antetítulo, chips ni el número gigante de fondo (ver el
+   comentario en index.html): el número lo canta el pie de la pila de portadas.
+   Los campos `kicker`, `chips` y `num` de content.json siguen ahí y no
+   molestan — simplemente no se leen. */
 function renderHero() {
   const m = latestIssue(), h = m.hero || {};
   if (h.titleHtml) $('hero-title').innerHTML = h.titleHtml;
-  if (h.num) $('hero-num').textContent = h.num;
   if (h.sub) $('hero-sub').textContent = h.sub;
   if (h.lead) $('hero-lead').textContent = h.lead;
   buildDeck();
@@ -123,7 +118,6 @@ function renderHero() {
 
 /* ---- pila de portadas del hero: rota entre ediciones ---- */
 let deckOrder = [], deckTimer = null, deckPaused = false;
-const issueNum = m => (m.hero && m.hero.num) || (String(m.nr || '').match(/\d+/) || ['•'])[0];
 
 function buildDeck() {
   const deck = $('hero-deck'); if (!deck) return;
@@ -222,11 +216,6 @@ function updateDeckUI() {
     cap.classList.add('on');
   }, 220);
   document.querySelectorAll('.ddot').forEach(d => d.classList.toggle('on', d.dataset.deckdot === deckOrder[0]));
-  const bn = $('hero-num'), num = issueNum(m);
-  if (bn.textContent !== num) {
-    bn.classList.add('swap');
-    setTimeout(() => { bn.textContent = num; bn.classList.remove('swap'); }, 320);
-  }
 }
 
 function renderKiosko() {
@@ -498,12 +487,10 @@ function observeEcosystem() {
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(ecoSyncHeights);
 }
 
-function renderFooter() {
-  $('soc').innerHTML = C.social.map(s =>
-    '<a href="' + esc(s.url) + '" target="_blank" rel="noopener" aria-label="' + esc(s.label) + '">' + (SOC_SVG[s.id] || '') + '</a>').join('');
-  $('foot-ediciones').innerHTML = MAGS.map(m =>
-    '<a href="#" data-visor="' + m.id + '">' + esc(m.nr) + ' · ' + esc(m.title) + '</a>').join('');
-}
+/* El pie (y los enlaces de la cabecera) los pinta js/shell.js, que es común a
+   las tres páginas del sitio: aquí solo queda la conducta: la lista de ediciones
+   del pie sale con data-visor y la recoge la delegación de aquí abajo, así que
+   en la portada abre el visor en vez de recargar. */
 
 /* delegación: todo lo que abre el visor */
 document.addEventListener('click', e => {
@@ -1305,7 +1292,7 @@ window.addEventListener('resize', () => { if (!visor.hidden) applyMode(); });
 
 /* ================= arranque ================= */
 function renderAll() {
-  renderHero(); renderKiosko(); renderJoin(); renderEcosystem(); renderFooter();
+  renderHero(); renderKiosko(); renderJoin(); renderEcosystem();
   $('v-issues').innerHTML = MAGS.map(m => '<button class="vchip" role="tab" data-id="' + m.id + '" data-visor-issue="' + m.id + '">' + esc(m.chip) + '</button>').join('');
   $('v-issues').onclick = e => { const c = e.target.closest('[data-visor-issue]'); if (c) setIssue(c.dataset.visorIssue, 0); };
   lucide.createIcons();
@@ -1314,9 +1301,12 @@ function renderAll() {
 
 async function boot() {
   try {
-    const r = await fetch('data/content.json', { cache: 'no-cache' });
-    if (r.ok) {
-      const json = await r.json();
+    // el fetch de content.json lo lanza js/shell.js (que va antes) y lo comparte
+    // en window.EdemContent: una sola petición por página
+    const json = window.EdemContent
+      ? await window.EdemContent
+      : await fetch('data/content.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : null);
+    if (json) {
       C = Object.assign({}, DEFAULTS, json);
       MAGS = C.issues;
     }

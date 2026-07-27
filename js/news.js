@@ -205,7 +205,6 @@
     }
 
     if (cfg && cfg.titulo) $('np-title').innerHTML = cfg.titulo;
-    if (cfg && cfg.kicker) $('np-kicker').textContent = cfg.kicker;
 
     if (!noticias.length) {
       host.innerHTML = '<p class="nvacio">Todavía no hay noticias publicadas. Vuelve pronto.</p>';
@@ -268,9 +267,6 @@
       '<button class="nfil on" type="button" data-fil="todas" aria-pressed="true">Todas <span class="fnum">' + noticias.length + '</span></button>' +
       usadas.map(s => '<button class="nfil" type="button" data-fil="' + esc(s.id) + '" aria-pressed="false" style="--fc:' + color(s.color) + '">' +
         esc(s.nombre) + ' <span class="fnum">' + cuenta(s.id) + '</span></button>').join('');
-
-    const total = $('np-total');
-    if (total) total.textContent = noticias.length + ' noticias · ' + usadas.length + ' secciones';
 
     /* ---- el diario por secciones (vista en reposo) ----
        Una columna por sección, con su filete grueso arriba: la destacada con

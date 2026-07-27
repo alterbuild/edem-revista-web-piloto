@@ -196,22 +196,20 @@
 /* ============================================================
    2 · PORTAL DE NOTICIAS
    ============================================================ */
-/* Mancheta: el cabecero de un semanario, no una portada de revista. El rótulo
-   y la línea de datos comparten renglón —título a la izquierda, fecha y cifras
-   apoyadas en la misma base—, y debajo cierra el filete grueso. Así la portada
-   empieza dentro de la primera pantalla en vez de detrás de un titular de 96px. */
+/* Mancheta: el cabecero de un semanario, no una portada de revista. El título
+   y la línea de datos comparten renglón —«Actualidad» a la izquierda, fecha y
+   plaza apoyadas en la misma base—, y debajo cierra el filete grueso. Así la
+   portada empieza dentro de la primera pantalla en vez de detrás de un titular
+   de 96px. */
 .npmast{padding:30px 0 0;position:relative}
 .npmastin{display:flex;align-items:flex-end;justify-content:space-between;gap:18px 30px;flex-wrap:wrap;
   padding-bottom:16px;border-bottom:3px solid var(--ink-900)}
-.npkick{display:flex;align-items:center;gap:10px;color:var(--edem-teal-700)}
-.npkick .dot{width:7px;height:7px;border-radius:50%;background:var(--lanzadera);animation:kpulse 2.6s ease-in-out infinite}
-.npmast h1{font-size:clamp(40px,4.4vw,62px);line-height:.92;color:var(--text-strong);margin-top:10px}
+.npmast h1{font-size:clamp(40px,4.4vw,62px);line-height:.92;color:var(--text-strong)}
 .npmast h1 .pt{color:var(--edem-teal-500)}
-/* la línea de datos: fecha, plaza y cuánto hay publicado */
+/* la línea de datos: fecha y plaza */
 .npdata{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-bottom:5px;
   font-size:11.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--text-faint)}
 .npdata .pip{width:5px;height:5px;border-radius:50%;background:var(--edem-teal-300)}
-.npdata #np-total{color:var(--edem-teal-700)}
 
 /* --- portada a tres columnas ---
    Apertura | secundarias | raíl de servicio, con una banda de cuatro que cierra

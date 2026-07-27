@@ -5,6 +5,61 @@
     "_ayuda": "Deja endpoint vacío para el modo demo (guarda el email en el navegador). Pon aquí la URL de tu servicio (Mailchimp, Brevo, API propia…) para suscripciones reales: recibirá un POST JSON {email, list}.",
     "endpoint": ""
   },
+  "chrome": {
+    "_ayuda": "Cabecera y pie de TODAS las páginas (portada, portal de noticias y noticia): se escriben una vez aquí y js/shell.js los pinta en las tres. «#seccion» se queda dentro de la página si esa sección existe y si no salta a index.html#seccion; el enlace a la página en la que estás no se pinta; «icon» es un icono de js/icons.js y solo se ve en el menú móvil; «menu: true» = solo en el menú móvil, nunca en la barra; «pages» limita un enlace a ciertas páginas.",
+    "navMax": 4,
+    "nav": [
+      { "label": "Buscar", "icon": "search", "action": "buscar", "menu": true },
+      { "label": "Portada", "href": "index.html", "icon": "anchor" },
+      { "label": "Kiosko", "href": "#kiosko", "icon": "library" },
+      { "label": "Actualidad", "href": "noticias.html", "icon": "newspaper", "menu": true },
+      { "label": "Conócenos", "href": "#conocenos", "icon": "book-marked" },
+      { "label": "Ecosistema", "href": "#ecosistema", "icon": "waypoints" },
+      { "label": "Suscríbete", "href": "#suscribete", "icon": "mail" }
+    ],
+    "footer": {
+      "tagline": "Empresarios formando a empresarios",
+      "columns": [
+        {
+          "h": "EDEM Times",
+          "links": [
+            { "label": "Portada", "href": "index.html" },
+            { "label": "Actualidad", "href": "noticias.html" },
+            { "label": "Kiosko de revistas", "href": "#kiosko" },
+            { "label": "Participar en la revista", "href": "#conocenos" }
+          ]
+        },
+        { "h": "Ediciones", "issues": true },
+        {
+          "h": "Marina de Empresas",
+          "links": [
+            { "label": "EDEM Escuela de Empresarios", "href": "https://edem.eu/" },
+            { "label": "Lanzadera", "href": "https://lanzadera.es/" },
+            { "label": "Angels", "href": "https://www.angelscapital.es/" },
+            { "label": "Marina de Empresas", "href": "https://marinadeempresas.es/" }
+          ]
+        },
+        {
+          "h": "Recursos",
+          "links": [
+            { "label": "Suscríbete a las novedades", "href": "#suscribete" },
+            { "label": "Proponer un tema", "href": "mailto:comunicacion@edem.es?subject=Tengo%20un%20tema%20para%20EDEM%20Times" },
+            { "label": "Contacto", "href": "mailto:comunicacion@edem.es" },
+            { "label": "Sistema de diseño", "action": "ds", "pages": ["index.html"] }
+          ]
+        }
+      ],
+      "base": {
+        "copyright": "© {year} EDEM · Escuela de Empresarios",
+        "legal": [
+          { "label": "Aviso legal", "href": "https://edem.eu/aviso-legal/" },
+          { "label": "Privacidad", "href": "https://edem.eu/privacidad/" },
+          { "label": "Cookies", "href": "https://edem.eu/politica-de-cookies/" }
+        ],
+        "note": "Parte de Marina de Empresas · Lanzadera · Angels"
+      }
+    }
+  },
   "issues": [
     {
       "id": "n2",
