@@ -81,6 +81,52 @@ let C = DEFAULTS;
 let MAGS = DEFAULTS.issues;
 
 
+/* ================= bus de scroll y medidas cacheadas =================
+   PROBLEMA QUE RESUELVE. La portada tenía cuatro efectos colgados del evento
+   «scroll» —el tríptico de «Conócenos», el apilado del ecosistema, la cabecera
+   que se aparta y el tinte de la barra del navegador— y cada uno se pedía SU
+   PROPIO requestAnimationFrame. Eso son cuatro callbacks por frame y, como cada
+   uno lee la geometría (getBoundingClientRect, offsetHeight) DESPUÉS de que el
+   anterior haya escrito estilos, el navegador se ve obligado a recalcular el
+   layout entero una vez por callback: cuatro «forced synchronous layouts» en
+   cada frame de scroll. Es el clásico layout thrashing y es lo que hacía que
+   bajar por la portada se sintiera pastoso en móvil.
+
+   CÓMO SE ARREGLA. Un único rAF por frame que los llama en orden, y las medidas
+   que NO cambian al hacer scroll (alturas de sección, posición de cada bloque
+   en el documento) se calculan una vez y se guardan aquí. Se vuelven a tomar
+   cuando de verdad pueden haber cambiado: al redimensionar, al llegar las
+   webfonts, al retirarse la cortina de carga y al terminar de cargar la página.
+
+   Nota sobre `docTop`: vale para bloques en flujo normal. Los paneles sticky
+   (.epanel) NO se pueden cachear así —su rect.top lo clava el propio sticky—,
+   así que esos se siguen midiendo en vivo. */
+const scrollJobs = [];
+let busTick = false;
+function busFrame() { busTick = false; for (let i = 0; i < scrollJobs.length; i++) scrollJobs[i](); }
+function busKick() { if (!busTick) { busTick = true; requestAnimationFrame(busFrame); } }
+/* Un solo listener para todos: se pone la primera vez que alguien se apunta. */
+function onScroll(fn) {
+  if (!scrollJobs.length) {
+    addEventListener('scroll', busKick, { passive: true });
+    addEventListener('resize', () => { measureAll(); busKick(); }, { passive: true });
+  }
+  scrollJobs.push(fn);
+}
+
+/* --- caché de geometría --- */
+const geomJobs = [];
+function onMeasure(fn) { geomJobs.push(fn); fn(); }
+function measureAll() { for (let i = 0; i < geomJobs.length; i++) geomJobs[i](); }
+/* posición de un elemento en el documento (no en la ventana) */
+function docTop(el) { return el ? el.getBoundingClientRect().top + window.scrollY : 0; }
+/* alto de ventana: innerHeight puede llegar a 0 en vistas embebidas */
+function viewH() { return window.innerHeight || document.documentElement.clientHeight || 800; }
+
+addEventListener('load', () => { measureAll(); busKick(); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { measureAll(); busKick(); });
+if (window.EdemSplash) EdemSplash.done.then(() => { measureAll(); busKick(); });
+
 /* ================= render de la home ================= */
 function latestIssue() { return MAGS.find(m => m.id === C.site.latest) || MAGS[0]; }
 
@@ -312,7 +358,7 @@ function renderJoin() {
   observeJoin();
 }
 
-let joinBound = false, joinCards = [], joinScenes = [], joinCur = -1, joinTick = false, joinLock = 0;
+let joinBound = false, joinCards = [], joinScenes = [], joinCur = -1, joinLock = 0;
 
 /* enciende la escena de fondo i y pasa su fondo y su acento a la sección:
    el mismo color plano manda en el fondo, en la caja activa y en la barra */
@@ -341,20 +387,29 @@ function setJoinRole(i) {
   });
 }
 
-function joinMeasure() {
-  joinTick = false;
+/* Las dos alturas de la sección (la del bloque y la del escenario clavado) NO
+   cambian al hacer scroll: se miden en measureAll() y aquí solo se lee scrollY.
+   Así el frame de scroll no vuelve a pedirle el layout al navegador. */
+let joinTop = 0, joinRange = 1;
+function joinRemeasure() {
   const sec = $('conocenos'), stage = sec && sec.querySelector('.jstage');
-  if (!sec || !stage || !joinCards.length) return;
+  if (!sec || !stage) return;
+  joinTop = docTop(sec);
+  joinRange = Math.max(1, sec.offsetHeight - stage.offsetHeight);
+}
+
+function joinMeasure() {
+  const sec = $('conocenos');
+  if (!sec || !joinCards.length) return;
   if (joinFlat()) {
     joinCur = -1;
     setJoinScene(0);                                 // sin clavado, una sola escena
     joinCards.forEach(b => { b.classList.add('on'); b.setAttribute('aria-expanded', 'true'); });
     return;
   }
-  const box = sec.getBoundingClientRect();
-  if (box.bottom < 0 || box.top > innerHeight) return;
-  const range = Math.max(1, sec.offsetHeight - stage.offsetHeight);
-  const p = Math.min(1, Math.max(0, -box.top / range));
+  const top = joinTop - window.scrollY;              // lo que daría getBoundingClientRect
+  if (top + sec.offsetHeight < 0 || top > viewH()) return;
+  const p = Math.min(1, Math.max(0, -top / joinRange));
   const bar = $('jbar');
   if (bar) bar.style.transform = 'scaleY(' + (0.05 + p * 0.95).toFixed(3) + ')';
   if (Date.now() < joinLock) return;                 // un clic reciente manda sobre el scroll
@@ -367,13 +422,12 @@ function observeJoin() {
   joinCur = -1;
   setJoinScene(0);
   if (!joinCards.length) return;
-  joinMeasure();
-  if (joinBound) return;
+  if (joinBound) { joinRemeasure(); joinMeasure(); return; }
   joinBound = true;
-  const kick = () => { if (!joinTick) { joinTick = true; requestAnimationFrame(joinMeasure); } };
-  addEventListener('scroll', kick, { passive: true });
-  addEventListener('resize', kick, { passive: true });
-  onMQ(JOIN_FLAT, () => { joinCur = -1; joinMeasure(); });
+  onMeasure(joinRemeasure);
+  joinMeasure();
+  onScroll(joinMeasure);
+  onMQ(JOIN_FLAT, () => { joinCur = -1; joinRemeasure(); joinMeasure(); });
   $('jroles').addEventListener('click', e => {
     const b = e.target.closest('[data-jrole]');
     if (!b || joinFlat()) return;
@@ -418,7 +472,7 @@ function renderEcosystem() {
    montadas unas sobre otras, un IntersectionObserver se queda corto).
    Solo se mide mientras la sección está cerca de pantalla, y con un rAF por
    frame como el resto de efectos de scroll. */
-let ecoBound = false, ecoPanels = [], ecoLinks = [], ecoCur = -1, ecoTick = false;
+let ecoBound = false, ecoPanels = [], ecoLinks = [], ecoCur = -1;
 
 /* El raíl y las fichas se sueltan del sticky cuando su caja deja de caber en el
    contenedor, así que solo se mueven juntos si miden lo mismo (el CSS les da a
@@ -436,27 +490,40 @@ function ecoSyncHeights() {
 
 let ecoPrev = -1;
 
+/* alto y posición de la sección: no cambian al hacer scroll */
+let ecoTop = 0, ecoH = 0;
+function ecoRemeasure() {
+  const sec = $('ecosistema');
+  if (!sec) return;
+  ecoTop = docTop(sec); ecoH = sec.offsetHeight;
+}
+
 function ecoMeasure() {
-  ecoTick = false;
   const sec = $('ecosistema');
   if (!sec || !ecoPanels.length) return;
-  // alto de ventana: innerHeight puede llegar a 0 en vistas embebidas, así que
-  // clientHeight hace de red — si no, la sección se daría siempre por fuera
-  const vh = innerHeight || document.documentElement.clientHeight || 800;
-  const box = sec.getBoundingClientRect();
-  if (box.bottom < 0 || box.top > vh) return;
+  const vh = viewH();
+  const top = ecoTop - window.scrollY;
+  if (top + ecoH < 0 || top > vh) return;
+
+  /* PRIMERO SE LEE TODO Y DESPUÉS SE ESCRIBE. El orden importa: escribir
+     --ecoP y volver a leer el rect de las fichas obligaba al navegador a
+     recalcular el layout en mitad del frame (una vez por cada scroll). Los
+     paneles son sticky, así que su rect.top sí hay que pedirlo en vivo —el
+     sticky lo clava y no se puede deducir de scrollY—, pero ahora se piden
+     antes de tocar ningún estilo y el layout se calcula una sola vez. */
+  const line = vh * .34;
+  let act = 0;
+  for (let i = 0; i < ecoPanels.length; i++) {
+    if (ecoPanels[i].getBoundingClientRect().top <= line) act = i;
+  }
 
   // --ecoP: 0 cuando la sección entra por abajo, 1 cuando acaba de salir por
   // arriba. Mueve las dos tramas del fondo (ver .eweave/.esigns en el CSS).
   // Se redondea a tres decimales y solo se escribe si cambia: una custom
   // property nueva invalida el estilo de todo el subárbol.
-  const p = Math.min(1, Math.max(0, -box.top / Math.max(1, sec.offsetHeight - vh)));
-  const q = +p.toFixed(3);
+  const q = +Math.min(1, Math.max(0, -top / Math.max(1, ecoH - vh))).toFixed(3);
   if (q !== ecoPrev) { ecoPrev = q; sec.style.setProperty('--ecoP', q); }
 
-  const line = vh * .34;
-  let act = 0;
-  ecoPanels.forEach((p, i) => { if (p.getBoundingClientRect().top <= line) act = i; });
   if (act === ecoCur) return;
   ecoCur = act;
   ecoLinks.forEach((a, j) => a.classList.toggle('on', j === act));
@@ -472,19 +539,27 @@ function observeEcosystem() {
   // sin sticky (movimiento reducido) no hay alturas que sincronizar
   if (REDUCED.matches) { ecoCur = 0; ecoLinks.forEach((a, j) => a.classList.toggle('on', !j)); return; }
   ecoSyncHeights();
-  ecoMeasure();
 
-  if (ecoBound) return;   // el listener se pone una sola vez
+  /* Las dos tramas del fondo (.eweave/.esigns) se mueven con --ecoP, así que
+     llevan will-change:transform. Dejarlo puesto siempre significa dos capas de
+     compositor MÁS GRANDES QUE LA PANTALLA vivas en memoria de GPU desde que se
+     abre la página, aunque la sección esté cinco pantallas más abajo. La clase
+     .eco-live enciende el will-change solo mientras la sección ronda el
+     viewport (ver css/site.css) y lo apaga al salir. */
+  const sec = $('ecosistema');
+  if (sec && !ecoBound && 'IntersectionObserver' in window) {
+    new IntersectionObserver(es => sec.classList.toggle('eco-live', es[0].isIntersecting),
+      { rootMargin: '60% 0px' }).observe(sec);
+  }
+
+  if (ecoBound) { ecoRemeasure(); ecoMeasure(); return; }   // el listener se pone una sola vez
   ecoBound = true;
-  addEventListener('scroll', () => {
-    if (ecoTick) return;
-    ecoTick = true;
-    requestAnimationFrame(ecoMeasure);
-  }, { passive: true });
   // al cambiar el ancho las fichas se reflowean: hay que volver a igualar cajas
-  addEventListener('resize', () => { ecoSyncHeights(); ecoMeasure(); }, { passive: true });
-  // las webfonts pueden llegar después del primer render y estirar el texto
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(ecoSyncHeights);
+  // antes de tomar las medidas (measureAll ya lo llama al redimensionar y
+  // cuando llegan las webfonts, que también estiran el texto).
+  onMeasure(() => { ecoSyncHeights(); ecoRemeasure(); });
+  ecoMeasure();
+  onScroll(ecoMeasure);
 }
 
 /* El pie (y los enlaces de la cabecera) los pinta js/shell.js, que es común a
@@ -563,27 +638,29 @@ onMQ(matchMedia('(min-width:861px)'), e => { if (e.matches) closeMenu(); });
   if (!head) return;
   const TOP = 90;        // arriba del todo siempre visible
   const DEAD = 6;        // rebote inercial y temblores del trackpad: se ignoran
-  let lastY = Math.max(0, scrollY), hidden = false, ticking = false;
+  let lastY = Math.max(0, scrollY), hidden = false;
+
+  // Ni el alto de la cabecera ni dónde empieza «Actualidad» cambian al hacer
+  // scroll: se miden aparte para que el frame de scroll solo lea scrollY.
+  let headH = 68, endY = Infinity;
+  onMeasure(() => {
+    headH = head.offsetHeight || 68;
+    const k = $('actualidad') || $('kiosko');
+    endY = k ? docTop(k) - headH : Infinity;
+  });
 
   function set(on) { if (on !== hidden) { hidden = on; head.classList.toggle('hide', on); } }
   // solo se esconde durante el hero, que es donde estorba de verdad (está
   // clavado y ocupa la pantalla entera). De la primera sección de después
   // —«Actualidad»— al pie se queda fija.
-  function inHero() {
-    const k = $('actualidad') || $('kiosko');
-    return !k || k.getBoundingClientRect().top > head.offsetHeight;
-  }
   function update() {
-    ticking = false;
     const y = Math.max(0, scrollY), d = y - lastY;
-    if (y < TOP || mnav.classList.contains('open') || !inHero()) { lastY = y; set(false); return; }
+    if (y < TOP || mnav.classList.contains('open') || y >= endY) { lastY = y; set(false); return; }
     if (Math.abs(d) < DEAD) return;
     lastY = y;
     set(d > 0);
   }
-  addEventListener('scroll', () => {
-    if (!ticking) { ticking = true; requestAnimationFrame(update); }
-  }, { passive: true });
+  onScroll(update);
   addEventListener('pageshow', () => { lastY = Math.max(0, scrollY); set(false); });
   window.showHeader = () => { lastY = Math.max(0, scrollY); set(false); };
 }());
@@ -891,12 +968,30 @@ $('sub-form').addEventListener('submit', async e => {
   } finally { btn.disabled = false; }
 });
 
-/* ================= carga y troceado de cada revista ================= */
+/* ================= carga y troceado de cada revista =================
+   Dos fases a propósito, porque cuestan cosas distintas:
+   · fetchIssue → RED. Se puede lanzar para las tres ediciones a la vez y así
+     los viajes de ida y vuelta se solapan en lugar de encadenarse.
+   · loadIssue  → CPU. Parsear 76 KB de HTML con DOMParser son decenas de
+     milisegundos, y hacerlo para las tres seguidas es una tarea larga que
+     bloquea el hilo justo en el arranque. Quien llama decide cuándo trocea
+     cada una (ver mountCovers, que las va soltando de una en una).
+   Las dos guardan su promesa en el objeto de la edición: llamarlas dos veces
+   no repite ni la petición ni el troceado. */
+function fetchIssue(m) {
+  if (m.txt != null) return Promise.resolve(m.txt);
+  if (!m.wire) {
+    m.wire = fetch(encodeURI(m.file)).then(r => r.text()).then(t => (m.txt = t));
+    m.wire.catch(() => { m.wire = null; });
+  }
+  return m.wire;
+}
+
 async function loadIssue(m) {
   if (m.data) return m.data;
   if (m.loading) return m.loading;
   m.loading = (async () => {
-    const txt = await (await fetch(encodeURI(m.file))).text();
+    const txt = await fetchIssue(m);
     const doc = new DOMParser().parseFromString(txt, 'text/html');
     const links = [...doc.querySelectorAll('head link[rel="stylesheet"]')].map(l => l.outerHTML).join('');
     const styles = [...doc.querySelectorAll('head style')].map(s => s.outerHTML).join('');
@@ -909,6 +1004,7 @@ async function loadIssue(m) {
     m.data = { pages, labels, head, n: pages.length };
     const imgs = [...new Set((pages.join('').match(/src="([^"]+)"/g) || []).map(x => x.slice(5, -1)))];
     m.imgs = imgs.map(u => new URL(u, base).href);
+    m.txt = null;                                  // el HTML crudo ya no hace falta
     return m.data;
   })();
   m.loading.catch(() => { m.loading = null; });
@@ -958,33 +1054,83 @@ function mountSlots(m, slots) {
   });
 }
 
-async function mountCovers() {
+/* Las tres ediciones se piden A LA VEZ pero se trocean DE UNA EN UNA.
+
+   Antes este bucle hacía `await loadIssue(m)` dentro del for, o sea que la
+   portada del mazo —lo único que se ve al entrar— esperaba a que hubieran
+   llegado y se hubieran parseado las TRES revistas, en serie. En local no se
+   nota, pero contra GitHub Pages son tres viajes de ida y vuelta encadenados:
+   ~300 ms de portada vacía por pura latencia.
+
+   Paralelizarlo entero tampoco vale: parsear una revista con DOMParser y montar
+   su iframe son ~40 ms cada uno, y hacer los tres a la vez junta 150 ms de
+   tarea larga en el peor momento —el arranque— y el primer scroll se queda
+   pegado. Así que se separan las dos cosas: la RED va en paralelo (fetchIssue
+   para las tres de golpe) y la CPU va en fila, cediendo el hilo entre una y
+   otra, empezando por la última edición, que es la que está delante del mazo. */
+function mountCovers() {
+  const latest = latestIssue();
+  const order = [latest, ...MAGS.filter(m => m !== latest)];
+  order.forEach(fetchIssue);                 // las tres peticiones, ya en el aire
   const pending = [];
-  for (const m of MAGS) {
-    try {
-      await loadIssue(m);
-      const all = [...document.querySelectorAll('.coverslot[data-mag="' + m.id + '"]')];
-      // el mazo del hero es lo único visible al entrar: se monta ya
-      mountSlots(m, all.filter(sl => sl.closest('.heroDeck')));
-      const rest = all.filter(sl => !sl.closest('.heroDeck'));
-      if (rest.length) pending.push([m, rest]);
-    } catch (e) { console.warn('No se pudo cargar', m.file, e); }
-  }
-  // el resto, repartido en huecos libres para no competir con el scroll;
-  // al terminar, las imágenes interiores de cada edición, también en huecos
-  (function next() {
-    const job = pending.shift();
-    if (!job) { MAGS.forEach(m => idle(() => warmIssueImages(m))); return; }
-    idle(() => { mountSlots(job[0], job[1]); next(); });
+
+  (async function run() {
+    for (let i = 0; i < order.length; i++) {
+      const m = order[i];
+      try {
+        await loadIssue(m);                  // trocea (la respuesta ya está)
+        const all = [...document.querySelectorAll('.coverslot[data-mag="' + m.id + '"]')];
+        const deck = all.filter(sl => sl.closest('.heroDeck'));
+        if (deck.length) mountSlots(m, deck);   // el mazo del hero: lo único visible al entrar
+        if (!i && window.EdemSplash) EdemSplash.hit('cover');
+        const rest = all.filter(sl => !sl.closest('.heroDeck'));
+        if (rest.length) pending.push([m, rest]);
+      } catch (e) { console.warn('No se pudo cargar', m.file, e); }
+      if (i < order.length - 1) await breathe();   // un respiro entre revista y revista
+    }
+
+    /* El resto —las portadas del kiosko— no se montan hasta que el kiosko se
+       acerca a pantalla. Cada una es un documento entero dentro de un iframe,
+       con sus hojas de estilo y sus webfonts; montarlas al arrancar es pagar ese
+       precio aunque nadie baje nunca hasta ahí. Con el margen de dos pantallas
+       llegan de sobra montadas antes de verse. Ya dentro, de una en una y en
+       huecos libres del navegador; al final, las imágenes interiores de cada
+       edición, también en huecos, para que pasar página sea instantáneo. */
+    whenNear($('kiosko'), function next() {
+      const job = pending.shift();
+      if (!job) { MAGS.forEach(m => idle(() => warmIssueImages(m))); return; }
+      idle(() => { mountSlots(job[0], job[1]); next(); });
+    });
   })();
+}
+
+/* Cede el hilo hasta el siguiente hueco libre (o, como mucho, un frame): lo que
+   va después no entra en la misma tarea larga que lo de antes. */
+function breathe() {
+  return new Promise(r => {
+    let done = false;
+    const go = () => { if (!done) { done = true; r(); } };
+    idle(go);
+    setTimeout(go, 60);
+  });
+}
+
+/* «cuando esto se acerque a pantalla, haz aquello» (sin IntersectionObserver,
+   se hace y ya está: el navegador es viejo y no vamos a dejarle sin portadas) */
+function whenNear(el, fn, margin) {
+  if (!el || !('IntersectionObserver' in window)) return fn();
+  const io = new IntersectionObserver(es => {
+    if (!es[0].isIntersecting) return;
+    io.disconnect();
+    fn();
+  }, { rootMargin: margin || '200% 0px' });
+  io.observe(el);
 }
 
 /* ================= sistema de diseño ================= */
 function swCell(step, hex, lightBg) { return '<div class="c" style="background:' + hex + ';color:' + (lightBg ? 'var(--ink-900)' : '#fff') + '"><b>' + step + '</b><span>' + hex.toUpperCase() + '</span></div>'; }
 const DS_TEAL = [['50', '#eef8fb'], ['100', '#dcf0f5'], ['200', '#b4dee9'], ['300', '#74c1d5'], ['400', '#34a3c0'], ['500', '#008aad'], ['600', '#007a99'], ['700', '#006a85'], ['800', '#0a4a5c'], ['900', '#06333f']];
 const DS_INK = [['900', '#0c1e24'], ['800', '#183038'], ['700', '#2a3f47'], ['600', '#455a61'], ['500', '#5a6e75'], ['400', '#869aa0'], ['300', '#b9c6ca'], ['200', '#dce4e6'], ['100', '#edf1f2'], ['50', '#f6f9f9']];
-$('ds-teal').innerHTML = DS_TEAL.map(([s, h]) => swCell(s, h, +s <= 300)).join('');
-$('ds-ink').innerHTML = DS_INK.map(([s, h]) => swCell(s, h, +s <= 300)).join('');
 const DS_ECO = [
   { n: 'EDEM', h: '#008aad', tag: 'primario oficial', ok: true },
   { n: 'Lanzadera', h: '#e8502d', tag: 'placeholder — confirmar' },
@@ -992,14 +1138,27 @@ const DS_ECO = [
   { n: 'Paper', h: '#fbfaf6', tag: 'fondo revista', light: true, ok: true },
   { n: 'Ink 900', h: '#0c1e24', tag: 'texto · modo lectura', ok: true }
 ];
-$('ds-eco').innerHTML = DS_ECO.map(e => '<div class="ecocard"><div class="sw" style="background:' + e.h + (e.light ? ';border-bottom:1px solid var(--border-hair)' : '') + '"></div><div class="cap"><div class="n">' + e.n + '</div><div class="h">' + e.h.toUpperCase() + '</div><div class="tag" style="color:' + (e.ok ? 'var(--edem-teal-700)' : 'var(--lanzadera)') + '">' + e.tag + '</div></div></div>').join('');
 const DS_SEM = [{ n: 'Success', h: '#2e8b6f' }, { n: 'Warning', h: '#d8912e' }, { n: 'Danger', h: '#c7452e' }, { n: 'Info', h: '#008aad' }];
-$('ds-sem').innerHTML = DS_SEM.map(e => '<div class="ecocard"><div class="sw" style="background:' + e.h + '"></div><div class="cap"><div class="n">' + e.n + '</div><div class="h">' + e.h.toUpperCase() + '</div></div></div>').join('');
 const DS_SPACE = [['space-1', 4], ['space-2', 8], ['space-3', 12], ['space-4', 16], ['space-5', 24], ['space-6', 32], ['space-7', 48], ['space-8', 64], ['space-9', 96], ['space-10', 128]];
-$('ds-space').innerHTML = DS_SPACE.map(([n, v]) => '<div class="r"><span class="nm">' + n + '</span><span class="bar" style="width:' + v + 'px"></span>' + v + 'px</div>').join('');
+
+/* El panel se PINTA LA PRIMERA VEZ QUE SE ABRE, no al cargar la página.
+   Antes estas cinco tablas se montaban en el arranque de app.js —unos 120 nodos
+   de paletas, espaciados y sombras— para un panel que casi nadie abre y que
+   nace oculto: trabajo de DOM en el camino crítico a cambio de nada. */
+let dsBuilt = false;
+function buildDS() {
+  if (dsBuilt) return;
+  dsBuilt = true;
+  $('ds-teal').innerHTML = DS_TEAL.map(([s, h]) => swCell(s, h, +s <= 300)).join('');
+  $('ds-ink').innerHTML = DS_INK.map(([s, h]) => swCell(s, h, +s <= 300)).join('');
+  $('ds-eco').innerHTML = DS_ECO.map(e => '<div class="ecocard"><div class="sw" style="background:' + e.h + (e.light ? ';border-bottom:1px solid var(--border-hair)' : '') + '"></div><div class="cap"><div class="n">' + e.n + '</div><div class="h">' + e.h.toUpperCase() + '</div><div class="tag" style="color:' + (e.ok ? 'var(--edem-teal-700)' : 'var(--lanzadera)') + '">' + e.tag + '</div></div></div>').join('');
+  $('ds-sem').innerHTML = DS_SEM.map(e => '<div class="ecocard"><div class="sw" style="background:' + e.h + '"></div><div class="cap"><div class="n">' + e.n + '</div><div class="h">' + e.h.toUpperCase() + '</div></div></div>').join('');
+  $('ds-space').innerHTML = DS_SPACE.map(([n, v]) => '<div class="r"><span class="nm">' + n + '</span><span class="bar" style="width:' + v + 'px"></span>' + v + 'px</div>').join('');
+}
 
 let dsReturnFocus = null;
 window.openDS = function () {
+  buildDS();
   const p = $('ds'); dsReturnFocus = document.activeElement;
   p.hidden = false; p.scrollTop = 0; document.body.classList.add('lock');
   closeMenu(); lucide.createIcons(); $('ds-close').focus();
@@ -1297,6 +1456,9 @@ function renderAll() {
   $('v-issues').onclick = e => { const c = e.target.closest('[data-visor-issue]'); if (c) setIssue(c.dataset.visorIssue, 0); };
   lucide.createIcons();
   observeReveals();
+  // el DOM de las secciones acaba de cambiar: las medidas cacheadas del bus de
+  // scroll (alturas y posiciones) hay que volver a tomarlas
+  measureAll();
 }
 
 async function boot() {
@@ -1383,19 +1545,22 @@ function abrirVisorPorURL() {
   const foot = document.querySelector('footer.site');
   if (foot) zones.push({ el: foot, color: '#0c1e24' });
 
-  let cur = '', ticking = false;
+  // Dónde empieza y cuánto mide cada sección: fijo mientras no se redimensione.
+  // Antes se pedía el rect de las seis EN CADA FRAME de scroll solo para saber
+  // de qué color teñir una franja de 30px.
+  onMeasure(() => zones.forEach(z => { z.top = docTop(z.el); z.h = z.el.offsetHeight; }));
+
+  let cur = '';
   function apply() {
-    ticking = false;
     let c;
     if (visor && !visor.hidden) c = '#0b1c23';          // fondo del visor
     else {
-      const y = scrollY + innerHeight;                  // borde inferior del viewport
+      const y = scrollY + viewH();                      // borde inferior del viewport
       for (let i = zones.length - 1; i >= 0; i--) {
-        const r = zones[i].el.getBoundingClientRect(), top = r.top + scrollY;
-        if (y >= top) {
+        if (y >= zones[i].top) {
           const col = zones[i].color;
           c = Array.isArray(col)
-            ? mix(col[0], col[1], Math.min(1, (y - top) / Math.max(1, r.height)))
+            ? mix(col[0], col[1], Math.min(1, (y - zones[i].top) / Math.max(1, zones[i].h)))
             : col;
           break;
         }
@@ -1407,10 +1572,7 @@ function abrirVisorPorURL() {
     }
     if (c !== cur) { cur = c; meta.content = c; }
   }
-  const kick = () => { if (!ticking) { ticking = true; requestAnimationFrame(apply); } };
-  window.syncBarTint = kick;
-  addEventListener('scroll', kick, { passive: true });
-  addEventListener('resize', kick, { passive: true });
-  addEventListener('load', kick);
+  window.syncBarTint = busKick;
+  onScroll(apply);
   apply();
 }());

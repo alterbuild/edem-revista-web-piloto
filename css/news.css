@@ -305,7 +305,7 @@
 .nfiltros::-webkit-scrollbar{display:none}
 .nfil{--fc:var(--edem-teal-500);white-space:nowrap;padding:9px 15px;border-radius:var(--radius-pill);
   border:1px solid var(--border-strong);background:transparent;color:var(--text-body);
-  font-size:13px;font-weight:700;cursor:pointer;transition:all var(--dur-fast)}
+  font-size:13px;font-weight:700;cursor:pointer;transition:background-color,border-color,color,box-shadow,transform var(--dur-fast)}
 .nfil:hover{border-color:var(--fc);color:var(--fc)}
 .nfil.on{background:var(--fc);border-color:var(--fc);color:#fff}
 .nfil .fnum{font-size:11px;opacity:.62;font-weight:800;margin-left:3px}
@@ -324,7 +324,7 @@
 .nbuscar input::placeholder{color:var(--text-faint);font-weight:500}
 .nbuscar input::-webkit-search-cancel-button{display:none}
 .nbx{width:26px;height:26px;flex:none;display:grid;place-items:center;border:0;border-radius:50%;
-  background:var(--ink-100);color:var(--text-muted);cursor:pointer;transition:all var(--dur-fast)}
+  background:var(--ink-100);color:var(--text-muted);cursor:pointer;transition:background-color,border-color,color,box-shadow,transform var(--dur-fast)}
 .nbx[hidden]{display:none}
 .nbx .lu{width:14px;height:14px}
 .nbx:hover{background:var(--ink-200);color:var(--text-strong)}
@@ -423,7 +423,7 @@
 .ashare{margin-left:auto;display:flex;align-items:center;gap:8px}
 .sbtn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;cursor:pointer;
   border:1px solid var(--border-strong);background:transparent;color:var(--text-body);
-  transition:all var(--dur-fast)}
+  transition:background-color,border-color,color,box-shadow,transform var(--dur-fast)}
 .sbtn:hover{background:var(--acc,var(--edem-teal-500));border-color:var(--acc,var(--edem-teal-500));color:#fff}
 .sbtn .lu{width:17px;height:17px}
 .scopy{font-size:12px;font-weight:700;color:var(--edem-teal-700)}

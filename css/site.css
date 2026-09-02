@@ -39,8 +39,93 @@ button{font:inherit}
   *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
 
+/* ============================================================
+   SPLASH · la mancheta escribiéndose
+   La cortina que tapa el primer pintado. No cuenta nada: solo
+   pone la marca. Aparece el logotipo de EDEM y a su lado se
+   escribe «times.» a máquina, letra a letra, con el cursor
+   siguiendo el filo. Cuando termina de escribirse —y cuando lo
+   que carga por detrás ya está— se disuelve. js/splash.js la
+   conduce.
+
+   Reglas de la casa que se respetan aquí:
+   · Solo se animan transform, opacity y clip-path (el compositor,
+     sin recalcular layout).
+   · El texto NO se escribe con `display:none` por letra: eso
+     cambiaría el ancho en cada pulsación y la mancheta entera
+     bailaría. Se recorta con clip-path sobre el texto ya
+     compuesto (--cut es el filo, en píxeles) y el cursor va
+     pegado a ese mismo filo. Nada se mueve de sitio.
+   · Nada depende de las webfonts para pintar el primer frame: la
+     marca no sale hasta que la tipografía está, así que nunca se
+     ve el salto de Georgia a Bodoni. Y las medidas de las letras
+     se toman en ese momento, ya con la fuente buena.
+   ============================================================ */
+.splash{
+  position:fixed;inset:0;z-index:9000;
+  background:var(--paper);
+  display:grid;place-items:center;
+  padding:0 24px;
+  overflow:hidden;
+  transition:opacity .42s var(--ease-standard);
+  touch-action:none;overscroll-behavior:none;
+  contain:layout paint;
+}
+html.sp-on{overflow:hidden}
+/* Sin JavaScript nadie retiraría la cortina, así que ahí no se pone: cada HTML
+   lleva un <noscript> que la esconde (y que además pide las webfonts a pelo). */
+
+.sp-stage{transition:opacity .34s var(--ease-standard),transform .5s var(--ease-out)}
+
+.sp-brand{display:flex;align-items:baseline;gap:clamp(9px,1.5vw,15px)}
+/* el logotipo entra primero, subiendo un poco */
+.sp-brand img{height:clamp(32px,5.6vw,54px);width:auto;
+  opacity:0;transform:translate3d(0,10px,0);
+  transition:opacity .5s var(--ease-out),transform .62s var(--ease-out)}
+.splash.sp-mark .sp-brand img{opacity:1;transform:none}
+
+/* ---- «times.», a máquina ---- */
+.sp-type{position:relative;display:inline-block;--cut:0px;
+  font-family:var(--font-display);font-style:italic;font-weight:600;
+  font-size:clamp(36px,6.4vw,62px);line-height:1;color:var(--text-strong)}
+/* el filo del recorte salta de letra en letra; los -0.3em de arriba y abajo son
+   para no rebanar el asta de la «t» ni el punto */
+.sp-type .ink{display:inline-block;
+  clip-path:inset(-.3em calc(100% - var(--cut)) -.3em 0);
+  transition:clip-path .05s linear}
+.sp-type .ink i{font-style:inherit}
+/* el punto cierra el logotipo, en coral: es el único acento cálido */
+.sp-type .pt{font-style:normal;color:var(--lanzadera)}
+/* el cursor, pegado al filo */
+.sp-caret{position:absolute;top:.1em;left:var(--cut);width:2px;height:.76em;
+  background:var(--edem-teal-500);opacity:0;
+  transition:left .05s linear,opacity .3s linear}
+.splash.sp-typing .sp-caret{opacity:1;animation:spBlink .8s steps(1) infinite}
+@keyframes spBlink{50%{opacity:0}}
+.splash.sp-typed .sp-caret{opacity:0;animation:none}
+
+/* ---- la salida ---- */
+.splash.sp-go .sp-stage{opacity:0;transform:translate3d(0,-16px,0)}
+.splash.sp-off{opacity:0}
+
+/* Vuelta a la portada dentro de la misma sesión: nada de escribir otra vez, la
+   mancheta sale puesta y el velo se disuelve. La cortina está para tapar el
+   primer pintado, no para hacerse notar cada vez que se navega. */
+.splash.sp-quick{transition:opacity .24s linear}
+.splash.sp-quick .sp-stage{transition:none}
+.splash.sp-quick .sp-brand img{transition:none}
+.splash.sp-quick .sp-type .ink{clip-path:none}
+
+@media (prefers-reduced-motion:reduce){
+  /* sin movimiento no se escribe nada: la mancheta sale entera y se disuelve.
+     La regla global de arriba ya anula duraciones; aquí solo se quita el
+     recorte progresivo y el parpadeo del cursor. */
+  .sp-type .ink{clip-path:none}
+  .sp-caret{display:none}
+}
+
 /* ---------- botones ---------- */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:13px 24px;border-radius:var(--radius-sm);font-weight:600;font-size:15px;border:0;cursor:pointer;transition:all var(--dur) var(--ease-standard)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:13px 24px;border-radius:var(--radius-sm);font-weight:600;font-size:15px;border:0;cursor:pointer;transition:background-color var(--dur) var(--ease-standard),border-color var(--dur) var(--ease-standard),color var(--dur) var(--ease-standard),box-shadow var(--dur) var(--ease-standard),gap var(--dur) var(--ease-standard),transform var(--dur) var(--ease-standard)}
 .btn:active{transform:translateY(1px)}
 .btn.pri{background:var(--color-primary);color:var(--color-on-primary);box-shadow:var(--shadow-md)}
 .btn.pri:hover{background:var(--color-primary-hover);gap:12px}
@@ -132,7 +217,7 @@ nav.main a:hover::after{transform:scaleX(1)}
    deja 12px de aire en vez de los 26 del gap. */
 .searchbtn{margin-left:auto;margin-right:-14px;width:42px;height:42px;flex-shrink:0;cursor:pointer;
   display:grid;place-items:center;border-radius:var(--radius-sm);border:1px solid var(--border-hair);
-  background:#fff;color:var(--text-strong);transition:all var(--dur-fast)}
+  background:#fff;color:var(--text-strong);transition:background-color,border-color,color,box-shadow,transform var(--dur-fast)}
 .searchbtn .lu{width:19px;height:19px}
 .searchbtn:hover{background:var(--edem-teal-50);border-color:var(--edem-teal-200);color:var(--edem-teal-700)}
 .hbar .searchbtn~.hacts,.hbar .searchbtn~.menubtn{margin-left:0}
@@ -159,7 +244,7 @@ html.sbusca-on{overflow:hidden}
 .sbar input::placeholder{color:var(--text-faint);font-weight:500}
 .sbar input::-webkit-search-cancel-button{display:none}
 .sx{width:34px;height:34px;flex:none;display:grid;place-items:center;border:0;border-radius:var(--radius-sm);
-  background:none;color:var(--text-faint);cursor:pointer;transition:all var(--dur-fast)}
+  background:none;color:var(--text-faint);cursor:pointer;transition:background-color,border-color,color,box-shadow,transform var(--dur-fast)}
 .sx .lu{width:18px;height:18px}
 .sx:hover{background:var(--ink-100);color:var(--text-strong)}
 .sbody{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:6px 0 10px}
@@ -178,7 +263,7 @@ html.sbusca-on{overflow:hidden}
   background:var(--edem-teal-50);color:var(--edem-teal-600)}
 .sitem .sic .lu{width:18px;height:18px}
 .sitem .sgo{width:17px;height:17px;flex:none;color:var(--edem-teal-500);opacity:0;transform:translateX(-4px);
-  transition:all var(--dur-fast)}
+  transition:background-color,border-color,color,box-shadow,transform var(--dur-fast)}
 /* una sola marca de selección para el teclado y el ratón */
 .sitem.on{background:var(--edem-teal-50)}
 .sitem.on .st{color:var(--edem-teal-700)}
@@ -686,7 +771,7 @@ html.sbusca-on{overflow:hidden}
 .deckcap .cnr{font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:800;color:var(--edem-teal-700)}
 .deckcap .ct{font-family:var(--font-display);font-style:italic;font-weight:600;font-size:19px;color:var(--text-strong)}
 .deckdots{display:flex;gap:8px}
-.ddot{width:9px;height:9px;border-radius:var(--radius-pill);border:0;padding:0;background:var(--edem-teal-200);cursor:pointer;transition:all .35s var(--ease-standard)}
+.ddot{width:9px;height:9px;border-radius:var(--radius-pill);border:0;padding:0;background:var(--edem-teal-200);cursor:pointer;transition:width .35s var(--ease-standard),background-color .35s var(--ease-standard)}
 .ddot:hover{background:var(--edem-teal-400)}
 .ddot.on{width:26px;background:var(--edem-teal-500)}
 
@@ -853,7 +938,7 @@ html.sbusca-on{overflow:hidden}
    Queda como componente documentado del sistema de diseño; las tarjetas del
    portal de noticias son las de css/news.css. */
 .abody{position:relative}
-.acard{background:var(--surface-card);border:1px solid var(--border-hair);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-md);display:flex;flex-direction:column;cursor:pointer;transition:all var(--dur) var(--ease-standard);text-align:left;font-family:inherit;color:inherit}
+.acard{background:var(--surface-card);border:1px solid var(--border-hair);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-md);display:flex;flex-direction:column;cursor:pointer;transition:background-color,border-color,color,box-shadow,transform var(--dur) var(--ease-standard);text-align:left;font-family:inherit;color:inherit}
 .acard:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
 .acard .im{aspect-ratio:3/2;overflow:hidden;background:linear-gradient(135deg,var(--edem-teal-800),var(--edem-teal-900));position:relative}
 .acard .im img{width:100%;height:100%;object-fit:cover;transition:transform var(--dur-slow);position:relative;z-index:1}
@@ -972,7 +1057,12 @@ html.sbusca-on{overflow:hidden}
 /* Las dos tramas se salen por los cuatro lados (inset negativo) para que al
    desplazarse nunca asome un borde. Solo cambian de transform: el compositor
    mueve una capa ya rasterizada y el scroll no paga nada. */
-.eweave,.esigns{position:absolute;inset:-320px -160px;pointer-events:none;will-change:transform}
+/* will-change solo mientras la sección ronda la pantalla: lo enciende y lo apaga
+   js/app.js con la clase .eco-live (ver observeEcosystem). Son dos capas más
+   grandes que el viewport; tenerlas promocionadas todo el rato es memoria de GPU
+   reservada para algo que casi siempre está fuera de plano. */
+.eweave,.esigns{position:absolute;inset:-320px -160px;pointer-events:none}
+#ecosistema.eco-live .eweave,#ecosistema.eco-live .esigns{will-change:transform}
 .eweave{background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'><g fill='none' stroke='rgba%28255,255,255,.09%29' stroke-width='1' stroke-linecap='round'><path d='M36 30v12M30 36h12'/></g><circle cx='0' cy='0' r='1.2' fill='rgba%28255,255,255,.10%29'/><circle cx='72' cy='0' r='1.2' fill='rgba%28255,255,255,.10%29'/><circle cx='0' cy='72' r='1.2' fill='rgba%28255,255,255,.10%29'/><circle cx='72' cy='72' r='1.2' fill='rgba%28255,255,255,.10%29'/></svg>");
   transform:translate3d(0,calc(var(--ecoP,0) * -70px),0)}
 .esigns{background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='216' height='216' viewBox='0 0 216 216'><g fill='none' stroke='rgba%28255,255,255,.17%29' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M22 56 46 32 70 56'/><path d='M22 74 46 50 70 74'/><circle cx='158' cy='46' r='17'/><circle cx='158' cy='46' r='5.5'/><path d='M124 154h40M152 142l12 12-12 12'/><path d='M62 168v-32M62 136l-11 11M62 136l11 11'/><path d='M186 150l14 14-14 14'/><path d='M96 96h24'/></g><circle cx='158' cy='150' r='2.6' fill='rgba%2863,166,196,.5%29'/><circle cx='46' cy='104' r='2.2' fill='rgba%28255,255,255,.16%29'/><circle cx='196' cy='96' r='2.2' fill='rgba%28255,255,255,.13%29'/></svg>");
@@ -1143,7 +1233,7 @@ footer.site .col a:hover,footer.site .col button.aslink:hover{color:var(--edem-t
    marcado en blanco para que se vea dónde estás */
 footer.site .col a[aria-current="page"]{color:#fff;font-weight:600}
 .soc{display:flex;gap:10px;margin-top:20px}
-footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.16);display:grid;place-items:center;color:var(--ink-200);transition:all var(--dur-fast)}
+footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.16);display:grid;place-items:center;color:var(--ink-200);transition:background-color,border-color,color,box-shadow,transform var(--dur-fast)}
 .soc a:hover{background:var(--edem-teal-500);border-color:var(--edem-teal-500);color:#fff}
 .soc svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .fbase{border-top:1px solid rgba(255,255,255,.1)}
@@ -1168,13 +1258,13 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
 .vbrand span{font-size:10px;letter-spacing:.26em;font-weight:800;color:#6f8b94}
 .vissues{display:flex;gap:6px;margin-left:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .vissues::-webkit-scrollbar{display:none}
-.vchip{padding:8px 14px;border-radius:var(--radius-pill);border:1px solid rgba(255,255,255,.16);background:transparent;color:#c7d6da;font-size:12.5px;font-weight:700;cursor:pointer;transition:all var(--dur-fast);white-space:nowrap}
+.vchip{padding:8px 14px;border-radius:var(--radius-pill);border:1px solid rgba(255,255,255,.16);background:transparent;color:#c7d6da;font-size:12.5px;font-weight:700;cursor:pointer;transition:background-color,border-color,color,box-shadow,transform var(--dur-fast);white-space:nowrap}
 .vchip:hover{border-color:var(--edem-teal-200);color:#fff}
 .vchip.on{background:var(--edem-teal-500);border-color:var(--edem-teal-500);color:#fff}
 .vright{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
 .vsel{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);color:#dbe6e9;font:inherit;font-size:12.5px;font-weight:600;padding:8px 10px;border-radius:var(--radius-sm);max-width:230px;cursor:pointer}
 .vsel option{color:var(--ink-900)}
-.vico{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:transparent;border:1px solid rgba(255,255,255,.16);color:#dbe6e9;cursor:pointer;transition:all var(--dur-fast)}
+.vico{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:transparent;border:1px solid rgba(255,255,255,.16);color:#dbe6e9;cursor:pointer;transition:background-color,border-color,color,box-shadow,transform var(--dur-fast)}
 .vico:hover{background:var(--edem-teal-500);border-color:var(--edem-teal-500);color:#fff}
 .vico .lu{width:17px;height:17px}
 .vstage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:24px 74px;touch-action:pan-y}
@@ -1193,7 +1283,7 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
 .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;background:#fff}
 .face.back{transform:rotateY(180deg)}
 .face .shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,20,26,.16),rgba(6,20,26,0) 22%,rgba(6,20,26,0) 78%,rgba(6,20,26,.1));pointer-events:none}
-.varrow{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;background:#fff;color:var(--ink-900);border:0;display:grid;place-items:center;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.4);transition:all var(--dur-fast);z-index:40}
+.varrow{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;background:#fff;color:var(--ink-900);border:0;display:grid;place-items:center;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.4);transition:background-color var(--dur-fast),color var(--dur-fast),box-shadow var(--dur-fast);z-index:40}
 .varrow:hover{background:var(--edem-teal-500);color:#fff}
 .varrow:disabled{opacity:.25;cursor:not-allowed}
 .varrow:disabled:hover{background:#fff;color:var(--ink-900)}
@@ -1202,7 +1292,7 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
 .vfoot{flex-shrink:0;display:flex;align-items:center;gap:20px;padding:14px 24px 18px;color:#89a2aa}
 .vfoot #v-ind{font-size:13px;font-weight:700;color:#c7d6da;min-width:150px}
 .vdots{display:flex;gap:7px;flex:1;justify-content:center;flex-wrap:wrap}
-.vdot{width:8px;height:8px;border-radius:var(--radius-pill);background:rgba(255,255,255,.25);border:0;padding:0;cursor:pointer;transition:all var(--dur)}
+.vdot{width:8px;height:8px;border-radius:var(--radius-pill);background:rgba(255,255,255,.25);border:0;padding:0;cursor:pointer;transition:width var(--dur),background-color var(--dur)}
 .vdot:hover{background:rgba(255,255,255,.55)}
 .vdot.on{background:var(--edem-teal-200);width:24px}
 .vhint{font-size:12px;min-width:150px;text-align:right}
@@ -1216,7 +1306,7 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
 .dspage[hidden]{display:none}
 .dsbar{position:sticky;top:0;z-index:5;height:68px;background:rgba(251,250,246,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--border-hair)}
 .dsbar .wrap{display:flex;align-items:center;gap:18px;height:100%}
-.dsclose{width:40px;height:40px;border-radius:50%;border:1px solid var(--border-hair);background:#fff;color:var(--ink-900);display:grid;place-items:center;cursor:pointer;transition:all var(--dur-fast);margin-left:auto}
+.dsclose{width:40px;height:40px;border-radius:50%;border:1px solid var(--border-hair);background:#fff;color:var(--ink-900);display:grid;place-items:center;cursor:pointer;transition:background-color,border-color,color,box-shadow,transform var(--dur-fast);margin-left:auto}
 .dsclose:hover{background:var(--edem-teal-500);border-color:var(--edem-teal-500);color:#fff}
 .dsclose .lu{width:18px;height:18px}
 .dshero{padding:56px 28px 6px}

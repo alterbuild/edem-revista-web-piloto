@@ -18,23 +18,56 @@
 <link rel="canonical" href="">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/edem-logo.png">
+<!-- el logotipo abre la cortina de carga: que esté antes de que haga falta -->
+<link rel="preload" as="image" fetchpriority="high" href="assets/edem-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="css/tokens.css?v=20260727e">
+<link rel="stylesheet" href="css/tokens.css?v=20260902c">
 <!-- Archivo: solo el eje de peso (ver index.html). Las cursivas del sitio son de
-     Bodoni y font-stretch solo se usa dentro de las revistas. -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&display=swap">
-<link rel="stylesheet" href="css/site.css?v=20260727e">
-<link rel="stylesheet" href="css/news.css?v=20260727e">
-<script src="js/icons.js?v=20260727e" defer></script>
-<script src="js/cms.js?v=20260727e" defer></script>
-<script src="js/search.js?v=20260727e" defer></script>
-<script src="js/news.js?v=20260727e" defer></script>
+     Bodoni y font-stretch solo se usa dentro de las revistas.
+     Y ADEMÁS YA NO BLOQUEA EL PINTADO: era el único recurso de terceros en el
+     camino crítico, así que el primer frame se retrasaba lo que tardase en
+     contestar fonts.googleapis.com. Ahora se precarga y se aplica en cuanto
+     llega (`media=print` + `onload`). El cambio de Georgia a Bodoni que eso
+     deja al aire NO se ve: la cortina de carga (#splash, ver js/splash.js)
+     está encima y se retira justo cuando document.fonts.ready resuelve. -->
+<link rel="preload" as="style" fetchpriority="high" href="https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&amp;family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&amp;display=swap">
+<link id="gfonts" rel="stylesheet" media="print" href="https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&amp;family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&amp;display=swap"
+      onload="this.media='all';window.__gfontsIn=1;dispatchEvent(new Event('edem:gfonts'))">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&amp;family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&amp;display=swap"><style>#splash{display:none}</style></noscript>
+<link rel="stylesheet" href="css/site.css?v=20260902c">
+<link rel="stylesheet" href="css/news.css?v=20260902c">
+<script src="js/icons.js?v=20260902c" defer></script>
+<script src="js/cms.js?v=20260902c" defer></script>
+<script src="js/search.js?v=20260902c" defer></script>
+<script src="js/news.js?v=20260902c" defer></script>
 <!-- shell.js va antes: pinta la cabecera y el pie comunes (content.json → chrome) -->
-<script src="js/shell.js?v=20260727e" defer></script>
-<script src="js/chrome.js?v=20260727e" defer></script>
+<script src="js/shell.js?v=20260902c" defer></script>
+<script src="js/splash.js?v=20260902c" defer></script>
+<script src="js/chrome.js?v=20260902c" defer></script>
 </head>
 <body>
+
+<!-- ============================================================
+     SPLASH · la cortina del primer pintado.
+     Solo la marca: sale el logotipo de EDEM y a su lado se escribe
+     «times.» a máquina. Cuando termina —y cuando lo que carga por
+     detrás ya está— se disuelve y aparece la página vestida.
+     Va aquí, en el HTML y no montada por JS, para que forme parte
+     del PRIMER frame: si la pintara un script se vería antes la
+     página a medio vestir, que es justo lo que viene a tapar.
+     Decorativa de cabo a rabo: aria-hidden y sin nada que leer.
+     Las letras van en <i> sueltos porque js/splash.js mide dónde
+     acaba cada una para llevar ahí el filo del recorte y el cursor.
+     ============================================================ -->
+<div class="splash" id="splash" role="presentation" aria-hidden="true">
+  <div class="sp-stage">
+    <span class="sp-brand">
+      <img src="assets/edem-logo.png" alt="" width="800" height="188" fetchpriority="high">
+      <span class="sp-type" id="sp-type"><span class="ink"><i>t</i><i>i</i><i>m</i><i>e</i><i>s</i><i class="pt">.</i></span><b class="sp-caret"></b></span>
+    </span>
+  </div>
+</div>
 
 <a class="skip" href="#art">Saltar al contenido</a>
 
