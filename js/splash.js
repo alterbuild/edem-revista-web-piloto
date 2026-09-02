@@ -55,9 +55,15 @@
   if (quick) el.classList.add('sp-quick');
   root.classList.add('sp-on');
 
-  /* Para revisar el diseño de la cortina sin cronómetro: entrar con #splash
-     en la URL la deja puesta hasta que se recargue sin el hash. */
-  const HOLD_OPEN = location.hash === '#splash';
+  /* Para revisar el diseño de la cortina sin cronómetro: entrar con #splash en la
+     URL la deja puesta. SOLO FUNCIONA SIRVIENDO EN LOCAL: en un dominio público
+     un enlace con ese hash —compartido, guardado en marcadores, pegado en un
+     chat— dejaría la portada tapada para siempre, y una ayuda de desarrollo no
+     puede poder tanto. Fuera de local el hash se ignora sin más. */
+  const LOCAL = location.protocol === 'file:'
+    || /^(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])$/i.test(location.hostname)
+    || /\.local$/i.test(location.hostname);
+  let holdOpen = LOCAL && location.hash === '#splash';
 
   /* ---- la máquina de escribir ----
      El texto ya está compuesto en el HTML; lo único que cambia es --cut, el
@@ -111,19 +117,34 @@
      Los tiempos van por reloj y no por transitionend a propósito: con
      «movimiento reducido» el sitio anula todas las duraciones (regla global de
      site.css) y el evento no llegaría nunca. */
-  let going = false;
+  let going = false, fast = still;
   function leave() {
-    if (going || HOLD_OPEN) return;
+    if (going || holdOpen) return;
     going = true;
     write();                                     // por si aún no había salido
     typed.then(() => setTimeout(() => {
       el.classList.add('sp-go');                 // la mancheta se apaga subiendo
       setTimeout(() => {
         el.classList.add('sp-off');              // y el velo se disuelve
-        setTimeout(finish, still ? 240 : 400);
-      }, still ? 0 : 160);
-    }, still ? 0 : HOLD));
+        setTimeout(finish, fast ? 240 : 400);
+      }, fast ? 0 : 160);
+    }, fast ? 0 : HOLD));
   }
+
+  /* Tocar la cortina la salta. Es a la vez cortesía —quien tiene prisa entra— y
+     VÁLVULA DE SEGURIDAD: pase lo que pase (un temporizador estrangulado por
+     tener la pestaña de fondo, una promesa que no resuelve, el hold de arriba),
+     la portada nunca se queda detrás de un telón sin salida. El texto sale
+     entero en vez de terminar de teclearse: al que toca no se le hace esperar. */
+  function skip() {
+    holdOpen = false;
+    fast = true;
+    el.classList.add('sp-skip');
+    resolveTyped();
+    leave();
+  }
+  el.addEventListener('pointerdown', skip);
+  el.addEventListener('click', skip);
 
   function finish() {
     root.classList.remove('sp-on');

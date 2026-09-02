@@ -107,6 +107,10 @@ html.sp-on{overflow:hidden}
 /* ---- la salida ---- */
 .splash.sp-go .sp-stage{opacity:0;transform:translate3d(0,-16px,0)}
 .splash.sp-off{opacity:0}
+/* al tocar la cortina (ver skip() en js/splash.js) el texto sale entero: no se
+   deja a nadie esperando a que termine de teclearse algo que ya quiere saltarse */
+.splash.sp-skip .sp-type .ink{clip-path:none;transition:none}
+.splash.sp-skip .sp-caret{opacity:0;animation:none}
 
 /* Vuelta a la portada dentro de la misma sesión: nada de escribir otra vez, la
    mancheta sale puesta y el velo se disuelve. La cortina está para tapar el
