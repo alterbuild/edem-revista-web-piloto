@@ -840,7 +840,10 @@ html.sbusca-on{overflow:hidden}
    ancho de .deck. */
 .heroDeck{--deck-w:min(350px,82%,calc((var(--heroH) - 500px) / 1.414));
   position:relative;display:flex;flex-direction:column;align-items:center;gap:18px}
-.deck{position:relative;width:var(--deck-w);aspect-ratio:794/1123}
+/* touch-action:pan-y — el navegador se queda con el scroll vertical y nosotros
+   solo reclamamos el gesto cuando es claramente horizontal (ver bindDeck en
+   js/app.js). Sin esto, arrastrar de lado en el móvil movía la página. */
+.deck{position:relative;width:var(--deck-w);aspect-ratio:794/1123;touch-action:pan-y}
 /* Claro detrás de la pila, hermano del de .heroCopy. La portada caía justo
    sobre la grúa y el sol: la pluma cruzaba la cubierta por la mitad y las
    puntas del sol asomaban por los cuatro lados de la revista. Este halo del
@@ -854,6 +857,19 @@ html.sbusca-on{overflow:hidden}
     rgba(251,250,246,.4) 68%,rgba(251,250,246,0) 88%)}
 @supports (filter:blur(1px)){.heroDeck::before{filter:blur(26px)}}
 .deckcard{position:absolute;inset:0;cursor:pointer;border-radius:3px;transition:transform 1.05s cubic-bezier(.25,.8,.25,1),opacity .6s;will-change:transform;backface-visibility:hidden}
+/* la de delante se puede arrastrar, y el cursor lo dice */
+.deckcard.p0{cursor:grab}
+.deck.dragging,.deck.dragging .deckcard.p0{cursor:grabbing}
+/* mientras el dedo la lleva no hay transición: la portada TIENE que ir pegada al
+   puntero, cualquier suavizado aquí se siente como retraso */
+.deckcard.drag{transition:none}
+/* y el balanceo se para: sumado al arrastre daba un temblor raro */
+.deck.dragging .deckcard .coverslot{animation-play-state:paused}
+/* DOS RITMOS. Sola, la pila se toma su tiempo (1,05s): es un adorno de fondo.
+   Contigo va rápida — .42s es el orden de magnitud en el que un movimiento se
+   lee como respuesta a lo que acabas de hacer y no como una animación aparte.
+   La clase la pone y la quita deckQuick() en js/app.js. */
+.deck.quick .deckcard{transition-duration:.42s,.3s}
 .deckcard .coverslot{position:absolute;inset:0;border-radius:3px;box-shadow:0 30px 62px rgba(6,51,63,.3),0 8px 20px rgba(6,51,63,.16);transition:box-shadow 1.05s var(--ease-standard)}
 .deckcard::after{content:'';position:absolute;inset:0;border-radius:3px;background:#06333f;opacity:0;transition:opacity 1.05s var(--ease-standard);pointer-events:none;z-index:2}
 .deckcard.p0{transform:translateZ(0) rotate(-2deg)}
@@ -864,7 +880,12 @@ html.sbusca-on{overflow:hidden}
 .deckcard.p2{transform:translateZ(0) rotate(-7deg) translate(-9%,5%) scale(.9)}
 .deckcard.p2::after{opacity:.17}
 .deckcard.p1 .coverslot,.deckcard.p2 .coverslot{box-shadow:0 18px 40px rgba(6,51,63,.2)}
-.deckcard.fly{transform:translateZ(0) rotate(9deg) translate(30%,-5%) scale(1.02)}
+/* La salida: se va deprisa y con curva de aceleración (empieza suave, termina
+   lanzada), para que se lea como «la han apartado» y no como un desplazamiento
+   más. La vuelta al montón la hace ya la transición normal. */
+.deckcard.fly{transform:translateZ(0) rotate(9deg) translate(30%,-5%) scale(1.02);
+  transition-duration:.34s;transition-timing-function:cubic-bezier(.4,0,.9,.35)}
+.deck.quick .deckcard.fly{transition-duration:.22s}
 .deckcard.fly::after{opacity:0}
 @keyframes deckbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
 /* --- el pie de la pila: número, título y selector ---
@@ -915,7 +936,9 @@ html.sbusca-on{overflow:hidden}
 /* señal de scroll durante los beats de la inmersión: sigue a --deepP, así que
    solo aparece mientras el relato está en pantalla y se apaga con él. */
 .deepcue{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:6;
-  opacity:var(--cueP);width:38px;height:38px;border-radius:50%;
+  /* el valor lo escribe js/app.js como opacidad directa; el var() con respaldo
+     a 0 solo cubre el hueco hasta la primera pasada */
+  opacity:var(--cueP,0);width:38px;height:38px;border-radius:50%;
   background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.32);
   display:grid;place-items:center;color:#fff;animation:cuebob 2.2s ease-in-out infinite;
   transition:background .3s var(--ease-standard)}

@@ -163,7 +163,7 @@ function renderHero() {
 })();
 
 /* ---- pila de portadas del hero: rota entre ediciones ---- */
-let deckOrder = [], deckTimer = null, deckPaused = false;
+let deckOrder = [], deckTimer = null, deckPaused = false, deckWake = null, flyJob = 0;
 
 function buildDeck() {
   const deck = $('hero-deck'); if (!deck) return;
@@ -178,89 +178,200 @@ function buildDeck() {
     return '<button class="ddot" data-deckdot="' + id + '" aria-label="Mostrar ' + esc(m.nr) + ' · ' + esc(m.title) + '"></button>';
   }).join('');
   applyDeck();
+  bindDeck($('hero-deck-wrap'), deck);
+  restartDeck();
+}
 
-  const wrap = $('hero-deck-wrap');
-  let swiped = false;
+/* ---- cómo se maneja la pila ----
+   Antes: un `touchstart`/`touchend` que solo miraba de dónde a dónde había ido
+   el dedo, y un clic que llevaba la portada de atrás al frente con la misma
+   transición de 1,05s del giro automático. Dos cosas fallaban:
+   · ARRASTRAR NO MOVÍA NADA. Durante todo el gesto la pila se quedaba quieta y
+     al soltar saltaba de golpe. Sin respuesta al dedo, el gesto no se siente
+     como manipular unas revistas: se siente como pulsar un botón escondido.
+   · AL INTERACTUAR IBA IGUAL DE LENTA QUE SOLA. Un segundo largo de deslizado
+     está bien para un carrusel que se mueve por su cuenta —es un adorno— pero
+     es una eternidad como respuesta a un clic. Se separan los dos ritmos: sola
+     va lenta, contigo va rápida (.42s, clase .quick).
+   Aquí se usan eventos de puntero, que cubren ratón y dedo con el mismo código.
+   `touch-action:pan-y` (ver site.css) deja que el navegador siga llevándose el
+   scroll vertical: solo reclamamos el gesto cuando es claramente horizontal. */
+function bindDeck(wrap, deck) {
+  if (!wrap || !deck) return;
+  let pid = null, x0 = 0, y0 = 0, dx = 0, horiz = false, card = null, dragged = false;
+  const width = () => deck.getBoundingClientRect().width || 300;
+
+  function paint() {
+    const t = dx / width();
+    // la portada sigue al dedo, se inclina un poco en el sentido del gesto y se
+    // levanta: los tres a la vez son lo que hace que parezca papel y no una caja
+    card.style.transform = 'translate3d(' + dx.toFixed(1) + 'px,' +
+      (Math.abs(t) * -16).toFixed(1) + 'px,0) rotate(' + (-2 + t * 13).toFixed(2) + 'deg)';
+  }
+
+  function release(commit) {
+    if (!card) { pid = null; return; }
+    const t = dx / width();
+    deck.classList.remove('dragging');
+    card.classList.remove('drag');
+    // Un quinto del ancho basta para pasar de portada. Menos que eso vuelve a su
+    // sitio solo: applyDeck() limpia el transform en línea y la transición la
+    // lleva de donde la soltaste a donde estaba, que es el «muelle» del gesto.
+    if (commit && horiz && Math.abs(t) > 0.2) {
+      deckQuick(() => { if (dx < 0) advanceDeck(); else prevDeck(); });
+      snoozeDeck();
+    } else applyDeck();
+    if (pid !== null && wrap.hasPointerCapture && wrap.hasPointerCapture(pid)) wrap.releasePointerCapture(pid);
+    pid = null; card = null; horiz = false; deckPaused = false;
+  }
+
+  wrap.addEventListener('pointerdown', e => {
+    if (e.button > 0 || pid !== null) return;
+    if (e.target.closest('.deckui')) return;          // los puntos van a su aire
+    pid = e.pointerId; x0 = e.clientX; y0 = e.clientY; dx = 0; horiz = false; dragged = false;
+    card = deck.querySelector('[data-deck="' + deckOrder[0] + '"]');
+    deckPaused = true;
+  });
+
+  wrap.addEventListener('pointermove', e => {
+    if (e.pointerId !== pid || !card) return;
+    dx = e.clientX - x0;
+    const dy = e.clientY - y0;
+    if (!horiz) {
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;   // todavía no es un gesto
+      // más vertical que horizontal: es scroll de la página, se suelta la presa
+      if (Math.abs(dx) <= Math.abs(dy)) { release(false); return; }
+      horiz = true; dragged = true;
+      deck.classList.add('dragging');
+      card.classList.add('drag');
+      if (wrap.setPointerCapture) wrap.setPointerCapture(pid);
+    }
+    e.preventDefault();
+    paint();
+  });
+
+  wrap.addEventListener('pointerup', e => { if (e.pointerId === pid) release(true); });
+  wrap.addEventListener('pointercancel', e => { if (e.pointerId === pid) release(false); });
+
   wrap.addEventListener('click', e => {
-    if (swiped) { swiped = false; e.stopPropagation(); return; }  // el swipe no abre nada
+    // el clic que cierra un arrastre no abre nada
+    if (dragged) { dragged = false; e.stopPropagation(); e.preventDefault(); return; }
     const dot = e.target.closest('[data-deckdot]');
-    if (dot) { advanceDeck(dot.dataset.deckdot); restartDeck(); return; }
-    const card = e.target.closest('.deckcard');
-    if (card && card.dataset.deck !== deckOrder[0]) {
+    if (dot) { deckQuick(() => advanceDeck(dot.dataset.deckdot)); snoozeDeck(); return; }
+    const c = e.target.closest('.deckcard');
+    if (c && c.dataset.deck !== deckOrder[0]) {
       // una portada trasera pasa al frente en vez de abrir el visor
-      e.stopPropagation(); advanceDeck(card.dataset.deck); restartDeck();
+      e.stopPropagation();
+      deckQuick(() => advanceDeck(c.dataset.deck));
+      snoozeDeck();
     }
   });
-  // Arrastrar el dedo sobre las portadas: izquierda = siguiente, derecha = anterior.
-  // Solo cuenta como swipe si el gesto es claramente horizontal, para no pisar el
-  // scroll vertical de la página.
-  let tx0 = 0, ty0 = 0;
-  wrap.addEventListener('touchstart', e => {
-    tx0 = e.touches[0].clientX; ty0 = e.touches[0].clientY; swiped = false; deckPaused = true;
-  }, { passive: true });
-  wrap.addEventListener('touchend', e => {
-    const t = e.changedTouches[0], dx = t.clientX - tx0, dy = t.clientY - ty0;
-    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.4) {
-      swiped = true;
-      if (dx < 0) advanceDeck(); else prevDeck();
-      restartDeck();
-    }
-    deckPaused = false;
-  }, { passive: true });
+
   wrap.addEventListener('mouseenter', () => { deckPaused = true; });
-  wrap.addEventListener('mouseleave', () => { deckPaused = false; });
+  wrap.addEventListener('mouseleave', () => { if (pid === null) deckPaused = false; });
   wrap.addEventListener('focusin', () => { deckPaused = true; });
-  wrap.addEventListener('focusout', () => { deckPaused = false; });
-  restartDeck();
+  wrap.addEventListener('focusout', () => { if (pid === null) deckPaused = false; });
+}
+
+/* El ritmo rápido: mientras dura el movimiento que ha pedido el usuario, la pila
+   lleva .42s en vez de 1,05s (ver .deck.quick en site.css). Se quita al terminar
+   para que el giro automático recupere su deslizado largo. */
+let quickOff = null;
+function deckQuick(fn) {
+  const deck = $('hero-deck'); if (!deck) return fn();
+  clearTimeout(quickOff);
+  deck.classList.add('quick');
+  fn();
+  quickOff = setTimeout(() => deck.classList.remove('quick'), 900);
+}
+
+/* Tras tocar la pila, el giro automático se calla 15 segundos. No se apaga del
+   todo —sigue siendo un escaparate— pero nunca compite con quien la está usando:
+   que se te mueva la portada mientras la miras es de lo que más molesta de un
+   carrusel. */
+function snoozeDeck() {
+  clearInterval(deckTimer); deckTimer = null;
+  clearTimeout(deckWake);
+  deckWake = setTimeout(restartDeck, 15000);
 }
 
 function applyDeck() {
   const deck = $('hero-deck');
   deckOrder.forEach((id, i) => {
     const c = deck.querySelector('[data-deck="' + id + '"]');
-    if (!c || c.classList.contains('fly')) return;
-    c.className = 'deckcard p' + Math.min(i, 2);
+    if (!c) return;
+    // Se reconcilian TODAS, también la que está volando. Antes se saltaba la del
+    // vuelo (`if (c.classList.contains('fly')) return`) y si llegaba otra
+    // interacción a media salida, esa portada se quedaba con z-index 40 y fuera
+    // de sitio hasta que venciera su temporizador: la pila se descuadraba sola
+    // en cuanto pasabas dos veces seguidas.
+    c.classList.remove('p0', 'p1', 'p2', 'fly', 'drag');
+    c.classList.add('p' + Math.min(i, 2));
+    c.style.transform = '';     // limpia lo que haya dejado el arrastre
     c.style.zIndex = 20 - i;
   });
   updateDeckUI();
 }
 
+/* El vuelo de salida: la portada de delante se va hacia arriba y a la derecha
+   antes de colocarse debajo del todo. Dos tramos con su propia duración —salir
+   es rápido, asentarse es lento— en vez del recorte a 520ms de una transición de
+   1050ms que tenía antes: interrumpida a mitad, la portada cambiaba de rumbo en
+   el aire y el gesto quedaba blando.
+   `flyJob` es el testigo que hace el relevo seguro: si empieza otro pase, el
+   temporizador del anterior se encuentra el número cambiado y no toca nada. */
 function advanceDeck(toId) {
   if (toId === deckOrder[0]) return;
   const deck = $('hero-deck'), frontId = deckOrder[0];
   if (toId) { while (deckOrder[0] !== toId) deckOrder.push(deckOrder.shift()); }
   else deckOrder.push(deckOrder.shift());
   const fly = deck.querySelector('[data-deck="' + frontId + '"]');
+  const job = ++flyJob;
   if (REDUCED.matches || !fly) { applyDeck(); return; }
-  // la portada frontal «sale» del montón y se recoloca debajo
-  fly.classList.add('fly'); fly.style.zIndex = 40;
-  applyDeck();
-  setTimeout(() => { fly.classList.remove('fly'); applyDeck(); }, 520);
+  applyDeck();                       // todas a su sitio nuevo…
+  fly.classList.add('fly');          // …menos la que sale, que primero vuela
+  fly.style.zIndex = 40;
+  setTimeout(() => {
+    if (job !== flyJob) return;      // ya manda otro pase: este no toca nada
+    fly.classList.remove('fly');
+    applyDeck();
+  }, deck.classList.contains('quick') ? 210 : 330);
 }
 
-// «Anterior»: la última portada del montón vuelve al frente. Sin el vuelo de
-// advanceDeck (ese es para salir hacia atrás); aquí basta con recolocar y que las
-// transiciones de .deckcard (p0/p1/p2) lleven cada portada a su nuevo sitio.
+// «Anterior»: la última portada del montón vuelve al frente. Sin vuelo —viene de
+// detrás, no sale— pero sí cancelando el que hubiera en marcha, para que ninguna
+// portada se quede a medias.
 function prevDeck() {
   if (deckOrder.length < 2) return;
+  flyJob++;
   deckOrder.unshift(deckOrder.pop());
   applyDeck();
 }
 
 function restartDeck() {
   clearInterval(deckTimer);
+  clearTimeout(deckWake);
+  deckTimer = null; deckWake = null;
   if (REDUCED.matches || deckOrder.length < 2) return;
   deckTimer = setInterval(() => { if (!deckPaused && !document.hidden) advanceDeck(); }, 5200);
 }
 
+/* El pie de la pila. El texto se cambia a mitad del fundido, no al instante, y
+   ese retardo era una carrera: pasando rápido de portada se encadenaban varios
+   temporizadores y el último en vencer no tenía por qué ser el del número que
+   estabas viendo — te quedabas con «Nº 1» debajo de la portada del 2. El testigo
+   `capJob` deja pasar solo al último. */
+let capJob = 0;
 function updateDeckUI() {
   const m = MAGS.find(x => x.id === deckOrder[0]); if (!m) return;
   const cap = $('deck-cap');
+  const job = ++capJob;
   cap.classList.remove('on');
   setTimeout(() => {
+    if (job !== capJob) return;
     cap.innerHTML = '<span class="cnr">' + esc(m.nr) + '</span><span class="ct disp-i">' + esc(m.title) + '</span>';
     cap.classList.add('on');
-  }, 220);
+  }, 190);
   document.querySelectorAll('.ddot').forEach(d => d.classList.toggle('on', d.dataset.deckdot === deckOrder[0]));
 }
 
@@ -820,9 +931,41 @@ function observeReveals() {
   const pin = $('heroPin'), hero = pin && pin.querySelector('.hero'), deep = $('deep');
   if (!pin || !hero || !deep || REDUCED.matches) return;
 
-  // --seaP/--deepP van sobre el hero, no sobre :root: escribir una custom
-  // property en :root invalida el estilo de TODO el documento en cada frame.
+  /* DÓNDE SE ESCRIBE CADA COSA (esto es la mitad del coste por frame).
+
+     Cambiar una custom property en un elemento invalida el estilo de TODO su
+     subárbol, y da igual que nadie la use: medido en este hero, escribir una
+     propiedad cualquiera en `.hero` cuesta 1,19 ms por frame, y una que no lee
+     nadie cuesta lo mismo. Son sus 267 nodos (156 de ellos del SVG del
+     paisaje) marcados como sucios sesenta veces por segundo. En un portátil se
+     nota poco; en un teléfono es la diferencia entre 60 y 30 fps, y era lo que
+     hacía que la bajada se viera a tirones.
+
+     Coste medido de escribir una propiedad, según dónde:
+        .hero    267 nodos → 1,187 ms      .grid   49 nodos → 0,198 ms
+        .heroBg  157 nodos → 0,372 ms      .sea     3 nodos → 0,062 ms
+        estilo directo (transform/opacity)          → 0,002 ms
+
+     Así que cada valor va al sitio más pequeño que lo necesita:
+     · el PAISAJE sí necesita cascada (diez selectores repartidos por el SVG):
+       --seaP se queda, pero en `.heroBg`, no en `.hero`. Y solo cambia durante
+       la subida del agua: en cuanto el mar cubre, seaP se queda en 1 y el
+       filtro de escritura deja de tocarlo el resto del recorrido.
+     · el MAR lo lee un solo elemento, pero su transform va atado a --heroH y
+       --sea-fill (que en CSS cambian por media query): se le escribe --seaP a
+       él mismo (0,062 ms) en vez de rehacer la cuenta en JS y duplicarla.
+     · todo lo demás —el desplazamiento del texto, las dos flechas y la
+       inmersión— tiene un único consumidor y una fórmula de una línea: se les
+       escribe el transform o la opacidad DIRECTAMENTE.
+     El background del hero sigue en `.hero` porque es la franja de iOS, pero
+     es una propiedad normal: no cascadea y solo se toca cuando cambia el color
+     cuantizado. */
   const root = hero;
+  const bgLayer = hero.querySelector('.heroBg');
+  const seaLayer = hero.querySelector('.sea');
+  const gridLayer = hero.querySelector('.grid');
+  const cue = hero.querySelector('.scrollcue');
+  const dcue = hero.querySelector('.deepcue');
   const beats = [...deep.querySelectorAll('[data-beat]')];
   const N = beats.length;
   const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
@@ -848,7 +991,8 @@ function observeReveals() {
   const SURFACE = heroCol(0, 0);   // el papel del landing, ya compuesto
 
   let pinTop = 0, range = 0, vh = 0, waveEnd = 0, seg = 0, enabled = true;
-  let prevSea = -1, prevDeep = -1, prevCue = -1, prevBg = '', prevQs = -1, prevQd = -1;
+  let prevSeaBg = -1, prevSeaSea = -1, prevDeep = -1, prevCue = -1, prevGrid = -1;
+  let prevBg = '', prevQs = -1, prevQd = -1;
   const prevPh = new Array(N).fill(null), prevOp = new Array(N).fill(null);
 
   function measure() {
@@ -865,10 +1009,22 @@ function observeReveals() {
     seg = (range - waveEnd) / N;
   }
 
-  function write(prop, val, prev) {
+  // custom property (cascadea al subárbol de `el`: cara, solo donde hace falta)
+  function writeVar(el, prop, val, prev) {
     if (Math.abs(val - prev) < 0.001) return prev;
-    root.style.setProperty(prop, val.toFixed(4));
+    el.style.setProperty(prop, val.toFixed(4));
     return val;
+  }
+  // estilo directo (no cascadea: prácticamente gratis)
+  function writeOpacity(el, val, prev) {
+    if (Math.abs(val - prev) < 0.002) return prev;
+    el.style.opacity = val.toFixed(3);
+    return val;
+  }
+  function writeShiftY(el, px, prev) {
+    if (Math.abs(px - prev) < 0.05) return prev;
+    el.style.transform = 'translate3d(0,' + px.toFixed(2) + 'px,0)';
+    return px;
   }
 
   // classList solo cuando cambia de verdad: tocarlo en cada frame invalidaría
@@ -880,24 +1036,31 @@ function observeReveals() {
     hero.classList.toggle(name, on);
   }
 
-  function update() {
+  function update(s) {
     if (!enabled) {
       // Solo la primera pasada tras quedar deshabilitada: con el bucle continuo,
-      // reescribir esto en cada frame invalidaría el estilo del hero para nada.
-      prevSea = write('--seaP', 0, prevSea);
-      prevDeep = write('--deepP', 0, prevDeep);
-      prevCue = write('--cueP', 0, prevCue);
+      // reescribir esto en cada frame invalidaría el estilo para nada.
+      prevSeaBg = writeVar(bgLayer, '--seaP', 0, prevSeaBg);
+      prevSeaSea = writeVar(seaLayer, '--seaP', 0, prevSeaSea);
+      prevDeep = writeOpacity(deep, 0, prevDeep);
+      prevCue = writeOpacity(dcue, 0, prevCue);
+      prevGrid = writeShiftY(gridLayer, 0, prevGrid);
+      if (cue) cue.style.opacity = '1';
       if (SURFACE !== prevBg) { prevBg = SURFACE; root.style.backgroundColor = SURFACE; }
       flag('dry', false); flag('sunk', false); flag('wake', false);
       return;
     }
-    const s = window.scrollY - pinTop;              // px recorridos dentro del pin
     if (s < -vh || s > range + vh) return;          // fuera de pantalla: nada que hacer
 
     const seaP = clamp01(s / waveEnd);
     const deepP = step(waveEnd * 0.55, waveEnd * 0.98, s);
-    prevSea = write('--seaP', seaP, prevSea);
-    prevDeep = write('--deepP', deepP, prevDeep);
+    // el paisaje (cascada, cara) y el mar (un solo lector)
+    prevSeaBg = writeVar(bgLayer, '--seaP', seaP, prevSeaBg);
+    prevSeaSea = writeVar(seaLayer, '--seaP', seaP, prevSeaSea);
+    // y los de un solo consumidor, a pelo
+    prevGrid = writeShiftY(gridLayer, seaP * -48, prevGrid);
+    prevDeep = writeOpacity(deep, deepP, prevDeep);
+    if (cue) cue.style.opacity = clamp01(1 - seaP * 4).toFixed(3);
     // El color de la franja se cuantiza (q24): cambia unas pocas veces en todo el
     // scroll, no en cada frame. Así el repintado del fondo del hero no compite por
     // fps con la inmersión —que ya mueve olas, burbujas y desenfoques—; la franja
@@ -912,11 +1075,9 @@ function observeReveals() {
       if (bg !== prevBg) { prevBg = bg; root.style.backgroundColor = bg; }
     }
 
-    // la flecha se apaga con el mismo tramo de salida del último beat, así
-    // desaparece justo cuando se suelta el pin y aparece el kiosko debajo.
     const uLast = (s - waveEnd - (N - 1) * seg) / seg;
     const cueP = deepP * (1 - step(.9, 1, uLast));
-    prevCue = write('--cueP', cueP, prevCue);
+    prevCue = writeOpacity(dcue, cueP, prevCue);
 
     // apagamos de verdad lo que la opacidad ya hacía invisible (ver site.css):
     // mientras se ven las olas, el relato de debajo no tiene por qué estar
@@ -959,25 +1120,69 @@ function observeReveals() {
      Ese despertar cuesta un frame de retraso en el primer movimiento —el mismo
      que tenía ANTES en todos—, y a partir de ahí ya va sincronizado frame a
      frame, que es lo que arregla los saltos de iOS. */
-  const IDLE = 20;   // ~1/3 de segundo quieto
+  /* AMORTIGUACIÓN. La escena no sigue al scroll: sigue a un valor que PERSIGUE
+     al scroll. Es lo que separa un scroll «atado» de uno que se siente fluido.
+
+     El motivo es que la rueda y el trackpad no entregan un movimiento continuo,
+     sino paquetes desiguales —tres frames de 0px y uno de 60px—, y una escena
+     atada al scrollY crudo hereda esa irregularidad tal cual: el agua da un
+     salto, se queda quieta, da otro salto. Con un perseguidor de primer orden
+     (sView += (objetivo − sView) · k) los saltos entran repartidos entre varios
+     frames y el agua sube sola, sin escalones. Lo que se pierde es fidelidad al
+     píxel de scroll, y aquí eso no importa: el hero está clavado, así que no hay
+     ninguna referencia fija contra la que el ojo pueda notar el desfase.
+
+     k se recalcula con el tiempo REAL entre frames, así el recorrido dura lo
+     mismo en una pantalla de 60Hz que en una de 120Hz (ProMotion). Sin esa
+     normalización, en 120Hz la persecución iría al doble de rápido y el efecto
+     se quedaría casi sin suavizado. */
+  const IDLE = 20;      // ~1/3 de segundo quieto
+  const FOLLOW = 0.22;  // fracción del hueco que se recorre en un frame de 60Hz
+  const SNAP = 0.4;     // px: por debajo de esto se da por llegado
+
   let rafId = 0, running = false, idleFrames = 0, lastY = -1;
-  function frame() {
-    const y = window.scrollY;
-    idleFrames = y === lastY ? idleFrames + 1 : 0;
+  let sView = null, tPrev = 0;
+
+  function target() { return window.scrollY - pinTop; }
+  // salto seco al valor exacto: al medir, al despertar de una pestaña oculta y
+  // en la primera pasada. Sin esto, entrar a la página con el scroll ya bajado
+  // haría que el agua subiera sola desde cero, como si el usuario no hubiera
+  // hecho nada.
+  function snapNow() { sView = target(); tPrev = 0; }
+
+  function frame(now) {
+    const y = window.scrollY, t = y - pinTop;
+    const dt = tPrev ? Math.min(64, now - tPrev) : 16.67;
+    tPrev = now;
+    if (sView === null) sView = t;
+    // Fuera del recorrido del pin NO se suaviza: los dos extremos tienen que ser
+    // exactos. Si no, bajando deprisa el hero se suelta mientras el perseguidor
+    // aún va por 0,9 y se ve asomar el puerto por debajo del agua justo en la
+    // costura con el kiosko.
+    if (t <= 0 || t >= range) sView = t;
+    else sView += (t - sView) * (1 - Math.pow(1 - FOLLOW, dt / 16.67));
+    const gap = Math.abs(t - sView);
+    if (gap < SNAP) sView = t;
+
+    // el bucle no se duerme hasta que el scroll está quieto Y la escena ha
+    // terminado de alcanzarlo: si no, se pararía a medio camino
+    idleFrames = (y === lastY && gap < SNAP) ? idleFrames + 1 : 0;
     lastY = y;
     if (running && idleFrames < IDLE) rafId = requestAnimationFrame(frame);
     else { rafId = 0; running = false; }
-    update();
+    update(sView);
   }
   function start() {
     if (document.hidden) return;
     idleFrames = 0;
+    tPrev = 0;
     if (!running) { running = true; if (!rafId) rafId = requestAnimationFrame(frame); }
   }
   function stop() {
     running = false;
     if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
-    update();   // una última pasada para dejar la escena en su sitio
+    snapNow();
+    update(sView);   // una última pasada para dejar la escena en su sitio
   }
   // el guardia: barato (no hace nada más que rearmar el bucle) y pasivo
   let armed = false;
@@ -1040,23 +1245,23 @@ function observeReveals() {
       const w = window.innerWidth;
       measure();
       if (w !== lastW) { lastW = w; bubbles(); }
-      update();
+      snapNow(); update(sView);
     }, 120);
   });
   // al volver a la pestaña el rAF estaba parado: recolocamos por si se scrolleó fuera
   addEventListener('visibilitychange', () => {
     if (document.hidden) { stop(); return; }
-    measure(); update();
+    measure(); snapNow(); update(sView);
     if (inView) start();   // el bucle solo vuelve si el hero sigue en pantalla
   });
   // vuelta atrás en iOS: la página sale de la bfcache ya scrolleada y sin disparar scroll
-  addEventListener('pageshow', () => { measure(); update(); });
-  addEventListener('orientationchange', () => setTimeout(() => { measure(); update(); }, 300));
+  addEventListener('pageshow', () => { measure(); snapNow(); update(sView); });
+  addEventListener('orientationchange', () => setTimeout(() => { measure(); snapNow(); update(sView); }, 300));
   bubbles();
   measure();
-  update();
+  snapNow(); update(sView);
   // el mazo de portadas y las fuentes cambian la altura del hero al cargar
-  addEventListener('load', () => { measure(); update(); });
+  addEventListener('load', () => { measure(); snapNow(); update(sView); });
 })();
 
 /* ================= suscripción a novedades ================= */
