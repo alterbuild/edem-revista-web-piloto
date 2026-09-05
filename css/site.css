@@ -143,14 +143,16 @@ html.sp-on{overflow:hidden}
 .btn .lu{width:17px;height:17px;flex-shrink:0}
 
 /* ---------- cabecera ---------- */
-header.site{position:sticky;top:0;z-index:60;background:rgba(251,250,246,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--border-hair);
+header.site{position:sticky;top:0;z-index:60;background:rgba(251,250,246,.92);backdrop-filter:blur(8px) saturate(140%);-webkit-backdrop-filter:blur(8px) saturate(140%);border-bottom:1px solid var(--border-hair);
   /* la vuelta es lenta y frenada: la cabecera se posa en vez de aparecer de golpe */
-  transition:transform .72s cubic-bezier(.19,.9,.24,1)}
+  transition:transform .72s cubic-bezier(.19,.9,.24,1),
+    background-color .5s var(--ease-standard),border-color .5s var(--ease-standard)}
 /* bajando se aparta de en medio (js/app.js pone .hide); subiendo vuelve.
    Irse sí es rápido —cuanto antes deje sitio, mejor—, de ahí las dos duraciones:
    la transición que manda es siempre la del estado al que se va.
    El menú móvil cuelga de la cabecera, así que abierto la mantiene a la vista. */
-header.site.hide{transform:translateY(-100%);transition:transform .32s var(--ease-standard)}
+header.site.hide{transform:translateY(-100%);transition:transform .32s var(--ease-standard),
+  background-color .5s var(--ease-standard),border-color .5s var(--ease-standard)}
 /* el salto por anclaje no deja el titular debajo de la cabecera */
 main>section[id],main>div>section[id]{scroll-margin-top:76px}
 .hbar{height:68px;display:flex;align-items:center;gap:26px}
@@ -211,6 +213,64 @@ nav.main a:hover::after{transform:scaleX(1)}
   opacity:0;transition:opacity .26s var(--ease-out)}
 .mscrim.on{opacity:1}
 .menubtn[aria-expanded="true"]{background:var(--edem-teal-50);border-color:var(--edem-teal-200);color:var(--edem-teal-700)}
+
+/* ---------- cabecera sobre el agua ----------
+   De «Actualidad» al pie la página entera es fondo oscuro, y la barra clara se
+   leía como un tablón encajado encima: partía la bajada en dos. Peor aún, al
+   ser translúcida se le encendían manchas —una portada blanca del kiosko
+   pasando por detrás le blanqueaba medio ancho— y la barra parecía parpadear
+   sola al hacer scroll.
+
+   Sobre esos tramos se invierte: el mismo vidrio, pero del color del agua. Deja
+   de competir con el contenido, las manchas desaparecen (el fondo ya es del
+   tono de lo que pasa por detrás) y la cabecera se lee como parte de la sección
+   en la que estás, no como una capa ajena. La clase la pone js/app.js
+   (headerTheme) mirando qué sección toca el borde SUPERIOR del viewport. */
+header.site.on-dark{background:rgba(8,36,47,.82);border-bottom-color:rgba(255,255,255,.15)}
+header.site.on-dark .brand .t{color:#fff}
+header.site.on-dark .brand .t .pt{color:var(--edem-teal-300)}
+/* el logotipo de EDEM es tinta oscura: sobre el agua se cambia por el blanco.
+   Se hace con filtro y no con otro <img> para no pedir un segundo fichero ni
+   tener que tocar el marcado que comparten las tres páginas. */
+header.site.on-dark .brand img{filter:brightness(0) invert(1)}
+header.site.on-dark nav.main a{color:rgba(255,255,255,.74)}
+header.site.on-dark nav.main a:hover{color:#fff}
+header.site.on-dark nav.main a::after{background:var(--edem-teal-300)}
+header.site.on-dark .searchbtn{background:rgba(255,255,255,.08);color:rgba(255,255,255,.86);border-color:rgba(255,255,255,.22)}
+header.site.on-dark .searchbtn:hover{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.4)}
+header.site.on-dark .menubtn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.22);color:#fff}
+header.site.on-dark .menubtn[aria-expanded="true"]{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.4);color:#fff}
+header.site.on-dark .btn.out{color:#fff;border-color:rgba(255,255,255,.38);background:transparent}
+header.site.on-dark .btn.out:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.7)}
+header.site.on-dark .btn.pri{background:var(--edem-teal-500);box-shadow:0 6px 18px rgba(0,0,0,.28)}
+header.site.on-dark .btn.pri:hover{background:var(--edem-teal-400)}
+/* el menú desplegable cuelga de la barra: se viste igual o se vería una
+   lengua de papel saliendo de una cabecera oscura */
+header.site.on-dark .mnav{background:#0a2b37;border-top-color:rgba(255,255,255,.14)}
+header.site.on-dark .mnav a,header.site.on-dark .mnav button{color:rgba(255,255,255,.82)}
+header.site.on-dark .mnav a:hover{background:rgba(255,255,255,.08);color:#fff}
+header.site.on-dark .mnav a .ic{color:var(--edem-teal-300)}
+header.site.on-dark .mnav a .ch{color:rgba(255,255,255,.38)}
+
+/* --- dónde estás: el enlace de la sección en pantalla se queda subrayado ---
+   Antes la barra no cantaba nada: seis secciones de scroll largo y ninguna
+   pista de en cuál estabas. El subrayado es el mismo que ya sale al pasar el
+   ratón, así que no añade lenguaje nuevo — solo lo deja fijo. */
+nav.main a.on{color:var(--edem-teal-700)}
+nav.main a.on::after{transform:scaleX(1)}
+header.site.on-dark nav.main a.on{color:#fff}
+
+/* --- hilo de avance ---
+   Una línea de un pelo en el canto de la barra que dice cuánto queda de
+   portada. En una página de 11.000px de scroll con tres tramos clavados, el
+   ascensor del navegador miente (se queda quieto mientras el hero está pinado):
+   esto no. Es un scaleX sobre una capa ya rasterizada, o sea que no cuesta
+   layout en el frame de scroll. */
+.hprog{position:absolute;left:0;right:0;bottom:-1px;height:2px;transform-origin:left;
+  transform:scaleX(var(--prog,0));background:var(--edem-teal-500);
+  pointer-events:none;will-change:transform}
+header.site.on-dark .hprog{background:var(--edem-teal-300)}
+@media (prefers-reduced-motion:reduce){.hprog{transition:none}}
 
 /* ---------- buscador ----------
    La lupa vive en la barra y NO se recoge en el menú: es lo único que se
@@ -311,7 +371,17 @@ html.sbusca-on{overflow:hidden}
 /* 370vh y no 480: con solo dos beats, 480 daba 1,4 pantallas de scroll a cada
    uno —casi todo de meseta, con la imagen quieta— y el tramo se hacía eterno.
    Así cada beat cae en ~0,95 pantallas y la subida del agua en 0,8. */
-.heroPin{position:relative;height:370vh}
+/* La cabecera es sticky, o sea que ocupa sus 69px en el flujo y empujaba el
+   hero hacia abajo: a scroll 0 el hero medía una pantalla pero EMPEZABA en el
+   píxel 69, así que se le quedaban 69px por debajo del borde inferior. Ahí
+   caían la cresta del mar y —peor— la flecha de «sigue bajando», que en un
+   portátil de 900px no se veía nunca: justo la pista que hace falta en la
+   primera pantalla.
+   Con el margen negativo el hero arranca pegado al borde de arriba y la barra
+   le flota por encima (patrón de cabecera transparente de toda la vida). No se
+   ve el solape porque en superficie los dos son el mismo papel #fbfaf6, y el
+   padding de 92px del hero ya mantenía el contenido por debajo de la barra. */
+.heroPin{position:relative;height:370vh;margin-top:-69px}
 /* --heroH: alto real de la pantalla, reutilizado por el mar para su recorrido.
    --seaP y --deepP se declaran AQUÍ, no en :root: js/app.js las reescribe en
    cada frame y una custom property en :root invalida el estilo de todo el
@@ -715,6 +785,10 @@ html.sbusca-on{overflow:hidden}
      la inmersión. En móvil la hacemos casi opaca (el papel ya es claro, apenas se
      nota) y quitamos el blur: el scroll deja de pagar ese peaje por frame. */
   header.site{background:rgba(251,250,246,.97);backdrop-filter:none;-webkit-backdrop-filter:none}
+  /* sin desenfoque de fondo, el 82% de la barra oscura deja ver lo que pasa por
+     detrás: en el simulador se leía un «A4» de una ficha del kiosko a través de
+     la cabecera. Aquí va casi opaca. */
+  header.site.on-dark{background:rgb(8,36,47)}
 
   /* Las GAVIOTAS y los BARCOS CHICOS se quedan quietos del todo en el teléfono
      —no solo durante la bajada, como hace .wake—. Son nueve bucles infinitos
@@ -753,8 +827,32 @@ html.sbusca-on{overflow:hidden}
 
 
 /* pila de portadas rotatoria */
-.heroDeck{position:relative;display:flex;flex-direction:column;align-items:center;gap:22px}
-.deck{position:relative;width:min(350px,82%);aspect-ratio:794/1123}
+/* La pila y su pie tienen que caber SOBRE EL AGUA. La cresta ocupa los ~150px
+   de abajo del hero, así que el ancho de la portada no puede depender solo del
+   ancho de la columna: se ata también al alto de pantalla. 470px es lo que se
+   llevan la placa del pie, el hueco entre ambos y el aire hasta la cresta; lo
+   que queda, dividido por la proporción del A4 (1123/794 = 1,414), es lo más
+   ancho que puede ser la portada sin mojarse. En una pantalla de 900px salen
+   ~304px de ancho; de 1000 para arriba manda el tope de 350px de siempre. */
+/* --deck-w manda en las dos piezas —la portada y la placa del pie— para que la
+   placa no se quede más ancha que la revista cuando en móvil la portada
+   encoge. Los cortes de abajo (ver «responsive») cambian ESTA variable, no el
+   ancho de .deck. */
+.heroDeck{--deck-w:min(350px,82%,calc((var(--heroH) - 500px) / 1.414));
+  position:relative;display:flex;flex-direction:column;align-items:center;gap:18px}
+.deck{position:relative;width:var(--deck-w);aspect-ratio:794/1123}
+/* Claro detrás de la pila, hermano del de .heroCopy. La portada caía justo
+   sobre la grúa y el sol: la pluma cruzaba la cubierta por la mitad y las
+   puntas del sol asomaban por los cuatro lados de la revista. Este halo del
+   propio papel apaga el dibujo solo donde va la revista —se desvanece antes de
+   llegar a los lados, así que no se ve ninguna caja— y la portada pasa a estar
+   apoyada en algo en vez de flotando sobre un cuadro lleno. */
+.heroDeck::before{content:'';position:absolute;z-index:-1;pointer-events:none;
+  inset:-8% -14% -6% -14%;
+  background:radial-gradient(60% 54% at 50% 46%,
+    rgba(251,250,246,.92) 0%,rgba(251,250,246,.78) 42%,
+    rgba(251,250,246,.4) 68%,rgba(251,250,246,0) 88%)}
+@supports (filter:blur(1px)){.heroDeck::before{filter:blur(26px)}}
 .deckcard{position:absolute;inset:0;cursor:pointer;border-radius:3px;transition:transform 1.05s cubic-bezier(.25,.8,.25,1),opacity .6s;will-change:transform;backface-visibility:hidden}
 .deckcard .coverslot{position:absolute;inset:0;border-radius:3px;box-shadow:0 30px 62px rgba(6,51,63,.3),0 8px 20px rgba(6,51,63,.16);transition:box-shadow 1.05s var(--ease-standard)}
 .deckcard::after{content:'';position:absolute;inset:0;border-radius:3px;background:#06333f;opacity:0;transition:opacity 1.05s var(--ease-standard);pointer-events:none;z-index:2}
@@ -769,15 +867,44 @@ html.sbusca-on{overflow:hidden}
 .deckcard.fly{transform:translateZ(0) rotate(9deg) translate(30%,-5%) scale(1.02)}
 .deckcard.fly::after{opacity:0}
 @keyframes deckbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
-.deckui{display:flex;flex-direction:column;align-items:center;gap:12px}
-.deckcap{display:flex;align-items:baseline;gap:10px;min-height:26px;opacity:0;transform:translateY(6px);transition:opacity .45s var(--ease-out),transform .45s var(--ease-out)}
+/* --- el pie de la pila: número, título y selector ---
+   AQUÍ SE CANTA QUÉ NÚMERO ES. El hero entra directo al titular y no lleva
+   antetítulo ni chips a propósito (ver index.html): el número, el año y la
+   edición los dice esta línea. Así que tiene que LEERSE, y antes no se leía —
+   caía sobre los veleros del paisaje y los puntos quedaban literalmente por
+   debajo de la línea de flotación, invisibles y sin poder pulsarse.
+
+   Ahora es una placa: el mismo papel del landing, con filete y una sombra
+   corta, que despega la línea del dibujo que pasa por detrás. En fila —número
+   y título a la izquierda, puntos a la derecha— y no en columna, porque en
+   vertical medía 50px y era justo lo que sobraba para que el bloque no cupiera
+   sobre el agua. */
+.deckui{display:flex;align-items:center;justify-content:space-between;gap:18px;
+  /* el suelo de 300px no es capricho: por debajo, «Bienvenidos a EDEM» no le
+     cabe al título y se cortaba con puntos suspensivos justo en la línea que
+     tiene que decir qué número estás viendo */
+  width:min(100%,max(var(--deck-w),300px));padding:11px 14px 11px 16px;border-radius:4px;
+  background:rgba(251,250,246,.92);border:1px solid rgba(6,51,63,.10);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  box-shadow:0 10px 26px rgba(6,51,63,.10),0 2px 6px rgba(6,51,63,.06)}
+.deckcap{display:flex;flex-direction:column;gap:2px;min-width:0;min-height:34px;
+  opacity:0;transform:translateY(6px);transition:opacity .45s var(--ease-out),transform .45s var(--ease-out)}
 .deckcap.on{opacity:1;transform:none}
-.deckcap .cnr{font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:800;color:var(--edem-teal-700)}
-.deckcap .ct{font-family:var(--font-display);font-style:italic;font-weight:600;font-size:19px;color:var(--text-strong)}
-.deckdots{display:flex;gap:8px}
-.ddot{width:9px;height:9px;border-radius:var(--radius-pill);border:0;padding:0;background:var(--edem-teal-200);cursor:pointer;transition:width .35s var(--ease-standard),background-color .35s var(--ease-standard)}
-.ddot:hover{background:var(--edem-teal-400)}
-.ddot.on{width:26px;background:var(--edem-teal-500)}
+.deckcap .cnr{font-size:10px;letter-spacing:.2em;text-transform:uppercase;font-weight:800;color:var(--edem-teal-600)}
+.deckcap .ct{font-family:var(--font-display);font-style:italic;font-weight:600;font-size:19px;line-height:1.1;
+  color:var(--text-strong);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.deckdots{display:flex;gap:7px;flex:none}
+/* Los puntos son el mando para cambiar de portada, así que cada uno necesita
+   sitio donde pulsar: el círculo sigue midiendo 9px, pero el botón que lo
+   rodea llega a 24px de alto (con un pelo de margen negativo para que la placa
+   no crezca por ello). */
+.ddot{width:9px;height:24px;padding:0;border:0;background:none;cursor:pointer;margin:-7px 0;
+  display:grid;place-items:center;box-sizing:content-box}
+.ddot::before{content:'';display:block;width:9px;height:9px;border-radius:var(--radius-pill);
+  background:var(--edem-teal-200);transition:width .35s var(--ease-standard),background-color .35s var(--ease-standard)}
+.ddot:hover::before{background:var(--edem-teal-400)}
+.ddot.on{width:26px}
+.ddot.on::before{width:26px;background:var(--edem-teal-500)}
 
 /* señal de scroll sobre las olas */
 .scrollcue{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);z-index:2;opacity:clamp(0,calc(1 - var(--seaP) * 4),1);width:46px;height:46px;border-radius:50%;background:#fff;box-shadow:var(--shadow-md);display:grid;place-items:center;color:var(--edem-teal-700);animation:cuebob 2.2s ease-in-out infinite}
@@ -973,10 +1100,25 @@ html.sbusca-on{overflow:hidden}
 /* --- fondos flat: cada escena es un dibujo de formas planas (sin degradados
    ni desenfoques) que entra cuando se enciende su forma de participar --- */
 .jbg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-/* velo plano del propio color de la escena: las formas siguen leyéndose pero
-   el texto y las cajas mandan por encima */
-.jbg::after{content:'';position:absolute;inset:0;background:var(--jbg);opacity:.5;
+/* VELO DIRECCIONAL. Antes era un velo plano al 50% por toda la pantalla: el
+   dibujo perdía la mitad de su fuerza a la derecha —donde no molesta a nadie— y
+   aun así seguía asomando por la izquierda, justo debajo del titular. Un
+   círculo de 215px de radio pasaba por detrás de «La revista la haces tú» y se
+   leía como una mancha.
+   Ahora el velo es un degradado: tapa de verdad la mitad izquierda (la del
+   texto) y se levanta hacia la derecha, que es donde vive la escena. El texto
+   gana contraste y el dibujo gana presencia — las dos cosas a la vez.
+   El color se mezcla con color-mix; donde no haya, se cae al velo plano de
+   antes, un punto más suave. */
+.jbg::after{content:'';position:absolute;inset:0;background:var(--jbg);opacity:.46;
   transition:background 1s var(--ease-standard)}
+@supports (color:color-mix(in srgb,red,white)){
+  .jbg::after{opacity:1;background:linear-gradient(92deg,
+    var(--jbg) 0,var(--jbg) 27%,
+    color-mix(in srgb,var(--jbg) 76%,transparent) 46%,
+    color-mix(in srgb,var(--jbg) 44%,transparent) 72%,
+    color-mix(in srgb,var(--jbg) 26%,transparent) 100%)}
+}
 .jscene{position:absolute;inset:0;opacity:0;transform:scale(1.06);
   transition:opacity .85s var(--ease-standard),transform 1.2s var(--ease-standard)}
 .jscene svg{width:100%;height:100%;display:block}
@@ -999,21 +1141,38 @@ html.sbusca-on{overflow:hidden}
 .jroles{list-style:none;display:flex;flex-direction:column;gap:10px}
 /* cada forma de participar: cerrada es solo el verbo; al encenderse se abre y
    se tiñe del naranja de la Marina */
+/* Las fichas apagadas estaban al 6% de blanco sobre un fondo ya claro (el
+   índigo de la escena 3): ni la caja ni el verbo se distinguían del fondo, y
+   «Fotografía» o «Edita» se leían como texto desactivado en vez de como las
+   otras tres opciones que puedes pulsar. Suben la caja, el filo y el verbo. */
 .jrole{position:relative;display:block;width:100%;text-align:left;cursor:pointer;
   padding:16px 22px 17px 60px;color:#fff;border-radius:var(--radius-lg);
-  background:rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.14);overflow:hidden;
+  /* Opacas, no traslúcidas. Al 9% de blanco la escena se veía A TRAVÉS de la
+     ficha: los renglones de «Escribe» y el círculo de «Diseña» cruzaban por
+     detrás del verbo y salían por los dos costados, y el texto quedaba apoyado
+     en un fondo lleno de dibujo. Ahora cada ficha se pinta con el color de la
+     escena en curso, casi opaco: pertenece al fondo (cambia de color con él)
+     pero no lo deja pasar. */
+  background:rgba(8,26,34,.88);
+  border:1px solid rgba(255,255,255,.2);overflow:hidden;
   transition:background .6s var(--ease-standard),border-color .6s var(--ease-standard),transform .6s var(--ease-standard)}
 .jrole::before{content:'';position:absolute;left:0;top:12px;bottom:12px;width:3px;background:var(--jacc);
   transform:scaleY(0);transform-origin:top;transition:transform .5s var(--ease-standard)}
 .jrole .jn{position:absolute;left:22px;top:22px;font-family:var(--font-display);font-weight:900;font-size:12.5px;
-  letter-spacing:.06em;color:rgba(255,255,255,.4);transition:color .5s var(--ease-standard)}
+  letter-spacing:.06em;color:rgba(255,255,255,.58);transition:color .5s var(--ease-standard)}
 .jrole .jt{display:block;font-size:clamp(23px,2.5vw,34px);line-height:1.04;letter-spacing:-.02em;
-  color:rgba(255,255,255,.6);transition:color .5s var(--ease-standard)}
+  color:rgba(255,255,255,.78);transition:color .5s var(--ease-standard)}
 .jrole .jd{display:block;max-height:0;opacity:0;overflow:hidden;
   transition:max-height .55s var(--ease-standard),opacity .4s var(--ease-standard)}
 .jrole .jd>span{display:block;padding-top:11px;font-size:14.5px;line-height:1.6;color:rgba(255,255,255,.74);max-width:46ch}
-.jrole:hover{border-color:rgba(255,255,255,.3)}
+.jrole:hover{background:rgba(10,32,42,.86);border-color:rgba(255,255,255,.38)}
+.jrole:hover .jt{color:#fff}
+/* después del :hover a propósito: si fuera antes, la regla llana de arriba
+   —misma especificidad, más abajo en el fichero— se comería el color mezclado */
+@supports (color:color-mix(in srgb,red,white)){
+  .jrole{background:color-mix(in srgb,var(--jbg) 97%,transparent)}
+  .jrole:hover{background:color-mix(in srgb,var(--jbg) 94%,white 6%)}
+}
 /* la caja activa se pinta plana con el color de la escena en curso */
 .jrole.on{background:var(--jacc);border-color:var(--jacc);transform:translate3d(-10px,0,0)}
 .jrole.on::before{transform:scaleY(1);background:#fff}
@@ -1025,13 +1184,18 @@ html.sbusca-on{overflow:hidden}
   background:var(--jacc);transition:background 1s var(--ease-standard)}
 
 /* rótulo continuo al pie: los verbos de la redacción pasando en bucle */
+/* El rótulo es adorno (aria-hidden): tiene que sonar de fondo, no competir. Se
+   le pone una banda que se apoya de verdad en el borde de abajo —antes era un
+   velo plano del 28% y las letras huecas se mezclaban con las formas de la
+   escena que pasaban por detrás— y el trazo baja un punto. */
 .jticker{position:absolute;left:0;right:0;bottom:0;z-index:1;padding:15px 0;
-  border-top:1px solid rgba(255,255,255,.12);background:rgba(6,28,38,.28);overflow:hidden;
+  border-top:1px solid rgba(255,255,255,.12);overflow:hidden;
+  background:linear-gradient(180deg,rgba(6,28,38,.12),rgba(6,28,38,.5));
   -webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);
   mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
 .jtrack{display:flex;width:max-content;animation:jslide 30s linear infinite}
 .jtrack span{font-family:var(--font-display);font-weight:900;letter-spacing:-.01em;white-space:nowrap;
-  font-size:clamp(20px,2.6vw,34px);padding-left:26px;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.42)}
+  font-size:clamp(20px,2.6vw,34px);padding-left:26px;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.3)}
 .jtrack span::after{content:'·';margin-left:26px;color:var(--jacc);-webkit-text-stroke:0}
 @keyframes jslide{to{transform:translate3d(-50%,0,0)}}
 
@@ -1389,14 +1553,14 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
 @media(max-width:1020px){
   .hero .grid{grid-template-columns:1fr;gap:44px}
   .heroDeck{order:-1;padding-top:10px}
-  .deck{width:min(270px,64%)}
+  .heroDeck{--deck-w:min(270px,64%)}
   /* el hero sigue clavado, pero apilado: lo compactamos y lo anclamos arriba
      para que el contenido quede por encima de la línea de agua */
   .heroPin{height:330vh}
   .hero{padding:84px 0 26px;align-items:flex-start}
   .hero .grid{gap:24px}
   .heroDeck{gap:14px}
-  .deck{width:min(190px,42%)}
+  .heroDeck{--deck-w:min(190px,42%)}
   .hero p.lead{display:none}
   .hero .acts{margin-top:22px}
   .hero .sea{--sea-fill:176px;--o2:28px;--o3:56px}
@@ -1432,8 +1596,13 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
      vuelven a leerse a su tamaño. */
   .jbg{top:auto;height:min(34vh,300px)}
   /* la banda queda justo detrás de la última caja: un punto más de velo para
-     que el texto no compita con las formas */
-  .jbg::after{opacity:.62}
+     que el texto no compita con las formas.
+     Y VUELVE A SER PLANO: el velo direccional de escritorio tapa por la
+     izquierda porque allí el texto está a la izquierda y el dibujo a la
+     derecha. Aquí la escena es una banda al pie, con el texto encima de todo
+     el ancho, así que un degradado lateral solo dejaría la mitad derecha
+     desprotegida. */
+  .jbg::after{opacity:.62;background:var(--jbg)}
   .jrole,.jrole.on{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16)}
   .jrole.on::before{background:var(--jacc)}
   .jrole.on .jn{color:var(--jacc)}
@@ -1479,7 +1648,7 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   .hero .grid{gap:18px}
   .hero .sub{font-size:19px}
   .heroCopy .acts .btn.ghost{display:none}   /* una sola llamada a la acción: el kiosko ya está en el menú */
-  .deck{width:min(168px,40%)}
+  .heroDeck{--deck-w:min(168px,40%)}
   .deckcap .ct{font-size:17px}
   .beat{padding:0 18px}
   .beat .bs{margin-top:16px}

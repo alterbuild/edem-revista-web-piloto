@@ -290,39 +290,80 @@ function renderKiosko() {
    plano. Cada escena lleva su fondo y su acento, que también tiñe las cajas.
    Si hay más formas que escenas, el ciclo se repite. */
 const JOIN_SCENES = [
+  /* 1 · ESCRIBE — la columna del periódico: el filete de sección, el renglonado
+     de una columna justificada y la comilla de apertura en el coral de la casa. */
   { bg: '#06333f', acc: '#e8502d', art:
-    '<circle class="sh" style="--d:.05s;--dy:40px" cx="1140" cy="235" r="215" fill="#e8502d"/>' +
-    '<rect class="sh" style="--d:.12s;--dx:-50px" x="40" y="560" width="300" height="400" rx="10" fill="#ffffff" opacity=".10"/>' +
-    '<rect class="sh" style="--d:.2s;--dx:-30px" x="130" y="510" width="300" height="400" rx="10" fill="#74c1d5" opacity=".26"/>' +
-    '<rect class="sh" style="--d:.28s" x="180" y="585" width="180" height="14" rx="7" fill="#06333f" opacity=".5"/>' +
-    '<rect class="sh" style="--d:.34s" x="180" y="630" width="215" height="14" rx="7" fill="#06333f" opacity=".38"/>' +
-    '<rect class="sh" style="--d:.4s" x="180" y="675" width="130" height="14" rx="7" fill="#06333f" opacity=".38"/>' +
-    '<path class="sh" style="--d:.46s;--dy:60px" d="M600 900 L815 520 L1030 900 Z" fill="#ffffff" opacity=".08"/>' +
-    '<circle class="sh" style="--d:.52s" cx="640" cy="120" r="58" fill="#74c1d5" opacity=".45"/>' },
-  { bg: '#12213f', acc: '#008aad', art:
-    '<rect class="sh" style="--d:.05s;--dx:60px" x="810" y="120" width="520" height="520" rx="18" fill="#008aad" opacity=".9"/>' +
-    '<circle class="sh" style="--d:.14s" cx="1070" cy="380" r="175" fill="#12213f"/>' +
-    '<circle class="sh" style="--d:.2s" cx="1070" cy="380" r="92" fill="#b4dee9" opacity=".9"/>' +
-    '<circle class="sh" style="--d:.26s" cx="1035" cy="345" r="30" fill="#ffffff"/>' +
-    '<path class="sh" style="--d:.32s;--dy:70px" d="M0 900 L300 470 L600 900 Z" fill="#ffffff" opacity=".09"/>' +
-    '<path class="sh" style="--d:.38s;--dy:70px" d="M260 900 L520 590 L780 900 Z" fill="#e8502d" opacity=".8"/>' +
-    '<circle class="sh" style="--d:.44s;--dy:-40px" cx="215" cy="205" r="86" fill="#e8502d" opacity=".85"/>' },
-  { bg: '#3b3a7a', acc: '#e8502d', art:
-    '<path class="sh" style="--d:.05s;--dx:70px" d="M1440 190 A250 250 0 0 1 1440 690 Z" fill="#e8502d"/>' +
-    '<rect class="sh" style="--d:.12s;--dx:-60px" x="0" y="0" width="330" height="330" fill="#ffffff" opacity=".10"/>' +
-    '<rect class="sh" style="--d:.18s;--dx:-40px" x="120" y="330" width="210" height="210" fill="#b4dee9" opacity=".85"/>' +
-    '<circle class="sh" style="--d:.24s" cx="330" cy="330" r="105" fill="#008aad"/>' +
-    '<path class="sh" style="--d:.3s;--dy:60px" d="M560 900 L560 640 L820 640 Z" fill="#ffffff" opacity=".13"/>' +
-    '<rect class="sh" style="--d:.36s;--dy:60px" x="880" y="740" width="420" height="26" fill="#ffffff" opacity=".22"/>' +
-    '<rect class="sh" style="--d:.42s;--dy:60px" x="880" y="800" width="260" height="26" fill="#ffffff" opacity=".14"/>' },
+    '<g class="sh" style="--d:.05s;--dx:40px">' +
+      '<rect x="880" y="150" width="470" height="3" fill="#e8502d"/>' +
+      '<rect x="880" y="150" width="120" height="9" fill="#e8502d"/>' +
+    '</g>' +
+    '<g class="sh" style="--d:.14s;--dx:30px" fill="#ffffff" opacity=".13">' +
+      '<rect x="880" y="196" width="470" height="13" rx="2"/>' +
+      '<rect x="880" y="224" width="470" height="13" rx="2"/>' +
+      '<rect x="880" y="252" width="392" height="13" rx="2"/>' +
+    '</g>' +
+    '<text class="sh" style="--d:.22s;--dy:40px" x="866" y="880" font-family="Bodoni Moda,Georgia,serif" font-weight="900" font-size="300" fill="#e8502d" opacity=".55">&#8220;</text>' +
+    '<g class="sh" style="--d:.3s;--dy:40px" fill="#ffffff" opacity=".11">' +
+      '<rect x="1060" y="672" width="290" height="12" rx="2"/>' +
+      '<rect x="1060" y="700" width="290" height="12" rx="2"/>' +
+      '<rect x="1060" y="728" width="290" height="12" rx="2"/>' +
+      '<rect x="1060" y="756" width="206" height="12" rx="2"/>' +
+    '</g>' +
+    '<rect class="sh" style="--d:.38s;--dy:40px" x="1324" y="672" width="26" height="26" fill="#e8502d" opacity=".85"/>' },
+
+  /* 2 · FOTOGRAFÍA — el visor: escuadras de encuadre, el diafragma abierto y la
+     retícula de enfoque. Todo hueco (solo trazo), que es como se ve un visor. */
+  { bg: '#0b2a38', acc: '#008aad', art:
+    '<g class="sh" style="--d:.05s;--dx:40px" fill="none" stroke="#ffffff" stroke-opacity=".26" stroke-width="4">' +
+      '<path d="M840 190 L840 140 L900 140"/><path d="M1400 190 L1400 140 L1340 140"/>' +
+      '<path d="M840 700 L840 750 L900 750"/><path d="M1400 700 L1400 750 L1340 750"/>' +
+    '</g>' +
+    '<circle class="sh" style="--d:.14s" cx="1120" cy="445" r="172" fill="none" stroke="#008aad" stroke-width="3" opacity=".85"/>' +
+    '<g class="sh" style="--d:.2s" fill="none" stroke="#ffffff" stroke-opacity=".18" stroke-width="2.5">' +
+      '<path d="M1120 273 L1269 359"/><path d="M1269 359 L1269 531"/><path d="M1269 531 L1120 617"/>' +
+      '<path d="M1120 617 L971 531"/><path d="M971 531 L971 359"/><path d="M971 359 L1120 273"/>' +
+    '</g>' +
+    '<circle class="sh" style="--d:.28s" cx="1120" cy="445" r="62" fill="#008aad" opacity=".55"/>' +
+    '<g class="sh" style="--d:.36s" stroke="#ffffff" stroke-opacity=".3" stroke-width="2.5">' +
+      '<path d="M1120 380 L1120 410"/><path d="M1120 480 L1120 510"/>' +
+      '<path d="M1055 445 L1085 445"/><path d="M1155 445 L1185 445"/>' +
+    '</g>' +
+    '<circle class="sh" style="--d:.44s;--dy:-30px" cx="1372" cy="196" r="11" fill="#e8502d" opacity=".9"/>' },
+
+  /* 3 · DISEÑA — la retícula de maquetación: cajas de columna, una masa de color
+     colocada y el círculo de una imagen que se sale de su caja. */
+  { bg: '#132749', acc: '#e8502d', art:
+    '<g class="sh" style="--d:.05s;--dx:40px" fill="none" stroke="#ffffff" stroke-opacity=".2" stroke-width="2">' +
+      '<rect x="860" y="160" width="150" height="580"/><rect x="1030" y="160" width="150" height="580"/>' +
+      '<rect x="1200" y="160" width="150" height="580"/>' +
+    '</g>' +
+    '<rect class="sh" style="--d:.14s;--dy:40px" x="1030" y="430" width="150" height="310" fill="#e8502d" opacity=".78"/>' +
+    '<circle class="sh" style="--d:.22s" cx="1180" cy="330" r="128" fill="#74c1d5" opacity=".5"/>' +
+    '<g class="sh" style="--d:.3s;--dx:20px" fill="#ffffff" opacity=".14">' +
+      '<rect x="875" y="182" width="120" height="9" rx="2"/><rect x="875" y="202" width="120" height="9" rx="2"/>' +
+      '<rect x="875" y="222" width="120" height="9" rx="2"/><rect x="875" y="242" width="78" height="9" rx="2"/>' +
+    '</g>' +
+    '<g class="sh" style="--d:.38s;--dy:30px" fill="none" stroke="#ffffff" stroke-opacity=".22" stroke-width="2">' +
+      '<path d="M820 160 L820 740"/><path d="M1390 160 L1390 740"/>' +
+      '<path d="M820 160 L860 160"/><path d="M820 740 L860 740"/>' +
+      '<path d="M1350 160 L1390 160"/><path d="M1350 740 L1390 740"/>' +
+    '</g>' },
+
+  /* 4 · EDITA — las marcas de corrección sobre las galeradas: el calderón, un
+     par de líneas tachadas, el signo de intercalar y el visto del cierre. */
   { bg: '#0e2129', acc: '#008aad', art:
-    '<rect class="sh" style="--d:.05s;--dy:70px" x="90" y="430" width="150" height="470" fill="#008aad"/>' +
-    '<rect class="sh" style="--d:.11s;--dy:70px" x="270" y="300" width="150" height="600" fill="#ffffff" opacity=".12"/>' +
-    '<rect class="sh" style="--d:.17s;--dy:70px" x="450" y="560" width="150" height="340" fill="#e8502d" opacity=".9"/>' +
-    '<circle class="sh" style="--d:.24s;--dy:-50px" cx="1130" cy="300" r="200" fill="#008aad" opacity=".22"/>' +
-    '<circle class="sh" style="--d:.3s;--dy:-50px" cx="1130" cy="300" r="112" fill="#b4dee9" opacity=".9"/>' +
-    '<path class="sh" style="--d:.36s;--dx:60px" d="M1440 900 L1080 900 L1440 560 Z" fill="#ffffff" opacity=".08"/>' +
-    '<rect class="sh" style="--d:.42s;--dy:-40px" x="760" y="90" width="26" height="220" fill="#e8502d"/>' }
+    '<text class="sh" style="--d:.05s;--dy:40px" x="1216" y="856" font-family="Bodoni Moda,Georgia,serif" font-weight="900" font-size="210" fill="#008aad" opacity=".6">&#182;</text>' +
+    '<g class="sh" style="--d:.14s;--dx:30px" fill="#ffffff" opacity=".12">' +
+      '<rect x="1010" y="176" width="340" height="12" rx="2"/><rect x="1010" y="206" width="340" height="12" rx="2"/>' +
+      '<rect x="1010" y="236" width="260" height="12" rx="2"/>' +
+    '</g>' +
+    '<path class="sh" style="--d:.22s" d="M1010 212 L1350 212" stroke="#e8502d" stroke-width="4" opacity=".9"/>' +
+    '<g class="sh" style="--d:.3s;--dy:40px" fill="#ffffff" opacity=".10">' +
+      '<rect x="866" y="430" width="484" height="12" rx="2"/><rect x="866" y="460" width="484" height="12" rx="2"/>' +
+      '<rect x="866" y="490" width="484" height="12" rx="2"/><rect x="866" y="520" width="360" height="12" rx="2"/>' +
+    '</g>' +
+    '<path class="sh" style="--d:.38s;--dy:30px" d="M1080 452 L1108 424 L1136 452" fill="none" stroke="#008aad" stroke-width="4" opacity=".9"/>' +
+    '<path class="sh" style="--d:.46s;--dy:40px" d="M880 660 L942 722 L1074 590" fill="none" stroke="#008aad" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity=".8"/>' }
 ];
 
 function renderJoinScenes(n) {
@@ -663,6 +704,84 @@ onMQ(matchMedia('(min-width:861px)'), e => { if (e.matches) closeMenu(); });
   onScroll(update);
   addEventListener('pageshow', () => { lastY = Math.max(0, scrollY); set(false); });
   window.showHeader = () => { lastY = Math.max(0, scrollY); set(false); };
+}());
+
+/* ================= la cabecera se viste de la sección =================
+   Tres cosas que la barra no sabía hacer y que en una portada de 11.000px de
+   scroll se echaban de menos:
+
+   1. INVERTIRSE SOBRE EL AGUA. De «Actualidad» al pie el fondo es oscuro. La
+      barra clara se leía como un tablón encajado encima, y al ser translúcida
+      se le encendían manchas cuando pasaba por detrás una portada blanca del
+      kiosko: parecía parpadear sola. Sobre esos tramos se pone .on-dark y usa
+      el vidrio oscuro (ver css/site.css). También durante la inmersión del
+      hero, en cuanto el agua le llega al canto de abajo.
+   2. DECIR DÓNDE ESTÁS. Seis secciones y ninguna pista. El enlace de la que
+      ocupa la pantalla se queda subrayado.
+   3. CONTAR CUÁNTO QUEDA. Con tres tramos clavados (hero, «Conócenos» y el
+      apilado del ecosistema) el ascensor del navegador miente: se queda quieto
+      mientras el hero está pinado. El hilo de abajo va con el scroll real.
+
+   Todo en el mismo bus de scroll que el resto (un rAF por frame) y escribiendo
+   solo clases y una custom property: nada que obligue a recalcular layout. */
+(function headerTheme() {
+  const head = document.querySelector('header.site');
+  if (!head) return;
+
+  // el hilo de avance se monta desde aquí: así el marcado que comparten las
+  // tres páginas del sitio se queda como está
+  const prog = head.appendChild(Object.assign(document.createElement('div'), { className: 'hprog' }));
+  prog.setAttribute('aria-hidden', 'true');
+
+  const hero = document.querySelector('#heroPin .hero');
+  // los enlaces de anclaje de la barra, emparejados con su sección
+  const links = [...head.querySelectorAll('nav.main a[href^="#"]')]
+    .map(a => ({ a, el: $(a.getAttribute('href').slice(1)) }))
+    .filter(l => l.el);
+
+  // Dónde empieza el fondo oscuro: el bloque que envuelve «Actualidad» y el
+  // kiosko. De ahí al pie ya no vuelve a haber papel.
+  const darkFrom = document.querySelector('.bajada') || $('actualidad');
+
+  let headH = 68, darkY = Infinity, maxScroll = 1;
+  onMeasure(() => {
+    headH = head.offsetHeight || 68;
+    darkY = darkFrom ? docTop(darkFrom) - headH : Infinity;
+    links.forEach(l => { l.top = docTop(l.el); l.bot = l.top + l.el.offsetHeight; });
+    maxScroll = Math.max(1, document.documentElement.scrollHeight - viewH());
+  });
+
+  let onDark = null, curLink = null, prevP = -1;
+  function update() {
+    const y = Math.max(0, scrollY);
+
+    // 1 · claro u oscuro. En el hero manda el agua: --seaP es la fracción de
+    //     pantalla que ya ha cubierto, así que en cuanto pasa del canto de la
+    //     barra (headH/alto de pantalla) la cabecera ya está sumergida.
+    let dark = y >= darkY;
+    if (!dark && hero) {
+      const seaP = parseFloat(hero.style.getPropertyValue('--seaP')) || 0;
+      dark = seaP >= 1 - (headH + 26) / viewH();
+    }
+    if (dark !== onDark) { onDark = dark; head.classList.toggle('on-dark', dark); }
+
+    // 2 · la sección en pantalla, medida justo bajo la barra
+    const probe = y + headH + 10;
+    let act = null;
+    for (const l of links) if (probe >= l.top && probe < l.bot) { act = l; break; }
+    if (act !== curLink) {
+      if (curLink) curLink.a.classList.remove('on');
+      if (act) act.a.classList.add('on');
+      curLink = act;
+    }
+
+    // 3 · el hilo. Se redondea a dos decimales: sin eso escribía una custom
+    //     property nueva en cada frame para mover la línea medio píxel.
+    const pr = Math.round(Math.min(1, y / maxScroll) * 100) / 100;
+    if (pr !== prevP) { prevP = pr; prog.style.setProperty('--prog', pr); }
+  }
+  onScroll(update);
+  update();
 }());
 
 /* ================= aparición al hacer scroll ================= */
