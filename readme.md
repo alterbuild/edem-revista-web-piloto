@@ -24,6 +24,8 @@ edem-times-web/
 │   └── noticias.json     ★ CONTENIDO DEL PORTAL — secciones, noticias y config del CMS
 ├── revistas/             Las revistas maquetadas (una página HTML por número + versión A4)
 └── assets/               Logos, favicon e imágenes (assets/img/)
+    └── hero/             La escena del hero (la Marina desde la dársena): dos SVG que
+                          genera ../scripts/escena-marina.mjs — se retoca ahí, no a mano
 ```
 
 **Dos ritmos, dos contenidos.** La revista es mensual y vive en `revistas/` + `content.json`;

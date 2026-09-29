@@ -114,6 +114,14 @@ function onScroll(fn) {
   scrollJobs.push(fn);
 }
 
+/* --- el estado de la inmersión del hero ---
+   Lo escribe immersion() en cada frame y lo leen la cabecera (headerTheme) y el
+   tinte de la barra del navegador (barTint). Antes esos dos lo sacaban de las
+   custom properties del hero, pero la inmersión dejó de escribirlas ahí para no
+   invalidar el estilo del hero entero en cada frame: leían siempre 0 y la
+   cabecera se quedaba clara con la pantalla ya bajo el agua. */
+const HERO = { seaP: 0, deepP: 0 };
+
 /* --- caché de geometría --- */
 const geomJobs = [];
 function onMeasure(fn) { geomJobs.push(fn); fn(); }
@@ -141,26 +149,6 @@ function renderHero() {
   if (h.lead) $('hero-lead').textContent = h.lead;
   buildDeck();
 }
-
-/* ---- el paisaje flat del hero: encuadre según la pantalla ----
-   El dibujo es apaisado (1440×620) y se pinta con «slice», o sea que rellena
-   la caja recortando lo que sobra. En una pantalla vertical lo que sobra son
-   los laterales, y la grúa, la lancha o las palmeras salían partidas. Cada
-   capa lleva en data-vbm un viewBox pensado para el móvil: más estrecho —se
-   queda con la dársena— y con cielo de sobra por arriba, que es por donde
-   interesa que recorte. El viewBox no se puede tocar desde CSS, de ahí este
-   puente; el resto del reajuste (lo que se aparta o se retira) va en site.css. */
-(function heroSceneFrame() {
-  const svgs = [...document.querySelectorAll('.hscene svg[data-vbm]')];
-  if (!svgs.length) return;
-  const XS = matchMedia('(max-width:680px)');   // el mismo corte de móvil que usa site.css
-  const apply = () => svgs.forEach(s => {
-    if (!s.dataset.vbw) s.dataset.vbw = s.getAttribute('viewBox');   // el de escritorio, tal cual venía
-    s.setAttribute('viewBox', XS.matches ? s.dataset.vbm : s.dataset.vbw);
-  });
-  apply();
-  onMQ(XS, apply);
-})();
 
 /* ---- pila de portadas del hero: rota entre ediciones ---- */
 let deckOrder = [], deckTimer = null, deckPaused = false, deckWake = null, flyJob = 0;
@@ -866,14 +854,11 @@ onMQ(matchMedia('(min-width:861px)'), e => { if (e.matches) closeMenu(); });
   function update() {
     const y = Math.max(0, scrollY);
 
-    // 1 · claro u oscuro. En el hero manda el agua: --seaP es la fracción de
+    // 1 · claro u oscuro. En el hero manda el agua: HERO.seaP es la fracción de
     //     pantalla que ya ha cubierto, así que en cuanto pasa del canto de la
     //     barra (headH/alto de pantalla) la cabecera ya está sumergida.
     let dark = y >= darkY;
-    if (!dark && hero) {
-      const seaP = parseFloat(hero.style.getPropertyValue('--seaP')) || 0;
-      dark = seaP >= 1 - (headH + 26) / viewH();
-    }
+    if (!dark && hero) dark = HERO.seaP >= 1 - (headH + 26) / viewH();
     if (dark !== onDark) { onDark = dark; head.classList.toggle('on-dark', dark); }
 
     // 2 · la sección en pantalla, medida justo bajo la barra
@@ -934,26 +919,19 @@ function observeReveals() {
   /* DÓNDE SE ESCRIBE CADA COSA (esto es la mitad del coste por frame).
 
      Cambiar una custom property en un elemento invalida el estilo de TODO su
-     subárbol, y da igual que nadie la use: medido en este hero, escribir una
-     propiedad cualquiera en `.hero` cuesta 1,19 ms por frame, y una que no lee
-     nadie cuesta lo mismo. Son sus 267 nodos (156 de ellos del SVG del
-     paisaje) marcados como sucios sesenta veces por segundo. En un portátil se
-     nota poco; en un teléfono es la diferencia entre 60 y 30 fps, y era lo que
-     hacía que la bajada se viera a tirones.
-
-     Coste medido de escribir una propiedad, según dónde:
-        .hero    267 nodos → 1,187 ms      .grid   49 nodos → 0,198 ms
-        .heroBg  157 nodos → 0,372 ms      .sea     3 nodos → 0,062 ms
-        estilo directo (transform/opacity)          → 0,002 ms
+     subárbol, y da igual que nadie la use: medido en el hero de antes, escribir
+     una propiedad cualquiera en `.hero` costaba 1,19 ms por frame (267 nodos,
+     156 de ellos del SVG del paisaje) y en `.sea` —tres nodos— 0,062 ms. Un
+     estilo directo (transform/opacity) cuesta 0,002 ms.
 
      Así que cada valor va al sitio más pequeño que lo necesita:
-     · el PAISAJE sí necesita cascada (diez selectores repartidos por el SVG):
-       --seaP se queda, pero en `.heroBg`, no en `.hero`. Y solo cambia durante
-       la subida del agua: en cuanto el mar cubre, seaP se queda en 1 y el
-       filtro de escritura deja de tocarlo el resto del recorrido.
+     · el PAISAJE son dos láminas <img> (la ciudad y el muelle): se hunden a
+       distinta velocidad según sube el mar y a cada una se le escribe su
+       transform DIRECTAMENTE. Ni cascada ni repintado: la GPU mueve una imagen
+       ya pintada.
      · el MAR lo lee un solo elemento, pero su transform va atado a --heroH y
        --sea-fill (que en CSS cambian por media query): se le escribe --seaP a
-       él mismo (0,062 ms) en vez de rehacer la cuenta en JS y duplicarla.
+       él mismo en vez de rehacer la cuenta en JS y duplicarla.
      · todo lo demás —el desplazamiento del texto, las dos flechas y la
        inmersión— tiene un único consumidor y una fórmula de una línea: se les
        escribe el transform o la opacidad DIRECTAMENTE.
@@ -961,7 +939,10 @@ function observeReveals() {
      es una propiedad normal: no cascadea y solo se toca cuando cambia el color
      cuantizado. */
   const root = hero;
-  const bgLayer = hero.querySelector('.heroBg');
+  // cuánto se hunde cada lámina cuando el mar ha cubierto la pantalla (px):
+  // lo de cerca más que lo de lejos, que es lo que da la profundidad
+  const layers = [...hero.querySelectorAll('.hscape .hl')]
+    .map(el => ({ el, k: el.classList.contains('hnear') ? 46 : 18, prev: -1 }));
   const seaLayer = hero.querySelector('.sea');
   const gridLayer = hero.querySelector('.grid');
   const cue = hero.querySelector('.scrollcue');
@@ -976,10 +957,11 @@ function observeReveals() {
   // Safari iOS 26 (ver comentario en site.css, .hero). Va por JS y en rgb() PLANO
   // a propósito: iOS extiende a la safe-area los rgb/hex, pero NO los color-mix()
   // (comprobado en simulador: con color-mix la franja se quedaba clara). El color
-  // sigue la escena: papel en superficie → mar (--seaP) → profundidad (--deepP),
-  // igual que el color-mix de site.css, que queda como respaldo para no-JS/Chrome.
+  // sigue la escena: el agua de la dársena, que es lo que toca el borde de abajo
+  // en reposo → el mar que sube (--seaP) → profundidad (--deepP), igual que el
+  // color-mix de site.css, que queda como respaldo para no-JS/Chrome.
   const hx = h => [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16));
-  const CREAM = hx('fbfaf6'), SEAC = hx('6fb4cb'), DEEPC = hx('052635');
+  const CREAM = hx('3b8eab'), SEAC = hx('2f7e9b'), DEEPC = hx('052635');
   const lerp = (a, b, t) => Math.round(a + (b - a) * t);
   const q24 = v => Math.round(v * 24) / 24;   // cuantiza el color de la franja
   const heroCol = (seaP, deepP) => {
@@ -988,10 +970,10 @@ function observeReveals() {
     const b = lerp(lerp(CREAM[2], SEAC[2], seaP), DEEPC[2], deepP);
     return 'rgb(' + r + ',' + g + ',' + b + ')';
   };
-  const SURFACE = heroCol(0, 0);   // el papel del landing, ya compuesto
+  const SURFACE = heroCol(0, 0);   // el agua de la dársena, ya compuesta
 
   let pinTop = 0, range = 0, vh = 0, waveEnd = 0, seg = 0, enabled = true;
-  let prevSeaBg = -1, prevSeaSea = -1, prevDeep = -1, prevCue = -1, prevGrid = -1;
+  let prevSeaSea = -1, prevDeep = -1, prevCue = -1, prevGrid = -1;
   let prevBg = '', prevQs = -1, prevQd = -1;
   const prevPh = new Array(N).fill(null), prevOp = new Array(N).fill(null);
 
@@ -1026,6 +1008,9 @@ function observeReveals() {
     el.style.transform = 'translate3d(0,' + px.toFixed(2) + 'px,0)';
     return px;
   }
+  function sink(seaP) {
+    for (let i = 0; i < layers.length; i++) { const l = layers[i]; l.prev = writeShiftY(l.el, seaP * l.k, l.prev); }
+  }
 
   // classList solo cuando cambia de verdad: tocarlo en cada frame invalidaría
   // el estilo del hero y nos comeríamos lo que acabamos de ahorrar.
@@ -1040,23 +1025,25 @@ function observeReveals() {
     if (!enabled) {
       // Solo la primera pasada tras quedar deshabilitada: con el bucle continuo,
       // reescribir esto en cada frame invalidaría el estilo para nada.
-      prevSeaBg = writeVar(bgLayer, '--seaP', 0, prevSeaBg);
       prevSeaSea = writeVar(seaLayer, '--seaP', 0, prevSeaSea);
+      sink(0);
       prevDeep = writeOpacity(deep, 0, prevDeep);
       prevCue = writeOpacity(dcue, 0, prevCue);
       prevGrid = writeShiftY(gridLayer, 0, prevGrid);
       if (cue) cue.style.opacity = '1';
       if (SURFACE !== prevBg) { prevBg = SURFACE; root.style.backgroundColor = SURFACE; }
-      flag('dry', false); flag('sunk', false); flag('wake', false);
+      HERO.seaP = 0; HERO.deepP = 0;
+      flag('dry', false); flag('sunk', false); flag('calm', true);
       return;
     }
     if (s < -vh || s > range + vh) return;          // fuera de pantalla: nada que hacer
 
     const seaP = clamp01(s / waveEnd);
     const deepP = step(waveEnd * 0.55, waveEnd * 0.98, s);
-    // el paisaje (cascada, cara) y el mar (un solo lector)
-    prevSeaBg = writeVar(bgLayer, '--seaP', seaP, prevSeaBg);
+    HERO.seaP = seaP; HERO.deepP = deepP;
+    // el mar (un solo lector) y las dos láminas del paisaje, que se hunden
     prevSeaSea = writeVar(seaLayer, '--seaP', seaP, prevSeaSea);
+    sink(seaP);
     // y los de un solo consumidor, a pelo
     prevGrid = writeShiftY(gridLayer, seaP * -48, prevGrid);
     prevDeep = writeOpacity(deep, deepP, prevDeep);
@@ -1084,9 +1071,9 @@ function observeReveals() {
     // animándose, y una vez bajo el agua el fondo y las crestas tampoco.
     flag('dry', deepP < 0.002);
     flag('sunk', seaP > 0.995);
-    // en cuanto el agua se mueve, el puerto deja de respirar (ver site.css:
-    // es la mitad del coste por frame de toda la bajada)
-    flag('wake', seaP > 0.004);
+    // mientras el mar no ha empezado a subir sus olas están fuera de cuadro:
+    // quietas (ver .hero.calm en site.css)
+    flag('calm', seaP < 0.002);
 
     for (let i = 0; i < N; i++) {
       const u = (s - waveEnd - i * seg) / seg;      // 0→1 dentro de la ventana del beat
@@ -1193,7 +1180,7 @@ function observeReveals() {
   }
   let inView = false;
 
-  /* burbujas y motas: puro CSS una vez creadas (el compositor las mueve solo) */
+  /* burbujas: puro CSS una vez creadas (el compositor las mueve solo) */
   function scatter(host, n, minSize, maxSize, minDur, maxDur) {
     if (!host) return;
     host.innerHTML = '';
@@ -1210,7 +1197,6 @@ function observeReveals() {
   function bubbles() {
     const small = window.innerWidth < 700;
     scatter($('bubbles'), small ? 10 : 18, 3, 12, 9, 21);
-    scatter($('motes'), small ? 7 : 12, 3, 7, 16, 30);
   }
 
   // la flecha bajo el agua no salta al kiosko: solo empuja un beat más.
@@ -1850,7 +1836,11 @@ function abrirVisorPorURL() {
   const rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
   const mix = (a, b, t) => '#' + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, '0')).join('');
 
-  const SURF = rgb('#91cede'), DEEP = rgb('#052635');   // agua de las olas → fondo de la inmersión (.deepTint)
+  // En el hero la barra de Chrome va ARRIBA, así que sigue lo que toca el borde de
+  // arriba: el cielo (papel) en reposo, el agua cuando el mar llega hasta ahí y la
+  // profundidad de la inmersión (.deepTint) después.
+  const SKY = rgb('#fbfaf6'), SURF = rgb('#62abc2'), DEEP = rgb('#052635');
+  const mixA = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
   // «Actualidad» y el kiosko ya no pintan su propio fondo: comparten el de
   // .bajada (ver css/site.css). Estos son los tramos de ESE degradado que le
   // tocan a cada una — el kiosko cierra en el #06333f con el que abre
@@ -1859,7 +1849,6 @@ function abrirVisorPorURL() {
   const KTOP = rgb('#0a4152'), KBOT = rgb('#06333f');
   const PAPER = '#fbfaf6';
 
-  const hero = document.querySelector('#heroPin .hero');
   // Secciones con fondo propio bajo el hero, en orden de documento. Un par de
   // colores en vez de uno significa degradado: se interpola según lo metido que
   // esté el borde inferior de la pantalla en la sección.
@@ -1890,8 +1879,8 @@ function abrirVisorPorURL() {
         }
       }
       if (!c) {                                         // aún en el hero: según baja la inmersión
-        const deepP = hero ? parseFloat(hero.style.getPropertyValue('--deepP')) || 0 : 0;
-        c = mix(SURF, DEEP, deepP);
+        const t = Math.min(1, Math.max(0, (HERO.seaP - 0.8) / 0.2));
+        c = mix(mixA(SKY, SURF, t), DEEP, HERO.deepP);
       }
     }
     if (c !== cur) { cur = c; meta.content = c; }

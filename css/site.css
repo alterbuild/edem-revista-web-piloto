@@ -373,22 +373,46 @@ html.sbusca-on{overflow:hidden}
    Así cada beat cae en ~0,95 pantallas y la subida del agua en 0,8. */
 /* La cabecera es sticky, o sea que ocupa sus 69px en el flujo y empujaba el
    hero hacia abajo: a scroll 0 el hero medía una pantalla pero EMPEZABA en el
-   píxel 69, así que se le quedaban 69px por debajo del borde inferior. Ahí
-   caían la cresta del mar y —peor— la flecha de «sigue bajando», que en un
-   portátil de 900px no se veía nunca: justo la pista que hace falta en la
-   primera pantalla.
+   píxel 69, así que se le quedaban 69px por debajo del borde inferior.
    Con el margen negativo el hero arranca pegado al borde de arriba y la barra
    le flota por encima (patrón de cabecera transparente de toda la vida). No se
-   ve el solape porque en superficie los dos son el mismo papel #fbfaf6, y el
+   ve el solape porque arriba del todo el cielo es el mismo papel #fbfaf6, y el
    padding de 92px del hero ya mantenía el contenido por debajo de la barra. */
 .heroPin{position:relative;height:370vh;margin-top:-69px}
 /* --heroH: alto real de la pantalla, reutilizado por el mar para su recorrido.
    --seaP y --deepP se declaran AQUÍ, no en :root: js/app.js las reescribe en
    cada frame y una custom property en :root invalida el estilo de todo el
-   documento. Acotadas al hero, el recálculo se queda en este subárbol — es la
-   diferencia entre 60fps y un pase de diapositivas en Safari iOS. */
-.hero{--heroH:100vh;--seaP:0;--deepP:0;padding:92px 0 150px;position:sticky;top:0;overflow:hidden;
-  /* LA FRANJA AZUL/BLANCA de la barra inferior de Safari iOS 26.
+   documento. (Hoy js/app.js solo escribe --seaP en .sea, que tiene tres nodos;
+   el resto lo mueve con transform y opacity directos.) */
+.hero{--heroH:100vh;--seaP:0;--deepP:0;position:sticky;top:0;overflow:hidden;
+  /* LA ESCENA: qué trozo cae en pantalla y cuánto alto se lleva.
+     Está dibujada a 1600×340 y se escala por el ANCHO. --sw es el ancho al que se
+     pinta: nunca menos que la pantalla (no quedan huecos a los lados) y, en
+     pantallas estrechas, bastante más, para que los edificios no se queden en
+     miniatura; lo que sobra se recorta por los lados. --fx es el punto de la
+     escena que cae en el centro de la pantalla cuando sobra ancho.
+     --band es el alto que la escena ocupa DE VERDAD. Si la escena pide más de lo
+     que la pantalla se puede permitir (--bandmax), se hunde por abajo: se recorta
+     agua —como mucho el 16% del dibujo, o sea la mitad de la dársena—, nunca
+     edificios. El contenido se centra en lo que queda por encima (--padB): así ni
+     el titular ni la pila de portadas pisan la grúa ni los edificios en ninguna
+     pantalla. Antes el paisaje iba DETRÁS del texto (la pluma de la grúa cruzaba
+     la entradilla y los veleros los botones) y había que tapar el dibujo con
+     halos desenfocados para poder leer. */
+  --sw:max(100vw,1000px,110vh);--fx:.42;
+  --sh:calc(var(--sw) * .2125);
+  --bandmax:38vh;
+  --band:clamp(calc(var(--sh) * .84),var(--bandmax),var(--sh));
+  /* --vbar: lo que tapan las barras del navegador en reposo. El hero mide el
+     viewport GRANDE (100lvh, ver abajo), pero con la barra de Safari o la de
+     Chrome desplegadas solo se ve el pequeño (100svh): sin esto, justo la franja
+     de agua y el muelle quedaban debajo de la barra. La escena y el contenido se
+     suben esa diferencia; al plegarse la barra asoma más agua por abajo, que es
+     lo natural. En escritorio vale 0. */
+  --vbar:0px;
+  --padB:calc(var(--band) - var(--sh) * .02 + 16px + var(--vbar));
+  padding:92px 0 var(--padB);
+  /* LA FRANJA de la barra inferior de Safari iOS 26.
      El hero (sticky, alto = lvh) acaba en el borde del viewport de LAYOUT
      (innerHeight). Con la barra flotante «cristal líquido» queda DEBAJO una franja
      física de ~120px —tras la barra y el home indicator— que el layout no cuenta.
@@ -396,29 +420,30 @@ html.sbusca-on{overflow:hidden}
      del elemento del borde (el hero); el `background-image`, los gradientes y los
      hijos absolutos (.sea, .deep, el paisaje) se recortan en innerHeight y NO
      llegan. Tampoco el theme-color ni env(safe-area-inset-bottom) (reporta 0).
-     Por eso el contenido real (agua, barcos) NO puede extenderse ahí; lo único
-     posible es que ese `background-color` IGUALE en cada frame al contenido justo
-     encima, para que la franja sea invisible («como si la barra no estuviera»).
-     Ese color sigue la escena con --seaP/--deepP (que app.js ya anima por frame,
-     sin el «efecto perseguidor» del theme-color):
-       superficie #fbfaf6 (el mismo papel del landing) → mar #6fb4cb (--seaP)
-       → profundidad #052635 (--deepP).
-     En superficie el color es el papel del landing, así que este background-color
-     hace de fondo VISIBLE del hero (por las zonas transparentes del paisaje) SIN
-     teñir nada; en cuanto el mar sube o baja la inmersión, el paisaje/mar/deep ya
-     cubren la parte en pantalla y este color solo se ve en la franja de abajo.
+     Así que ese `background-color` tiene que IGUALAR en cada momento lo que hay
+     justo encima, para que la franja no se vea («como si la barra no estuviera»):
+       reposo: el agua de la dársena, que es lo que toca el borde de abajo
+       (#3b8eab) → el mar que sube (#2f7e9b, --seaP) → profundidad (#052635, --deepP).
+     Este color no se ve en ningún otro sitio: .heroBg tapa el hero entero con el
+     cielo y la escena. Lo mantiene al día js/app.js (en rgb plano: iOS no extiende
+     a la franja un color-mix); el color-mix de aquí es el respaldo sin JS.
+     OJO, visto en el Simulador con iOS 26.5 (29-09-2026): con la barra desplegada
+     la franja es la propia barra (papel), y al plegarse Safari toma el color UNA
+     vez —el del hero en ese momento, o sea el de reposo— y no lo actualiza
+     mientras dura la bajada. Por eso el de reposo es el agua y no el papel: el
+     papel quedaba como una tira blanca bajo el mar durante toda la inmersión.
      (Intentar separarlo con un ::before no vale: en iOS ese hijo con z-index
      negativo SECUESTRA la franja y la deja clara aunque el hero sea oscuro.) */
-  background-color:#fbfaf6;
+  background-color:#3b8eab;
   background-color:color-mix(in srgb,
     #052635 calc(var(--deepP) * 100%),
-    color-mix(in srgb,#6fb4cb calc(var(--seaP) * 100%),#fbfaf6));
+    color-mix(in srgb,#2f7e9b calc(var(--seaP) * 100%),#3b8eab));
   height:calc(var(--heroH) + env(safe-area-inset-bottom, 0px));display:flex;align-items:center}
 /* Viewport GRANDE (barra de Safari plegada), como el 100vh clásico de iOS y las
    secciones full-screen de apple.com: si midiera 100svh, al plegarse la barra
    durante los beats el viewport crece y asoma una franja de papel bajo el hero. */
-@supports (height:100lvh){.hero{--heroH:100lvh}}
-.hero .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center;position:relative;z-index:1;width:100%;transform:translateY(calc(var(--seaP) * -48px))}
+@supports (height:100lvh){.hero{--heroH:100lvh;--vbar:calc(100lvh - 100svh)}}
+.hero .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center;position:relative;z-index:1;width:100%}
 .kicker{display:inline-flex;align-items:center;gap:10px;color:var(--edem-teal-700)}
 .kicker .dot{width:7px;height:7px;border-radius:50%;background:var(--lanzadera);animation:kpulse 2.6s ease-in-out infinite}
 @keyframes kpulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.55);opacity:.5}}
@@ -427,27 +452,7 @@ html.sbusca-on{overflow:hidden}
 .hero .sub{font-size:clamp(22px,2.4vw,30px);color:var(--edem-teal-700);margin-top:14px}
 .hero p.lead{font-size:17px;line-height:1.65;color:var(--text-muted);max-width:520px;margin-top:20px}
 .hero .acts{display:flex;align-items:center;gap:14px;margin-top:32px;flex-wrap:wrap}
-
-/* Colchón bajo el texto: el paisaje pasa justo por detrás del titular y de la
-   entradilla (la pluma de la grúa cruza la línea de texto) y el contraste se
-   resentía. Es un halo del propio papel, sin borde duro —radial que se apaga
-   antes de llegar a los lados—, así que no se ve una caja: solo el texto
-   despegado del fondo. Va con z-index negativo DENTRO de .grid, que ya crea su
-   contexto de apilado, así que se queda entre el paisaje y el texto. */
 .heroCopy{position:relative}
-.heroCopy::before{content:'';position:absolute;z-index:-1;pointer-events:none;
-  inset:-70px -18% -58px -12%;
-  background:radial-gradient(104% 84% at 34% 46%,
-    rgba(251,250,246,.95) 0%,rgba(251,250,246,.88) 34%,rgba(251,250,246,.62) 56%,
-    rgba(251,250,246,.26) 74%,rgba(251,250,246,0) 90%)}
-/* El desenfoque es lo que le quita el borde del todo: el degradado por sí solo
-   dejaba un canto perceptible donde se apagaba. Es una capa estática —no se
-   anima ni se repinta—, así que el blur se rasteriza una vez y sale gratis. */
-@supports (filter:blur(1px)){
-  .heroCopy::before{filter:blur(28px)}
-}
-/* y una sombra de nada bajo el titular: lo asienta sobre el papel sin ensuciarlo */
-.hero h1,.hero .sub{text-shadow:0 2px 16px rgba(12,30,36,.07)}
 
 /* entrada escalonada del texto */
 @keyframes heroRise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
@@ -459,234 +464,110 @@ html.sbusca-on{overflow:hidden}
 .heroCopy>*:nth-child(6){animation-delay:.4s}
 .heroDeck{animation:heroRise .9s .2s var(--ease-out) both}
 
-/* fondo animado */
-/* El papel BEIGE del landing lo pinta esta capa (antes lo dejaba ver el <body> por
-   detrás del hero transparente). Va aquí, en un hijo, y NO en el background del
-   propio hero: ese background lo usa js/app.js para teñir la FRANJA tras la barra
-   inferior de iOS siguiendo el mar (crema→azul→oscuro). Si el beige lo pusiéramos
-   en el hero, «Tracción» y el deck se teñirían de azul al subir el mar; al ponerlo
-   en .heroBg (que se recorta en el viewport y se oculta con .sunk) el deck se queda
-   beige hasta que el agua lo cubre, y la franja sigue su color aparte. */
-.heroBg{position:absolute;inset:0;pointer-events:none;overflow:hidden;background:#fbfaf6}
-/* Paisaje flat de la Marina, anclado al horizonte (por eso xMidYMax) y en tres
-   capas. Cada una se hunde a distinta velocidad con --seaP: el cielo apenas se
-   mueve, los veleros del primer plano bajan el triple. Solo transform y
-   opacity — el mismo trato que el resto del hero. */
-/* El alto de la banda va atado al ancho a propósito. Con «slice» el dibujo se
-   escala por el ANCHO, así que con un alto fijo cuanto más ancha es la pantalla
-   menos alto del dibujo cabe: a partir de ~1550px la torre de la grúa se salía
-   por arriba (portátiles de 15", monitores). El suelo de 470px mantiene la
-   medida de siempre hasta 1470px —ahí no cambia nada— y de ahí en adelante la
-   banda crece con la pantalla para que la escena entre entera. El tope en vh
-   evita que el paisaje se coma el hero en ventanas bajas. */
-.hscene{position:absolute;left:0;right:0;bottom:0;height:min(62vh,max(470px,32vw));
-  will-change:transform;transform:translate3d(0,calc(var(--seaP) * var(--par,24px)),0)}
-.hscene svg{width:100%;height:100%;display:block}
-/* el cielo necesita más margen: el sol asoma por encima del borde del viewBox */
-.hscene.sky{--par:-34px;height:min(96vh,max(900px,45vw));opacity:calc(1 - var(--seaP) * .55)}
-/* El cielo NO recorta. Su caja acaba a media pantalla (arriba del todo del hero
-   queda aire), y el sol —que con la inmersión se va hacia arriba, ver .up— se
-   cortaba en seco contra ese borde invisible: a 1400×620 le cercenaba 84px de
-   corona con la inmersión al 22%, un filo recto en mitad del cielo. Con overflow
-   visible el único recorte es el de .heroBg, o sea el borde real del hero, que
-   con el hero clavado es el borde de la pantalla: el sol se va de cuadro en vez
-   de partirse. Lo que sobra a los lados lo sigue recortando .heroBg, que mide
-   exactamente lo mismo de ancho. */
-.hscene.sky svg{overflow:visible}
-/* y el sol se apaga nada más salir de cuadro, para no verlo cruzar por debajo
-   de la cabecera translúcida */
-.hscene .sun{opacity:calc(1 - var(--seaP) * 4)}
-.hscene.far{--par:26px}
-.hscene.near{--par:78px;opacity:calc(1 - var(--seaP) * .35)}
-/* entrada: el paisaje se levanta una vez con la página, como el resto del hero */
-@keyframes hsceneIn{from{opacity:0;transform:translate3d(0,34px,0)}}
-.hscene{animation:hsceneIn 1.1s var(--ease-out) both}
-.hscene.far{animation-delay:.1s}
-.hscene.near{animation-delay:.2s}
+/* ---------- el fondo: la Marina de Empresas vista desde la dársena ----------
+   El cielo es el papel del landing arriba del todo —la cabecera flota encima y
+   tienen que ser el mismo color— y se va aclarando a azul hacia el horizonte,
+   que es donde los edificios blancos necesitan algo detrás para leerse.
+   Va en .heroBg y NO en el background del propio hero: ese lo usa la franja de
+   iOS (ver arriba). .heroBg se recorta en el viewport y se oculta con .sunk. */
+.heroBg{position:absolute;inset:0;pointer-events:none;overflow:hidden;
+  background:linear-gradient(180deg,#fbfaf6 0,#fbfaf6 calc(100% - var(--band) - var(--vbar) - 40vh),
+    #f1f6f5 calc(100% - var(--band) - var(--vbar) - 14vh),#e2eef2 calc(100% - var(--band) * .45 - var(--vbar)))}
+/* La escena: dos láminas <img> SVG (assets/hero/), la ciudad detrás y el muelle
+   delante. Como IMAGEN y no como SVG en línea: el navegador las rasteriza una vez
+   y ya. No añaden nodos al DOM ni recalculan estilo al hacer scroll, y lo único
+   que se les hace es moverlas enteras (transform, ver js/app.js), que es trabajo
+   de la GPU. El paisaje de antes llevaba una docena de bucles DENTRO de sus SVG
+   —barcos, gaviotas, palmeras, el sol— y cada fotograma obligaba a volver a pintar
+   las tres capas a pantalla completa, también con la página quieta. */
+.hscape{position:absolute;width:var(--sw);height:var(--sh);
+  left:clamp(calc(100% - var(--sw)),calc(50% - var(--sw) * var(--fx)),0px);
+  bottom:calc(var(--band) - var(--sh) + var(--vbar))}
+/* el agua sigue por debajo de la escena: es lo que asoma cuando el navegador
+   pliega su barra (ver --vbar) */
+.hscape::after{content:'';position:absolute;left:0;right:0;top:100%;height:240px;background:#3b8eab}
+.hscape .hl{position:absolute;left:0;top:0;width:100%;height:100%;display:block;will-change:transform}
 
-/* Cada pieza va en dos grupos anidados para que las dos cosas no se pisen:
-   .ex se encarga de la SALIDA (la manda el scroll con --seaP) y dentro va el
-   grupo del movimiento en bucle (.bob, .fly, .sway…), que es quien anima. */
-.hscene .ex{transition:opacity .3s linear}
-.hscene .left{transform:translate(calc(var(--seaP) * -820px),calc(var(--seaP) * 40px))}
-.hscene .right{transform:translate(calc(var(--seaP) * 880px),calc(var(--seaP) * 40px))}
-.hscene .up{transform:translate(calc(var(--seaP) * 210px),calc(var(--seaP) * -300px))}
-/* lo que está más lejos tarda más en irse: el puerto se vacía por capas */
-.hscene .far2{transform:translate(calc(var(--seaP) * var(--fx,520px)),calc(var(--seaP) * 26px))}
-.hscene .left.far2{--fx:-520px}
-/* el horizonte no se aparta: se desvanece según lo tapa el mar */
-.hscene .quay{opacity:calc(1 - var(--seaP))}
-
-/* movimiento en bucle: recorridos de pocos píxeles y ciclos largos — se nota
-   que el puerto respira, no que algo se mueve */
-.hscene .bob,.hscene .sway,.hscene .brea{transform-box:view-box;transform-origin:var(--o)}
-@keyframes hsBob{0%,100%{transform:rotate(-.9deg) translateY(0)}50%{transform:rotate(.9deg) translateY(-5px)}}
-.hscene .bob{animation:hsBob 9s var(--ease-standard) infinite}
-.hscene .bob.b2{animation-duration:7.2s;animation-delay:-2.4s}
-.hscene .bob.b3{animation-duration:5.4s;animation-delay:-1.1s}
-.hscene .bob.b4{animation-duration:8.1s;animation-delay:-3.7s}
-.hscene .bob.b5{animation-duration:6.3s;animation-delay:-5.2s}
-@keyframes hsSway{0%,100%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}}
-.hscene .sway{animation:hsSway 8s ease-in-out infinite}
-.hscene .sway.s2{animation-duration:6.4s;animation-delay:-2s}
-@keyframes hsBrea{50%{transform:scale(1.035)}}
-.hscene .brea{animation:hsBrea 14s ease-in-out infinite}
-@keyframes hsFly{0%{transform:translate(0,0)}50%{transform:translate(46px,-9px)}100%{transform:translate(0,0)}}
-.hscene .fly{animation:hsFly 19s ease-in-out infinite}
-.hscene .fly.f2{animation-duration:24s;animation-delay:-6s}
-.hscene .fly.f3{animation-duration:29s;animation-delay:-13s}
-.hscene .fly.f4{animation-duration:21s;animation-delay:-9s}
-.hscene .fly.f5{animation-duration:26s;animation-delay:-4s}
-.hscene .fly.f6{animation-duration:23s;animation-delay:-17s}
-/* el carro de la grúa, yendo y viniendo por la pluma */
-@keyframes hsTroll{0%,100%{transform:translateX(0)}50%{transform:translateX(268px)}}
-.hscene .troll{animation:hsTroll 22s var(--ease-standard) infinite}
-/* la corona del sol gira tan despacio que no se ve moverse: solo hace que el
-   sol nunca esté dos veces igual. fill-box centra el giro en el propio sol —los
-   12 rayos son simétricos, así que su caja está centrada en el astro. */
-@keyframes hsRays{to{transform:rotate(360deg)}}
-.hscene .rays{transform-box:fill-box;transform-origin:center;
-  animation:hsRays 190s linear infinite}
+/* nubes y gaviotas: piezas sueltas, cada una en su caja y animadas solo con
+   transform (las mueve el compositor, sin repintar nada) */
+.hsky{position:absolute;inset:0}
+.cloud{position:absolute;width:250px;height:58px;opacity:.9;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 70'%3E%3Cg fill='%23eaf2f5'%3E%3Ccircle cx='74' cy='46' r='22'/%3E%3Ccircle cx='116' cy='36' r='30'/%3E%3Ccircle cx='164' cy='40' r='25'/%3E%3Ccircle cx='208' cy='47' r='19'/%3E%3Ccircle cx='243' cy='52' r='13'/%3E%3Crect x='52' y='47' width='204' height='21' rx='10.5'/%3E%3C/g%3E%3Cg fill='%23fff'%3E%3Ccircle cx='74' cy='44' r='21'/%3E%3Ccircle cx='116' cy='34' r='29'/%3E%3Ccircle cx='163' cy='38' r='24'/%3E%3Ccircle cx='207' cy='45' r='18'/%3E%3Ccircle cx='242' cy='50' r='12'/%3E%3Crect x='53' y='45' width='201' height='19' rx='9.5'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;
+  animation:cloudDrift 80s ease-in-out infinite alternate}
+.cloud.c1{left:42%;top:14%}
+.cloud.c2{right:2%;top:10%;width:300px;height:70px;animation-duration:110s;animation-delay:-40s}
+@keyframes cloudDrift{from{transform:translate3d(-26px,0,0)}to{transform:translate3d(26px,0,0)}}
+/* La gaviota planea (la caja) y de vez en cuando bate las alas (el dibujo,
+   ::before, que se aplasta en vertical un instante). Dos animaciones en dos
+   elementos para que un transform no pise al otro. */
+.gull{position:absolute;width:30px;height:11px;animation:gullGlide 17s ease-in-out infinite}
+.gull::before{content:'';position:absolute;inset:0;transform-origin:50% 60%;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 16'%3E%3Cpath d='M1 9.5C7 3 13.5 2 20 8.2c.9.9 3.1.9 4 0C30.5 2 37 3 43 9.5c-6.4-3.2-12.6-2.6-18 2.6-1.4 1.4-4.6 1.4-6 0C13.6 6.9 7.4 6.3 1 9.5z' fill='%234f8394'/%3E%3C/svg%3E") center/contain no-repeat;
+  animation:gullFlap 5.5s ease-in-out infinite}
+.gull.g1{left:49%;bottom:calc(var(--band) + var(--vbar) + 15vh)}
+.gull.g2{left:54.5%;bottom:calc(var(--band) + var(--vbar) + 21vh);width:22px;height:8px;animation-duration:21s;animation-delay:-7s}
+.gull.g2::before{animation-delay:-2s}
+.gull.g3{left:45%;bottom:calc(var(--band) + var(--vbar) + 7vh);width:18px;height:7px;animation-duration:24s;animation-delay:-12s}
+.gull.g3::before{animation-delay:-3.6s}
+@keyframes gullGlide{0%,100%{transform:translate3d(0,0,0) rotate(-3deg)}50%{transform:translate3d(38px,-10px,0) rotate(3deg)}}
+@keyframes gullFlap{0%,62%,100%{transform:none}68%{transform:scaleY(.45)}74%{transform:none}80%{transform:scaleY(.45)}86%{transform:none}}
 
 @media (prefers-reduced-motion:reduce){
-  .hscene,.hscene .bob,.hscene .sway,.hscene .brea,.hscene .fly,.hscene .troll,
-  .hscene .rays{animation:none}
-}
-
-/* EN CUANTO EMPIEZA A SUBIR EL AGUA, EL PUERTO DEJA DE RESPIRAR.
-   Esto es LO MÁS CARO de toda la inmersión, y con diferencia. Un <g> de un SVG
-   no se puede componer aparte: cuando su transform cambia, WebKit vuelve a
-   RASTERIZAR el dibujo. Aquí hay una docena de bucles infinitos (cinco barcos
-   cabeceando, seis gaviotas, las palmeras, el carro de la grúa, la corona del
-   sol) repartidos por las tres capas, así que los tres SVG a pantalla completa
-   se redibujan en CADA frame, todo el rato — también mientras el mar los tapa.
-   Medido en el simulador durante la subida del agua: 42,4ms por frame (24fps)
-   con los bucles en marcha, 27,5ms (36fps) congelándolos. Quince milisegundos,
-   un 35% del presupuesto, gastados en un cabeceo de 5px que sucede DEBAJO del
-   agua que está subiendo.
-   `animation-play-state:paused` congela cada bucle donde esté —no hay salto, no
-   se recoloca nada— y solo mientras dura la bajada: arriba del todo, que es
-   donde se mira el puerto, sigue respirando igual que siempre. Al volver a
-   subir, se reanudan desde donde se quedaron.
-
-   SOLO EN TELÉFONO. En un ordenador esto no hacía falta —ahí sobra GPU y el
-   paisaje iba fluido— y además se notaba: la pantalla es grande, el puerto
-   ocupa medio cuadro y verlo congelarse de golpe al empezar a bajar se lee como
-   un tirón, justo lo contrario de lo que se buscaba. En escritorio el puerto
-   respira durante toda la bajada, como siempre. */
-@media (max-width:700px){
-  .hero.wake .hscene .bob,.hero.wake .hscene .sway,.hero.wake .hscene .brea,
-  .hero.wake .hscene .fly,.hero.wake .hscene .troll,.hero.wake .hscene .rays,
-  .hero.wake .heroBg .motes span{animation-play-state:paused}
-}
-
-/* ---- el paisaje en un teléfono ----
-   El encuadre apaisado, metido a la fuerza en una pantalla vertical, obliga al
-   «slice» a comerse los laterales: la grúa, la lancha y las palmeras salían
-   partidas por la mitad. Con el viewBox de móvil (data-vbm en el HTML, lo pone
-   js/app.js) el cuadro se cierra sobre la dársena y le sobra cielo, así que el
-   recorte cae siempre ARRIBA —donde no hay nada— y nunca a los lados.
-   Aquí solo se recoloca lo que se quedaba fuera de ese cuadro nuevo. */
-@media(max-width:680px){
-  /* fuera lo que no cabe sin amontonarse: la grúa lejana, la segunda palmera y
-     el sol —que a esta escala se plantaba justo detrás de la llamada a la
-     acción y le comía el contraste. El puerto se lee mejor con una sola grúa. */
-  .hscene .xs-off{display:none}
-  /* la palmera que queda se arrima al muelle, dentro de cuadro */
-  .hscene .palm{transform:translate(1018px,472px)}
-  /* las gaviotas entran en el encuadre y bajan a volar sobre la dársena: donde
-     estaban se cruzaban con el botón de «Leer en el visor» */
-  .hscene .left.far2{transform:translate(calc(350px + var(--seaP) * var(--fx,-520px)),calc(150px + var(--seaP) * 26px))}
-
-  /* El puerto sube por encima de la línea de agua. Las tres capas van pegadas
-     al fondo del hero, pero la banda de olas mide 176px fijos, así que grúa y
-     cascos quedaban medio metidos bajo las crestas.
-     El dibujo se escala con el ANCHO (100vw/720), de modo que la línea de
-     flotación —y=500 del viewBox, 120 unidades por encima del borde— cae a
-     16,67vw del suelo. Subiendo la banda esos 161px menos lo que ya sube sola,
-     los cascos se posan justo en la cresta a cualquier ancho: apoyados en el
-     agua, mojándose solo la obra viva.
-     El segundo término del min() es el freno por ALTO: en una pantalla corta
-     (un SE) el hero se comprime, el texto baja y esos mismos píxeles meterían
-     los veleros dentro del titular. La recta 42vh-240px da los 98px enteros a
-     partir de ~810px de alto y los va recortando hasta casi nada por debajo de
-     600 — donde sencillamente no caben las dos cosas y manda el texto.
-     El tope inferior en 0 es por si alguna cuenta se pasara de rosca. Las tres
-     capas suben igual, así que el horizonte no se despega del mar ni asoma
-     papel entre medias. */
-  .hscene{bottom:max(0px,min(161px - 16.67vw,42vh - 240px))}
-  /* Al subir el puerto, la pluma de la grúa entra en el colchón del texto y se
-     desvanecía casi del todo. El colchón se recoge por abajo: hace falta detrás
-     del titular y del subtítulo, no detrás del botón —que ya es una pieza
-     sólida y se defiende solo—. */
-  .heroCopy::before{inset:-54px -14% 30px -10%}
-}
-/* motas que suben flotando (las genera js/app.js) */
-.heroBg .motes{position:absolute;inset:0;overflow:hidden}
-.heroBg .motes span{position:absolute;bottom:-6%;border-radius:50%;background:var(--edem-teal-400,#63b6cd);
-  animation:mote linear infinite}
-@keyframes mote{
-  0%{transform:translate3d(0,0,0) scale(.6);opacity:0}
-  15%{opacity:.5}
-  80%{opacity:.35}
-  100%{transform:translate3d(var(--dx,20px),-108vh,0) scale(1);opacity:0}
+  .cloud,.gull,.gull::before{animation:none}
 }
 
 /* el mar: tres capas de olas en bucle sin costuras.
    Con el scroll (--seaP) el bloque de agua sube hasta cubrir el hero.
-   Se mueve con translate3d (compositor) en vez de con height: cero layout por frame. */
-/* El agua profunda es el fondo de .sea y empieza justo donde acaba la cresta más
-   baja (--sea-fill). Ahí las tres capas ya son opacas y su mezcla es exactamente
-   #91cede, así que no se ve ninguna costura. Encima de esa línea .sea es
-   transparente: solo se ven las crestas recortadas.
-   Solo se animan tres tiras de --sea-fill de alto (no capas de 1800px): 60fps. */
-/* sin overflow:hidden aquí a propósito: .hero ya recorta (es sticky, o sea el
+   Se mueve con translate3d (compositor) en vez de con height: cero layout por frame.
+   EN REPOSO NO SE VE: el agua de la primera pantalla es la de la dársena, que ya
+   está dibujada en la escena. El mar entra desde el borde de abajo en cuanto se
+   empieza a bajar y sube por encima del muelle, los edificios y el titular.
+   El agua profunda es el fondo de .sea y empieza justo donde acaba la cresta más
+   baja (--sea-fill). Ahí la capa de delante (w3) ya es opaca y es exactamente
+   #62abc2, el primer color del degradado del fondo: no se ve ninguna costura.
+   Es el mismo teal del agua de la dársena dibujada: el mar que sube se lee como
+   la marea que crece, no como una lámina pálida que tapa el puerto.
+   Encima de esa línea .sea es transparente: solo se ven las crestas.
+   Sin overflow:hidden aquí a propósito: .hero ya recorta (es sticky, o sea el
    bloque contenedor de .sea) y este elemento cambia de transform en cada frame
    del scroll — un clip que se mueve encima de tres capas animadas obligaba a
-   Safari a recomponer el grupo entero. El recorte de .hero hace lo mismo gratis. */
+   Safari a recomponer el grupo entero. El recorte de .hero hace lo mismo gratis.
+   Recorrido: arriba del todo (--seaP 0) la cresta queda 8px por debajo del borde;
+   con --seaP 1 el agua de fondo llega al borde de arriba. */
 .hero .sea{position:absolute;left:0;right:0;bottom:0;z-index:3;pointer-events:none;
-  --sea-fill:210px;--o1:0px;--o2:46px;--o3:90px;
-  /* alto = una pantalla + margen arriba y abajo, para poder subir del todo.
-     Recorrido: de dejar asomar solo la cresta (--sea-fill) a taparlo todo. */
+  --sea-fill:150px;--o1:0px;--o2:24px;--o3:50px;
   height:calc(var(--heroH) + 2 * var(--sea-fill));will-change:transform;
-  background-image:linear-gradient(#91cede,#6fb4cb);
+  background-image:linear-gradient(#62abc2,#3f90ad 45%,#2d7c99);
   background-repeat:no-repeat;
-  background-position:left var(--sea-fill);
-  background-size:100% calc(100% - var(--sea-fill));
-  transform:translate3d(0,calc(var(--heroH) + var(--sea-fill) - var(--seaP) * var(--heroH)),0)}
-/* cada capa: su cresta (120px) desplazada --o, y debajo su color hasta --sea-fill */
+  /* el fondo arranca 4px POR ENCIMA del final de las crestas: si empezara justo
+     donde acaban, el antialias de ese borde deja un pelo transparente por el que
+     se ve el cielo (una raya clara cruzando el agua). Las crestas lo tapan. */
+  background-position:left calc(var(--sea-fill) - 4px);
+  background-size:100% calc(100% - var(--sea-fill) + 4px);
+  transform:translate3d(0,calc(var(--heroH) + 2 * var(--sea-fill) + 8px - var(--seaP) * (var(--heroH) + var(--sea-fill) + 8px)),0)}
+/* cada capa: su cresta (60px, con el filo de espuma) desplazada --o, y debajo su
+   color hasta --sea-fill. Olas bajas y largas: es una dársena, no mar abierto. */
 .hero .wave{position:absolute;left:0;top:0;height:var(--sea-fill);width:calc(100% + 1200px);
   background-repeat:repeat-x,repeat-x;
   background-position:left var(--o),left bottom;
-  background-size:1200px 120px,100% calc(var(--sea-fill) - var(--o) - 118px);
+  background-size:1200px 60px,100% calc(var(--sea-fill) - var(--o) - 58px);
   will-change:transform;animation:waveX linear infinite}
 @keyframes waveX{to{transform:translate3d(-1200px,0,0)}}
-.hero .w1{--o:var(--o1);animation-duration:38s;
-  background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201200%20120'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0,60%20C300,20%20300,100%20600,60%20C900,20%20900,100%201200,60%20L1200,120%20L0,120%20Z'%20fill='%23dcf0f5'/%3E%3C/svg%3E"),linear-gradient(#dcf0f5,#dcf0f5)}
-.hero .w2{--o:var(--o2);animation-duration:26s;
-  background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201200%20120'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0,50%20C300,110%20300,10%20600,50%20C900,110%20900,10%201200,50%20L1200,120%20L0,120%20Z'%20fill='%23b4dee9'/%3E%3C/svg%3E"),linear-gradient(#b4dee9,#b4dee9)}
-.hero .w3{--o:var(--o3);animation-duration:18s;opacity:.55;
-  background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201200%20120'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0,70%20C300,30%20300,105%20600,70%20C900,30%20900,105%201200,70%20L1200,120%20L0,120%20Z'%20fill='%2374c1d5'/%3E%3C/svg%3E"),linear-gradient(#74c1d5,#74c1d5)}
-
-/* El pez de EDEM, cruzando la dársena por debajo de la superficie. Va detrás de
-   las tres crestas en el DOM (o sea, encima), pero rebajado y un punto borroso
-   para que se lea como algo que pasa BAJO el agua y no encima de ella. Recorre
-   la pantalla de babor a estribor en un minuto largo, con un vaivén suave. */
-.hero .pez{position:absolute;top:calc(var(--sea-fill) * .52);left:0;
-  width:clamp(44px,4.6vw,74px);height:auto;opacity:.42;
-  filter:blur(.4px) saturate(.85);pointer-events:none;
-  will-change:transform;animation:pezSwim 74s linear infinite,pezBob 9s ease-in-out infinite}
-@keyframes pezSwim{from{transform:translate3d(-22vw,0,0)}to{transform:translate3d(122vw,0,0)}}
-/* translate/rotate son propiedades independientes: se componen con el transform
-   del recorrido sin pisarlo y sin obligar a recalcular layout */
-@keyframes pezBob{0%,100%{translate:0 0;rotate:-2.5deg}50%{translate:0 -9px;rotate:2.5deg}}
-/* bajo el agua ya manda la inmersión: el pez se retira con las crestas */
-.hero.sunk .pez{visibility:hidden}
-/* sin movimiento el pez se queda quieto en un sitio concreto, no en el que le
-   pille al cortar la animación */
-@media (prefers-reduced-motion:reduce){
-  .hero .pez{animation:none;transform:translate3d(38vw,0,0)}
-}
+/* Las dos crestas de atrás acaban 8px antes que la de delante. Si llegaran las
+   tres hasta el mismo borde, el antialias de ese borde dejaba asomar el color
+   claro de las de atrás y se veía una raya fina cruzando el agua (en Safari, a
+   mitad de subida). Así en la junta solo queda w3, que es del mismo color que
+   el fondo del mar. */
+.hero .w1,.hero .w2{height:calc(var(--sea-fill) - 8px);
+  background-size:1200px 60px,100% calc(var(--sea-fill) - 8px - var(--o) - 58px)}
+.hero .w1{--o:var(--o1);animation-duration:46s;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 60' preserveAspectRatio='none'%3E%3Cpath d='M0 30Q150 18 300 30T600 30T900 30T1200 30V60H0Z' fill='%23aed9e6'/%3E%3Cpath d='M0 30Q150 18 300 30T600 30T900 30T1200 30' fill='none' stroke='%23e2f3f8' stroke-width='2'/%3E%3C/svg%3E"),linear-gradient(#aed9e6,#aed9e6)}
+.hero .w2{--o:var(--o2);animation-duration:31s;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 60' preserveAspectRatio='none'%3E%3Cpath d='M0 30Q150 44 300 30T600 30T900 30T1200 30V60H0Z' fill='%2386c2d4'/%3E%3Cpath d='M0 30Q150 44 300 30T600 30T900 30T1200 30' fill='none' stroke='%23c8e8f0' stroke-width='2.2'/%3E%3C/svg%3E"),linear-gradient(#86c2d4,#86c2d4)}
+.hero .w3{--o:var(--o3);animation-duration:22s;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 60' preserveAspectRatio='none'%3E%3Cpath d='M0 30Q150 18 300 30T600 30T900 30T1200 30V60H0Z' fill='%2362abc2'/%3E%3Cpath d='M0 30Q150 18 300 30T600 30T900 30T1200 30' fill='none' stroke='%239fd2e0' stroke-width='1.8'/%3E%3C/svg%3E"),linear-gradient(#62abc2,#62abc2)}
+/* en reposo las olas están fuera de cuadro: no tiene sentido tenerlas girando.
+   .calm lo pone js/app.js mientras el mar no ha empezado a subir. */
+.hero.calm .wave{animation-play-state:paused}
 
 /* ---------- inmersión (el relato bajo el agua) ----------
    Cada «beat» recibe --ph de js/app.js: -1 = aún no ha entrado, 0 = centrado,
@@ -751,23 +632,26 @@ html.sbusca-on{overflow:hidden}
    js/app.js marca el hero según el tramo de la inmersión en el que estemos.
    `visibility:hidden` no es cosmético aquí: saca la capa del pipeline, así que
    Safari deja de rasterizar los blur y de componer las animaciones que quedan
-   detrás del agua. Antes seguían corriendo a la vez que las olas —tres blur de
-   los rayos, las burbujas, los blobs, los aros, el destello, las motas— y en un
-   iPhone eso es justo lo que dejaba las olas a cuatro frames. */
+   detrás del agua. */
 .hero.dry .deep{visibility:hidden}            /* todavía en la superficie: rayos y burbujas apagados */
 .hero.sunk .heroBg,.hero.sunk .wave{visibility:hidden}  /* ya bajo el agua: fondo y crestas fuera de plano */
 
 /* sin «pin» si el usuario pide menos movimiento o la ventana es muy baja
-   (móvil en horizontal): el hero vuelve a ser una sección normal.
+   (móvil en horizontal): el hero vuelve a ser una sección normal, con la escena
+   quieta al pie y sin mar que suba (el agua ya está dibujada en la dársena).
    Ojo con el umbral: en Safari iOS las media queries de alto se resuelven contra
    el viewport GRANDE, que en un iPhone SE (667) o un 13 mini (~713) se queda
    cerca de 700 — con el corte antiguo la inmersión desaparecía en esos móviles
    en vertical, que es justo donde debe verse. Solo apagamos en apaisado. */
+/* móvil en horizontal: la pantalla mide 320-430 de alto; nubes y gaviotas, a
+   la escala de siempre, se comían el cielo que queda junto a la portada */
+@media (orientation:landscape) and (max-height:560px){
+  .cloud,.gull{display:none}
+}
 @media (prefers-reduced-motion:reduce),(orientation:landscape) and (max-height:560px){
   .heroPin{height:auto}
-  .hero{position:static;height:auto;min-height:calc(100vh - 68px);min-height:calc(100svh - 68px);padding:24px 0 150px}
-  .hero .grid{transform:none}
-  .hero .sea{height:var(--sea-fill);transform:none}   /* solo la banda de crestas, quieta abajo */
+  .hero{position:static;height:auto;min-height:calc(100vh - 68px);min-height:calc(100svh - 68px)}
+  .hero .sea{display:none}
   .deep{display:none}
   .deepcue{display:none}
 }
@@ -789,73 +673,26 @@ html.sbusca-on{overflow:hidden}
      detrás: en el simulador se leía un «A4» de una ficha del kiosko a través de
      la cabecera. Aquí va casi opaca. */
   header.site.on-dark{background:rgb(8,36,47)}
-
-  /* Las GAVIOTAS y los BARCOS CHICOS se quedan quietos del todo en el teléfono
-     —no solo durante la bajada, como hace .wake—. Son nueve bucles infinitos
-     sobre un <g> de SVG, y cada uno obliga a rasterizar de nuevo el dibujo
-     entero (misma historia que .wake, ver arriba); a esta escala el recorrido
-     de una gaviota son tres píxeles y el cabeceo del velero chico, uno. Se paga
-     el redibujado constante por un movimiento que en una pantalla de mano no se
-     llega a leer.
-     Se quedan moviéndose los dos veleros que sí se ven: el grande del primer
-     término (.bob a secas) y el mediano (.b2). El puerto sigue respirando.
-     El selector va pegado a .hscene a propósito: `.fly` también es la clase de
-     la portada que sale volando del mazo (.deckcard.fly), que no tiene nada que
-     ver y sí debe animarse. */
-  .hscene .fly,.hscene .bob.b4,.hscene .bob.b5{animation:none}
-
-  /* EL PUERTO YA NO SE APARTA AL SUBIR EL AGUA: SE QUEDA Y EL MAR LO CUBRE.
-     Este era el último trozo del dibujo que cambiaba en cada frame del scroll.
-     Los barcos salían de cuadro con --seaP, y esos transforms van sobre <g> de
-     SVG: no se componen aparte, así que cada frame de la subida obligaba a
-     rasterizar otra vez las tres capas del paisaje a pantalla completa. Con los
-     bucles ya congelados (arriba), quitar esto deja el SVG COMPLETAMENTE quieto
-     durante la bajada: se dibuja una vez y a partir de ahí solo se compone.
-     Lo que sí se mantiene es el paralaje de las capas enteras (.hscene lleva su
-     translate3d) y el desvanecido del cielo y del primer término: son transform
-     y opacity sobre <div>, que el compositor mueve sin redibujar nada.
-     En escritorio los barcos siguen zarpando como siempre. */
-  .hscene .left,.hscene .right,.hscene .up,.hscene .far2{transform:none}
-  .hscene .quay{opacity:1}
 }
-/* Las gaviotas sí conservan su recolocación de móvil —entran en el encuadre y
-   bajan sobre la dársena, ver el bloque de 680px—, pero ya sin el tramo que
-   dependía de --seaP: se quedan en el sitio al que las traía ese ajuste. */
-@media (max-width:680px){
-  .hscene .left.far2{transform:translate(350px,150px)}
-}
-
 
 /* pila de portadas rotatoria */
-/* La pila y su pie tienen que caber SOBRE EL AGUA. La cresta ocupa los ~150px
-   de abajo del hero, así que el ancho de la portada no puede depender solo del
-   ancho de la columna: se ata también al alto de pantalla. 470px es lo que se
-   llevan la placa del pie, el hueco entre ambos y el aire hasta la cresta; lo
-   que queda, dividido por la proporción del A4 (1123/794 = 1,414), es lo más
-   ancho que puede ser la portada sin mojarse. En una pantalla de 900px salen
-   ~304px de ancho; de 1000 para arriba manda el tope de 350px de siempre. */
+/* La pila y su pie tienen que caber POR ENCIMA DE LA ESCENA, así que el ancho de
+   la portada no puede depender solo del ancho de la columna: se ata también al
+   hueco que deja la escena (--padB, ver .hero). 92px es el margen de arriba (la
+   cabecera) y 96 lo que se llevan la placa del pie y el aire entre ambas; lo que
+   queda, dividido por la proporción del A4 (1123/794 = 1,414), es lo más ancha
+   que puede ser la portada. En un portátil de 1440×900 salen ~285px; de ~1050 de
+   alto para arriba manda el tope de 350 de siempre. */
 /* --deck-w manda en las dos piezas —la portada y la placa del pie— para que la
    placa no se quede más ancha que la revista cuando en móvil la portada
    encoge. Los cortes de abajo (ver «responsive») cambian ESTA variable, no el
    ancho de .deck. */
-.heroDeck{--deck-w:min(350px,82%,calc((var(--heroH) - 500px) / 1.414));
+.heroDeck{--deck-w:min(350px,82%,calc((var(--heroH) - 92px - var(--padB) - 96px) / 1.414));
   position:relative;display:flex;flex-direction:column;align-items:center;gap:18px}
 /* touch-action:pan-y — el navegador se queda con el scroll vertical y nosotros
    solo reclamamos el gesto cuando es claramente horizontal (ver bindDeck en
    js/app.js). Sin esto, arrastrar de lado en el móvil movía la página. */
 .deck{position:relative;width:var(--deck-w);aspect-ratio:794/1123;touch-action:pan-y}
-/* Claro detrás de la pila, hermano del de .heroCopy. La portada caía justo
-   sobre la grúa y el sol: la pluma cruzaba la cubierta por la mitad y las
-   puntas del sol asomaban por los cuatro lados de la revista. Este halo del
-   propio papel apaga el dibujo solo donde va la revista —se desvanece antes de
-   llegar a los lados, así que no se ve ninguna caja— y la portada pasa a estar
-   apoyada en algo en vez de flotando sobre un cuadro lleno. */
-.heroDeck::before{content:'';position:absolute;z-index:-1;pointer-events:none;
-  inset:-8% -14% -6% -14%;
-  background:radial-gradient(60% 54% at 50% 46%,
-    rgba(251,250,246,.92) 0%,rgba(251,250,246,.78) 42%,
-    rgba(251,250,246,.4) 68%,rgba(251,250,246,0) 88%)}
-@supports (filter:blur(1px)){.heroDeck::before{filter:blur(26px)}}
 .deckcard{position:absolute;inset:0;cursor:pointer;border-radius:3px;transition:transform 1.05s cubic-bezier(.25,.8,.25,1),opacity .6s;will-change:transform;backface-visibility:hidden}
 /* la de delante se puede arrastrar, y el cursor lo dice */
 .deckcard.p0{cursor:grab}
@@ -905,8 +742,10 @@ html.sbusca-on{overflow:hidden}
      cabe al título y se cortaba con puntos suspensivos justo en la línea que
      tiene que decir qué número estás viendo */
   width:min(100%,max(var(--deck-w),300px));padding:11px 14px 11px 16px;border-radius:4px;
-  background:rgba(251,250,246,.92);border:1px solid rgba(6,51,63,.10);
-  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  /* opaca y sin backdrop-filter: detrás ya no pasa ningún dibujo que haya que
+     difuminar, y un desenfoque de fondo obliga a Safari a recomponerlo cada vez
+     que algo se mueve por detrás */
+  background:#fbfaf6;border:1px solid rgba(6,51,63,.10);
   box-shadow:0 10px 26px rgba(6,51,63,.10),0 2px 6px rgba(6,51,63,.06)}
 .deckcap{display:flex;flex-direction:column;gap:2px;min-width:0;min-height:34px;
   opacity:0;transform:translateY(6px);transition:opacity .45s var(--ease-out),transform .45s var(--ease-out)}
@@ -928,7 +767,10 @@ html.sbusca-on{overflow:hidden}
 .ddot.on::before{width:26px;background:var(--edem-teal-500)}
 
 /* señal de scroll sobre las olas */
-.scrollcue{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);z-index:2;opacity:clamp(0,calc(1 - var(--seaP) * 4),1);width:46px;height:46px;border-radius:50%;background:#fff;box-shadow:var(--shadow-md);display:grid;place-items:center;color:var(--edem-teal-700);animation:cuebob 2.2s ease-in-out infinite}
+.scrollcue{position:absolute;left:50%;transform:translateX(-50%);z-index:2;opacity:clamp(0,calc(1 - var(--seaP) * 4),1);width:46px;height:46px;
+  /* centrada en la franja de agua de la escena (del muro del muelle, a 246/340
+     del dibujo, al borde de abajo): así nunca tapa el rótulo de EDEM ni el muelle */
+  bottom:calc(max(8px,(var(--band) - var(--sh) * .7235 - 46px) / 2) + var(--vbar));border-radius:50%;background:#fff;box-shadow:var(--shadow-md);display:grid;place-items:center;color:var(--edem-teal-700);animation:cuebob 2.2s ease-in-out infinite}
 .scrollcue:hover{background:var(--edem-teal-500);color:#fff}
 .scrollcue .lu{width:20px;height:20px}
 @keyframes cuebob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(9px)}}
@@ -1576,21 +1418,25 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
 @media(max-width:1020px){
   .hero .grid{grid-template-columns:1fr;gap:44px}
   .heroDeck{order:-1;padding-top:10px}
-  .heroDeck{--deck-w:min(270px,64%)}
-  /* el hero sigue clavado, pero apilado: lo compactamos y lo anclamos arriba
-     para que el contenido quede por encima de la línea de agua */
+  /* El hero sigue clavado, pero apilado: portada arriba y texto debajo, centrados
+     en el hueco que deja la escena. La escena se pinta más ancha que la pantalla
+     (y se recorta por los lados, centrada en la grúa y EDEM) para que los
+     edificios conserven un tamaño que se lea. */
   .heroPin{height:330vh}
-  .hero{padding:84px 0 26px;align-items:flex-start}
+  .hero{padding-top:84px;--sw:max(100vw,1180px,110vh);--fx:.4;--bandmax:30vh;
+    /* lo que mide el bloque apilado SIN la portada: titular, subtítulo, botón,
+       placa del pie y los huecos entre medias */
+    --stackH:300px}
   .hero .grid{gap:24px}
-  .heroDeck{gap:14px}
-  .heroDeck{--deck-w:min(190px,42%)}
+  /* la portada se lleva lo que sobra de alto, entre un suelo y un techo */
+  .heroDeck{gap:14px;--deck-w:clamp(112px,calc((var(--heroH) - 84px - var(--padB) - var(--stackH)) / 1.414),300px)}
   .hero p.lead{display:none}
   .hero .acts{margin-top:22px}
-  .hero .sea{--sea-fill:176px;--o2:28px;--o3:56px}
-  /* en pantalla estrecha el paisaje se queda como banda baja: el titular sube y
-     no debe competir con las grúas */
-  .hscene{height:min(46vh,360px)}
-  .hscene.sky{height:min(70vh,560px)}
+  .hero .sea{--sea-fill:130px;--o2:20px;--o3:42px}
+  .cloud.c1{left:auto;right:6%;top:11%}
+  .gull.g1{left:auto;right:12%;bottom:calc(var(--band) + var(--vbar) - var(--sh) * .18)}
+  .gull.g2{left:auto;right:22%;bottom:calc(var(--band) + var(--vbar) - var(--sh) * .06)}
+  .gull.g3{display:none}
   .beat .kicker{margin-bottom:14px}
   /* Conócenos deja de estar clavado: una columna, con todas las formas de
      participar abiertas (tres tarjetas cerradas no se entienden sin el scroll) */
@@ -1667,11 +1513,16 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   #kiosko{padding:56px 0 64px}
   nav.main,.hbar .hacts{display:none}
   .menubtn{display:grid}
-  .hero{padding:80px 0 20px}
+  .hero{padding-top:80px;--sw:max(100vw,1020px);--fx:.27;--bandmax:25vh;--stackH:280px}
   .hero .grid{gap:18px}
   .hero .sub{font-size:19px}
   .heroCopy .acts .btn.ghost{display:none}   /* una sola llamada a la acción: el kiosko ya está en el menú */
-  .heroDeck{--deck-w:min(168px,40%)}
+  .heroDeck{--deck-w:clamp(112px,calc((var(--heroH) - 80px - var(--padB) - var(--stackH)) / 1.414),190px)}
+  .cloud.c2{display:none}
+  .cloud.c1{right:-50px;top:10%;width:200px;height:47px}
+  /* en el teléfono no queda franja de agua donde poner la flecha sin tapar el
+     rótulo de EDEM, y aquí el gesto de bajar no necesita pista */
+  .scrollcue{display:none}
   .deckcap .ct{font-size:17px}
   .beat{padding:0 18px}
   .beat .bs{margin-top:16px}
@@ -1692,21 +1543,13 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   .brandslab{grid-template-columns:1fr}
 }
 
-/* Móvil ancho / ventana estrecha: con el encuadre de móvil el paisaje se dibuja
-   a la escala del ANCHO, así que a 680px sube tanto que una banda de 360px le
-   cortaría la torre de la grúa por arriba. Un poco más de alto y entra entera.
-   (Va aquí, después del bloque de arriba, para ganarle en cascada.) */
-@media(min-width:561px) and (max-width:680px){
-  .hscene{height:min(52vh,440px)}
-}
-
-/* Tablet estrecha: aquí ya manda el encuadre apaisado (1440×620), y con la
-   banda a 360px de alto el «slice» todavía se comía un trozo por los lados —la
-   grúa lejana y el sol salían partidos. Atando el alto al ancho (1440/620 ≈
-   2,32) la escena entra completa a cualquier medida de esta franja. */
-@media(min-width:681px) and (max-width:840px){
-  .hscene{height:min(46vh,42vw)}
-  .hscene.sky{height:min(70vh,42vw)}
+/* Teléfonos bajos (un SE, muchos Android de 640): no caben a la vez la portada,
+   su placa, el titular, el botón y la escena. Sobra la placa —el titular ya dice
+   qué número es y la pila se sigue pasando con el dedo— y el titular se arrima. */
+@media(max-width:680px) and (max-height:700px){
+  .hero{--stackH:204px}
+  .hero h1{margin-top:10px}
+  .deckui{display:none}
 }
 
 /* ---------- visor: pulido de interfaz ----------
