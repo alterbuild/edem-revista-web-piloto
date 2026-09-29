@@ -101,14 +101,23 @@
   const PAGE = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   const HOME = PAGE === 'index.html';
 
-  /* content.json se pide UNA vez por página: app.js reutiliza esta misma
-     promesa en vez de repetir el fetch (ver su boot()). */
+  /* content.json se pide UNA vez por página: app.js, el buscador y la cortina
+     de carga reutilizan esta misma promesa en vez de repetir el fetch.
+     Las ediciones pasan por js/cms.js (EdemCMS.ediciones): si content.json
+     tiene un CMS activo, las ediciones salen de ahí —con su PDF— y, si no
+     responde, de content.json. Así la pila del hero, el kiosko, el visor, el
+     buscador y la lista del pie ven SIEMPRE las mismas. */
   window.EdemContent = window.EdemContent || (async function () {
+    let json = null;
     try {
       const r = await fetch('data/content.json', { cache: 'no-cache' });
-      if (r.ok) return await r.json();
+      if (r.ok) json = await r.json();
     } catch (_) { /* sin servidor o sin JSON: respaldo embebido */ }
-    return null;
+    if (json && window.EdemCMS && EdemCMS.ediciones) {
+      try { json = await EdemCMS.ediciones(json); }
+      catch (e) { console.warn('[EDEM Times] no se han podido preparar las ediciones:', e.message); }
+    }
+    return json;
   })();
 
   /* ---------- resolución de enlaces ---------- */

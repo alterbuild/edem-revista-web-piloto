@@ -14,7 +14,7 @@ const DEFAULTS = {
       id: 'n2', file: 'revistas/n2.html', print: 'revistas/n2.html',
       nr: 'Nº 2 · 2026', title: 'Tracción', chip: 'Nº 2 · Tracción',
       badge: 'Última edición', badgeColor: 'lanzadera',
-      desc: 'Crónica del Hackathon, entrevista cruzada alumno × CEO, radar Lanzadera, métricas de Angels y pasatiempos.',
+      desc: 'Crónica del Hackathon, entrevista cruzada alumno × mentora, radar Lanzadera, métricas de Angels y pasatiempos.',
       meta: '24 páginas · edición física + digital · 2026',
       note: '¡La más gorda: 24 páginas!',
       hero: {
@@ -22,7 +22,7 @@ const DEFAULTS = {
         titleHtml: 'Trac&shy;ción<span class="pt">.</span>',
         num: '2',
         sub: 'El arte de hacer que las cosas funcionen',
-        lead: '24 páginas a toda máquina: la crónica del Hackathon desde dentro, una entrevista cruzada alumno × CEO, el radar de Lanzadera, las métricas que mira Angels y pasatiempos para el trayecto de vuelta.',
+        lead: '24 páginas a toda máquina: la crónica del Hackathon desde dentro, una entrevista cruzada alumno × mentora, el radar de Lanzadera, las métricas que mira Angels y pasatiempos para el trayecto de vuelta.',
         chips: ['24 páginas', 'Edición física + digital', 'Marina de Empresas']
       }
     },
@@ -32,7 +32,11 @@ const DEFAULTS = {
       badge: 'Contracorriente', badgeColor: 'edem',
       desc: 'El número fundacional: el manual de supervivencia en la Marina, tipografía brutal, sellos, radar Lanzadera y duotonos.',
       meta: '10 páginas · edición física + digital · 2026',
-      note: 'El primero de verdad'
+      note: 'El primero de verdad',
+      hero: {
+        sub: 'Manual de supervivencia en la Marina',
+        lead: 'El número fundacional: un mapa para quien acaba de atracar en la Marina. Cómo sobrevivir al primer año, tres startups en el radar de Lanzadera y cómo piensa un inversor de Angels.'
+      }
     },
     {
       id: 'n1', file: 'revistas/n1.html', print: 'revistas/n1-print.html',
@@ -40,7 +44,11 @@ const DEFAULTS = {
       badge: 'Archivo', badgeColor: 'angels',
       desc: 'La primera maqueta del piloto: el origen de EDEM Times, de portada a contraportada.',
       meta: '10 páginas · maqueta inicial',
-      note: 'El borrador cero'
+      note: 'El borrador cero',
+      hero: {
+        sub: 'La primera maqueta del piloto',
+        lead: 'Diez páginas de portada a contraportada: la carta de «la opción difícil», el pasillo de EDEM para sobrevivir al primer año, el radar de Lanzadera y cómo piensa un inversor.'
+      }
     }
   ],
   articles: [
@@ -141,16 +149,101 @@ if (window.EdemSplash) EdemSplash.done.then(() => { measureAll(); busKick(); });
 /* ================= render de la home ================= */
 function latestIssue() { return MAGS.find(m => m.id === C.site.latest) || MAGS[0]; }
 
+/* ---------- de qué está hecha cada edición ----------
+   Se lee en HTML (`file`: las maquetadas en revistas/) o en PDF (`pdf`: lo que
+   se sube al CMS; ver js/cms.js → EDICIONES). Si trae las dos, manda el HTML:
+   se ve más nítido y pesa menos. La portada es una imagen cuando la edición
+   trae la suya subida (`cover`) o cuando es un PDF; si no, la primera página
+   viva del HTML, como siempre. */
+const isPdfIssue = m => !m.file && !!m.pdf;
+const imageCover = m => !!m.cover || isPdfIssue(m);
+const printUrl = m => m.print || m.pdf || m.file || '';
+const isPdfUrl = u => /\.pdf($|[?#])/i.test(u || '');
+const absUrl = u => { try { return new URL(u, location.href).href; } catch (_) { return u; } };
+
 /* El hero ya no pinta antetítulo, chips ni el número gigante de fondo (ver el
    comentario en index.html): el número lo canta el pie de la pila de portadas.
    Los campos `kicker`, `chips` y `num` de content.json siguen ahí y no
-   molestan — simplemente no se leen. */
+   molestan — simplemente no se leen.
+
+   EL TEXTO VA CON LA PORTADA. Antes se pintaba solo el de la última edición y,
+   al girar la pila, el Nº 1 aparecía delante con «Tracción» al lado. Ahora cada
+   edición tiene su capa de titular, subtítulo y entradilla (en el mismo orden
+   que la pila) y syncHeroCopy() enciende la de la portada que está delante.
+   De dónde sale cada pieza, por orden: `hero.titleHtml`/`hero.title`, `hero.sub`
+   y `hero.lead` de la edición; si faltan (una edición recién subida al CMS sin
+   textos de portada), el título con su punto, `sub` y la descripción. */
+function heroCopyOf(m) {
+  const h = m.hero || {};
+  return {
+    title: h.titleHtml ? safeTitleHtml(h.titleHtml) : esc(h.title || m.title) + '<span class="pt">.</span>',
+    sub: h.sub || m.sub || '',
+    lead: h.lead || m.lead || m.desc || ''
+  };
+}
+
+/* `titleHtml` permite un salto de línea y el punto de color, nada más. Viene
+   de content.json o de un CMS, y lo que alguien pegue en un campo no debería
+   poder colar marcado en la portada: se queda el texto, <br> y <span class="pt">
+   (un <template> no carga imágenes ni ejecuta nada mientras se lee). */
+function safeTitleHtml(html) {
+  const t = document.createElement('template');
+  t.innerHTML = String(html);
+  const walk = node => [...node.childNodes].map(c => {
+    if (c.nodeType === 3) return esc(c.textContent);
+    if (c.nodeName === 'BR') return '<br>';
+    if (c.nodeName === 'SPAN' && c.classList.contains('pt')) return '<span class="pt">' + esc(c.textContent) + '</span>';
+    return c.nodeType === 1 ? walk(c) : '';
+  }).join('');
+  return walk(t.content);
+}
+
 function renderHero() {
-  const m = latestIssue(), h = m.hero || {};
-  if (h.titleHtml) $('hero-title').innerHTML = h.titleHtml;
-  if (h.sub) $('hero-sub').textContent = h.sub;
-  if (h.lead) $('hero-lead').textContent = h.lead;
+  const latest = latestIssue();
+  const order = [latest, ...MAGS.filter(x => x !== latest)];
+  const layers = (key, raw) => order.map((m, i) =>
+    '<span class="hslide' + (i ? '' : ' on') + '" data-issue="' + esc(m.id) + '"' + (i ? ' aria-hidden="true"' : '') + '>' +
+    (raw ? heroCopyOf(m)[key] : esc(heroCopyOf(m)[key])) + '</span>').join('');
+  $('hero-title').innerHTML = layers('title', true);
+  $('hero-sub').innerHTML = layers('sub');
+  $('hero-lead').innerHTML = layers('lead');
   buildDeck();
+  if (!heroFitBound) { heroFitBound = true; onMeasure(fitHeroTitles); } else fitHeroTitles();
+}
+
+function syncHeroCopy(id) {
+  ['hero-title', 'hero-sub', 'hero-lead'].forEach(k => {
+    const box = $(k); if (!box) return;
+    for (const s of box.children) {
+      const on = s.dataset.issue === id;
+      if (s.classList.contains('on') === on) continue;
+      s.classList.toggle('on', on);
+      if (on) s.removeAttribute('aria-hidden'); else s.setAttribute('aria-hidden', 'true');
+    }
+  });
+}
+
+/* Un titular largo («Bienvenidos a EDEM.») a cuerpo de «Tracción.» ocupaba
+   tres líneas y empujaba todo el bloque. Se mide cada capa en una sola línea y,
+   si no cabe, se encoge lo justo (--fit) hasta un 55 %; por debajo de eso ya
+   es mejor partirla en dos. Se repite al cambiar el ancho y al llegar las
+   fuentes (onMeasure). Lee todo primero y escribe después: un solo layout. */
+/* Ojo al medir: el ancho disponible se toma ANTES de tocar nada. En cuanto una
+   capa pasa a una sola línea, la columna de la rejilla crece hasta su largo y
+   el titular entero con ella (medido: de 683 a 974px), así que medirlo después
+   daba siempre «cabe». Y cada capa se mide con su propio max-content, no con el
+   ancho de la columna, que es el de la más larga. */
+let heroFitBound = false;
+function fitHeroTitles() {
+  const h1 = $('hero-title'); if (!h1) return;
+  const slides = [...h1.children];
+  const W = h1.clientWidth;
+  slides.forEach(s => { s.style.removeProperty('--fit'); s.style.whiteSpace = 'nowrap'; s.style.width = 'max-content'; });
+  const need = slides.map(s => s.getBoundingClientRect().width);
+  slides.forEach((s, i) => {
+    s.style.whiteSpace = ''; s.style.width = '';
+    if (W && need[i] > W) s.style.setProperty('--fit', Math.max(.55, (W - 2) / need[i]).toFixed(3));
+  });
 }
 
 /* ---- pila de portadas del hero: rota entre ediciones ---- */
@@ -162,7 +255,7 @@ function buildDeck() {
   deckOrder = [latest, ...MAGS.filter(x => x !== latest)].map(x => x.id);
   deck.innerHTML = deckOrder.map(id => {
     const m = MAGS.find(x => x.id === id);
-    return '<div class="deckcard" data-deck="' + id + '"><div class="coverslot" data-mag="' + id + '" role="button" tabindex="0" title="Leer en el visor" aria-label="Leer ' + esc(m.nr) + ' en el visor"><span class="cslabel"><span>EDEM Times</span><span>' + esc(m.nr) + '</span></span></div></div>';
+    return '<div class="deckcard" data-deck="' + id + '"><div class="coverslot" data-mag="' + id + '" role="button" tabindex="0" title="Leer en el visor" aria-label="Leer ' + esc(m.nr || m.title) + ' en el visor"><span class="cslabel"><span>EDEM Times</span><span>' + esc(m.nr || m.title) + '</span></span></div></div>';
   }).join('');
   $('deck-dots').innerHTML = deckOrder.map(id => {
     const m = MAGS.find(x => x.id === id);
@@ -355,6 +448,7 @@ function restartDeck() {
 let capJob = 0;
 function updateDeckUI() {
   const m = MAGS.find(x => x.id === deckOrder[0]); if (!m) return;
+  syncHeroCopy(m.id);                  // el texto de al lado, con la portada
   const cap = $('deck-cap');
   const job = ++capJob;
   cap.classList.remove('on');
@@ -385,21 +479,23 @@ const K_POINT = '<svg viewBox="0 0 62 30" aria-hidden="true" focusable="false"><
 function renderKiosko() {
   const latest = latestIssue();
   $('kgrid').innerHTML = MAGS.map((m, i) => {
-    const pages = parseInt((/(\d+)\s*p[áa]g/i.exec(m.meta || '') || [])[1], 10) || 0;
+    const pages = m.pages || parseInt((/(\d+)\s*p[áa]g/i.exec(m.meta || '') || [])[1], 10) || 0;
+    const pr = printUrl(m), prPdf = isPdfUrl(pr);
     return '<article class="kitem rv" style="--i:' + i + ';--tilt:' + K_TILT[i % K_TILT.length] + 'deg;--hand:' + (K_HAND[m.badgeColor] || K_HAND.neutral) + '">' +
       '<div class="khang"><div class="kbob">' +
       '<i class="kpin" aria-hidden="true"></i>' +
-      '<div class="kmag' + (pages > 20 ? ' thick' : '') + '"><div class="coverslot" data-mag="' + m.id + '" role="button" tabindex="0" title="Leer en el visor" aria-label="Leer ' + esc(m.nr) + ' en el visor"><span class="cslabel"><span>EDEM Times</span><span>' + esc(m.nr) + '</span></span></div></div>' +
+      '<div class="kmag' + (pages > 20 ? ' thick' : '') + '"><div class="coverslot" data-mag="' + m.id + '" role="button" tabindex="0" title="Leer en el visor" aria-label="Leer ' + esc(m.nr || m.title) + ' en el visor"><span class="cslabel"><span>EDEM Times</span><span>' + esc(m.nr || m.title) + '</span></span></div></div>' +
       (m === latest ? '<span class="ksticker" aria-hidden="true">¡Nuevo!</span>' : '') +
       '</div></div>' +
       '<div class="kinfo">' +
       (m.note ? '<p class="kscrawl">' + K_ARROW + '<span>' + esc(m.note) + '</span></p>' : '') +
-      '<span class="nr">' + esc(m.nr) + (m.badge ? ' · <b>' + esc(m.badge) + '</b>' : '') + '</span>' +
+      '<span class="nr">' + esc(m.nr) + (m.nr && m.badge ? ' · ' : '') + (m.badge ? '<b>' + esc(m.badge) + '</b>' : '') + '</span>' +
       '<h3 class="disp">' + esc(m.title) + '</h3>' +
       '<p class="kdesc">' + esc(m.desc) + '</p>' +
       '<span class="kmeta">' + esc(m.meta) + '</span>' +
       '<div class="kacts"><button class="btn pri" data-visor="' + m.id + '"><i data-lucide="book-open" class="lu"></i> Leer</button>' +
-      '<a class="btn out" href="' + encodeURI(m.print) + '" target="_blank" rel="noopener"><i data-lucide="printer" class="lu"></i> A4</a></div>' +
+      (pr ? '<a class="btn out" href="' + esc(encodeURI(pr)) + '" target="_blank" rel="noopener"' + (prPdf ? ' title="Descargar el PDF"' : ' title="Versión A4 imprimible"') + '>' +
+        (prPdf ? '<i data-lucide="file-down" class="lu"></i> PDF' : '<i data-lucide="printer" class="lu"></i> A4') + '</a>' : '') + '</div>' +
       '</div></article>';
   }).join('');
   const n = MAGS.length;
@@ -1016,37 +1112,64 @@ function observeReveals() {
   document.querySelectorAll('.rv:not(.in)').forEach(el => revealIO.observe(el));
 }
 
-/* ================= el agua de la bajada =================
-   Las burbujas de la inmersión siguen subiendo por «Actualidad» y el kiosko:
-   muchas menos, repartidas por todo el alto de .bajada. Se siembran la primera
-   vez que la bajada se acerca a pantalla —para entonces «Actualidad» ya ha
-   pintado y el alto es el de verdad— y ninguna sube más allá de 40px por
-   debajo de la costura con el hero, así que ninguna se corta contra ese borde.
-   Después es puro CSS (transform/opacity), y sin .live se quedan paradas
-   mientras la bajada está fuera de pantalla. */
-(function bajadaViva() {
-  const baj = $('bajada'), host = $('bbubbles');
-  if (!baj || !host || REDUCED.matches) return;
+/* ================= el agua: un solo campo de burbujas =================
+   Las burbujas son del agua, no de una sección. Hay dos ventanas que las dejan
+   ver —el agua del hero (#bubbles, dentro de .deep) y la de la bajada
+   (#bbubbles, dentro de .bdeep)— y las dos llevan LA MISMA siembra, fija a la
+   pantalla (ver .bubbles en css/site.css). Cuando el hero se suelta y la
+   costura cruza la pantalla, una burbuja que sube por la bajada sigue subiendo
+   por el hero sin saltos: es la misma burbuja vista por la otra ventana.
+   Antes cada tramo sembraba las suyas y en la bajada salían pocas y lentas
+   (alguna a 8px por segundo): justo bajo la costura parecían paradas.
+
+   Para que sean LA MISMA hace falta que compartan el reloj. Se crean en la
+   misma tarea (arrancan en el mismo frame) y, por si una de las dos ventanas
+   tarda en pintarse, se les iguala además el startTime con la Web Animations
+   API. Ocultar una ventana (visibility) no para su reloj: al volver, casan.
+   Después es puro CSS: transform y opacity, el compositor las mueve solo. */
+(function aguaViva() {
+  const hosts = [$('bubbles'), $('bbubbles')].filter(Boolean);
+  if (!hosts.length || REDUCED.matches) return;
+
   function sow() {
-    const H = baj.offsetHeight || 1, n = innerWidth < 700 ? 7 : 12;
+    const n = window.innerWidth < 700 ? 10 : 18;
+    let html = '';
     for (let i = 0; i < n; i++) {
-      const b = document.createElement('span'), size = 4 + Math.random() * 9;
-      const top = H * (.1 + Math.random() * .86);
-      const rise = Math.max(60, Math.min(360 + Math.random() * 420, top - 40));
-      b.style.cssText = 'left:' + (Math.random() * 100).toFixed(2) + '%;top:' + (top / H * 100).toFixed(2) + '%;' +
+      const size = 3 + Math.random() * 9;
+      html += '<span style="left:' + (Math.random() * 100).toFixed(2) + '%;' +
         'width:' + size.toFixed(1) + 'px;height:' + size.toFixed(1) + 'px;' +
-        '--dx:' + (Math.random() * 50 - 25).toFixed(0) + 'px;--rise:-' + rise.toFixed(0) + 'px;' +
-        'animation-duration:' + (12 + Math.random() * 12).toFixed(1) + 's;animation-delay:-' + (Math.random() * 20).toFixed(1) + 's';
-      host.appendChild(b);
+        '--dx:' + (Math.random() * 70 - 35).toFixed(0) + 'px;' +
+        'animation-duration:' + (9 + Math.random() * 12).toFixed(1) + 's;' +
+        'animation-delay:-' + (Math.random() * 24).toFixed(1) + 's"></span>';
     }
+    hosts.forEach(h => { h.innerHTML = html; });
+    if (hosts.length < 2) return;
+    requestAnimationFrame(() => {
+      try {
+        const a = hosts[0].children, b = hosts[1].children;
+        for (let i = 0; i < a.length; i++) {
+          const x = a[i].getAnimations()[0], y = b[i] && b[i].getAnimations()[0];
+          if (x && y && x.startTime != null) y.startTime = x.startTime;
+        }
+      } catch (_) { /* sin Web Animations API: arrancaron en el mismo frame y basta */ }
+    });
   }
-  if (!('IntersectionObserver' in window)) { sow(); baj.classList.add('live'); return; }
-  let sown = false;
-  new IntersectionObserver(es => {
-    const on = es[0].isIntersecting;
-    if (on && !sown) { sown = true; sow(); }
-    baj.classList.toggle('live', on);
-  }, { rootMargin: '25% 0px' }).observe(baj);
+  sow();
+
+  // al cambiar el ANCHO se vuelve a sembrar (en iOS «resize» salta cada vez que
+  // se pliega la barra de direcciones: eso no cambia el ancho y no se toca)
+  let lastW = window.innerWidth, rz;
+  addEventListener('resize', () => {
+    clearTimeout(rz);
+    rz = setTimeout(() => { if (window.innerWidth !== lastW) { lastW = window.innerWidth; sow(); } }, 160);
+  });
+
+  // la ventana de la bajada solo se enciende cuando la bajada ronda la pantalla
+  const baj = $('bajada');
+  if (!baj) return;
+  if (!('IntersectionObserver' in window)) { baj.classList.add('live'); return; }
+  new IntersectionObserver(es => baj.classList.toggle('live', es[0].isIntersecting),
+    { rootMargin: '25% 0px' }).observe(baj);
 }());
 
 /* ================= inmersión: el mar sube y aparece el relato =================
@@ -1337,24 +1460,8 @@ function observeReveals() {
   }
   let inView = false;
 
-  /* burbujas: puro CSS una vez creadas (el compositor las mueve solo) */
-  function scatter(host, n, minSize, maxSize, minDur, maxDur) {
-    if (!host) return;
-    host.innerHTML = '';
-    for (let i = 0; i < n; i++) {
-      const b = document.createElement('span'), size = minSize + Math.random() * (maxSize - minSize);
-      b.style.cssText = 'left:' + (Math.random() * 100).toFixed(2) + '%;' +
-        'width:' + size.toFixed(1) + 'px;height:' + size.toFixed(1) + 'px;' +
-        '--dx:' + (Math.random() * 70 - 35).toFixed(0) + 'px;' +
-        'animation-duration:' + (minDur + Math.random() * (maxDur - minDur)).toFixed(1) + 's;' +
-        'animation-delay:-' + (Math.random() * 24).toFixed(1) + 's';
-      host.appendChild(b);
-    }
-  }
-  function bubbles() {
-    const small = window.innerWidth < 700;
-    scatter($('bubbles'), small ? 10 : 18, 3, 12, 9, 21);
-  }
+  /* las burbujas ya no son de aquí: las siembra aguaViva() para el hero y la
+     bajada a la vez (es el mismo campo visto por dos ventanas) */
 
   // la flecha bajo el agua no salta al kiosko: solo empuja un beat más.
   const deepcue = hero.querySelector('.deepcue');
@@ -1366,7 +1473,7 @@ function observeReveals() {
     window.scrollTo({ top: target, behavior: 'smooth' });
   });
 
-  let rz, lastW = window.innerWidth;
+  let rz;
   /* Encendido/apagado del bucle. El margen de un viewport a cada lado es el mismo
      que ya usaba update() para salirse: así el bucle está en marcha ANTES de que
      el hero asome y no se pierde el primer frame. Sin IntersectionObserver
@@ -1382,12 +1489,9 @@ function observeReveals() {
     clearTimeout(rz);
     rz = setTimeout(() => {
       // En Safari iOS «resize» salta cada vez que se pliega o despliega la barra
-      // de direcciones, o sea constantemente mientras se baja. Remedir es barato;
-      // regenerar las burbujas no lo es (y además las hace parpadear), así que
-      // eso solo cuando cambia el ANCHO: rotación o cambio de ventana de verdad.
-      const w = window.innerWidth;
+      // de direcciones, o sea constantemente mientras se baja. Remedir es barato
+      // (las burbujas, que sí serían caras de regenerar, las lleva aguaViva()).
       measure();
-      if (w !== lastW) { lastW = w; bubbles(); }
       snapNow(); update(sView);
     }, 120);
   });
@@ -1400,7 +1504,6 @@ function observeReveals() {
   // vuelta atrás en iOS: la página sale de la bfcache ya scrolleada y sin disparar scroll
   addEventListener('pageshow', () => { measure(); snapNow(); update(sView); });
   addEventListener('orientationchange', () => setTimeout(() => { measure(); snapNow(); update(sView); }, 300));
-  bubbles();
   measure();
   snapNow(); update(sView);
   // el mazo de portadas y las fuentes cambian la altura del hero al cargar
@@ -1458,6 +1561,14 @@ async function loadIssue(m) {
   if (m.data) return m.data;
   if (m.loading) return m.loading;
   m.loading = (async () => {
+    // una edición en PDF no se trocea: basta con saber cuántas páginas tiene y
+    // cómo se llaman; cada una se pinta cuando el visor la pide (mkPage)
+    if (isPdfIssue(m)) {
+      if (!window.EdemPDF) throw new Error('falta js/revistas-pdf.js');
+      const inf = await EdemPDF.info(absUrl(m.pdf));
+      m.data = { kind: 'pdf', n: inf.n, labels: inf.labels };
+      return m.data;
+    }
     const txt = await fetchIssue(m);
     const doc = new DOMParser().parseFromString(txt, 'text/html');
     const links = [...doc.querySelectorAll('head link[rel="stylesheet"]')].map(l => l.outerHTML).join('');
@@ -1490,6 +1601,7 @@ function pageDoc(m, i) { return '<!DOCTYPE html><html lang="es"><head>' + m.data
 function mkPage(m, i) {
   const w = document.createElement('div'); w.className = 'pg';
   if (i == null) { w.classList.add('void'); return { el: w, ready: Promise.resolve() }; }
+  if (m.data && m.data.kind === 'pdf') return mkPdfPage(m, i, w);
   const f = document.createElement('iframe');
   f.setAttribute('tabindex', '-1'); f.setAttribute('aria-hidden', 'true'); f.setAttribute('scrolling', 'no');
   f.title = 'Página ' + (i + 1);
@@ -1502,6 +1614,36 @@ function mkPage(m, i) {
   w.appendChild(f); return { el: w, ready };
 }
 
+/* Una página de una edición en PDF es una imagen ya pintada (js/revistas-pdf.js).
+   El ancho de pintado sale del tamaño al que se ve el libro y de la densidad
+   de la pantalla, redondeado a saltos de 400px —así redimensionar la ventana
+   no obliga a repintarlo todo por diez píxeles— y con techo de 2000: por
+   encima no se nota y pesa el doble. `ready` no espera más de 9s: una página
+   que no llega no puede dejar el giro colgado. */
+function pdfRenderWidth() {
+  const want = 794 * Math.max(.6, bookScale() || scale) * Math.min(2, window.devicePixelRatio || 1);
+  return Math.min(2000, Math.ceil(want / 400) * 400);
+}
+function mkPdfPage(m, i, w) {
+  w.classList.add('pgpdf');
+  const img = document.createElement('img');
+  img.alt = ''; img.decoding = 'async'; img.draggable = false;
+  w.appendChild(img);
+  const ready = EdemPDF.page(absUrl(m.pdf), i, pdfRenderWidth())
+    .then(r => { img.src = r.url; return img.decode ? img.decode().catch(() => {}) : null; })
+    .catch(() => { w.classList.add('pgfail'); });
+  return { el: w, ready: Promise.race([ready, new Promise(r => setTimeout(r, 9000))]) };
+}
+/* y mientras se lee, las de los pliegos de al lado se van pintando en huecos
+   libres: pasar página no tiene que esperar a PDF.js */
+function prefetchPdf(m) {
+  if (!m || !m.data || m.data.kind !== 'pdf' || !window.EdemPDF) return;
+  const u = absUrl(m.pdf), w = pdfRenderWidth();
+  [cur + 1, cur + 2, cur - 1].forEach(k => (SP[k] || []).forEach(p => {
+    if (p != null) idle(() => EdemPDF.page(u, p, w).catch(() => {}));
+  }));
+}
+
 /* ================= portadas vivas en home y kiosko ================= */
 const slotRO = new ResizeObserver(es => es.forEach(e => fitSlot(e.target)));
 function fitSlot(sl) { const pg = sl.querySelector('.pg'); if (pg) pg.style.transform = 'scale(' + (sl.clientWidth / 794) + ')'; }
@@ -1512,7 +1654,34 @@ function fitSlot(sl) { const pg = sl.querySelector('.pg'); if (pg) pg.style.tran
       (requestIdleCallback), aprovechando el rato largo que dura la inmersión. */
 const idle = window.requestIdleCallback || (fn => setTimeout(() => fn({ timeRemaining: () => 8 }), 60));
 
+/* La portada como imagen: la subida con la edición (`cover`) o, si es un PDF
+   sin ella, su primera página pintada por PDF.js. Una promesa por edición: el
+   mazo del hero y el kiosko comparten la misma imagen. Si falla, la portada se
+   queda con su rótulo («EDEM Times · Nº …») y la edición se sigue pudiendo
+   abrir. */
+function coverImage(m) {
+  if (!m.coverImg) {
+    m.coverImg = m.cover
+      ? Promise.resolve(absUrl(m.cover))
+      : (window.EdemPDF ? EdemPDF.cover(absUrl(m.pdf), 720).then(r => r.url) : Promise.reject(new Error('falta js/revistas-pdf.js')));
+    m.coverImg.catch(() => { m.coverImg = null; });
+  }
+  return m.coverImg;
+}
+function mountImageCovers(m, slots) {
+  return coverImage(m).then(src => {
+    slots.forEach(sl => {
+      const label = sl.querySelector('.cslabel');
+      const img = document.createElement('img');
+      img.className = 'cvimg'; img.alt = ''; img.decoding = 'async'; img.draggable = false; img.src = src;
+      sl.replaceChildren(img);
+      if (label) { sl.appendChild(label); label.style.display = 'none'; }
+    });
+  }).catch(e => console.warn('No se pudo pintar la portada de', m.id, e));
+}
+
 function mountSlots(m, slots) {
+  if (imageCover(m)) return mountImageCovers(m, slots);
   slots.forEach(sl => {
     const label = sl.querySelector('.cslabel');
     sl.replaceChildren(mkPage(m, 0).el);
@@ -1538,21 +1707,27 @@ function mountSlots(m, slots) {
 function mountCovers() {
   const latest = latestIssue();
   const order = [latest, ...MAGS.filter(m => m !== latest)];
-  order.forEach(fetchIssue);                 // las tres peticiones, ya en el aire
+  // las peticiones de las revistas en HTML, ya en el aire (las de portada
+  // imagen no necesitan su HTML para enseñarse)
+  order.filter(m => !imageCover(m)).forEach(fetchIssue);
   const pending = [];
 
   (async function run() {
     for (let i = 0; i < order.length; i++) {
       const m = order[i];
       try {
-        await loadIssue(m);                  // trocea (la respuesta ya está)
         const all = [...document.querySelectorAll('.coverslot[data-mag="' + m.id + '"]')];
         const deck = all.filter(sl => sl.closest('.heroDeck'));
-        if (deck.length) mountSlots(m, deck);   // el mazo del hero: lo único visible al entrar
-        if (!i && window.EdemSplash) EdemSplash.hit('cover');
+        if (imageCover(m)) { if (deck.length) await mountImageCovers(m, deck); }
+        else {
+          await loadIssue(m);                  // trocea (la respuesta ya está)
+          if (deck.length) mountSlots(m, deck);   // el mazo del hero: lo único visible al entrar
+        }
         const rest = all.filter(sl => !sl.closest('.heroDeck'));
         if (rest.length) pending.push([m, rest]);
-      } catch (e) { console.warn('No se pudo cargar', m.file, e); }
+      } catch (e) { console.warn('No se pudo cargar', m.file || m.pdf, e); }
+      // la cortina espera a la primera portada; si esa falla, no se queda esperando
+      if (!i && window.EdemSplash) EdemSplash.hit('cover');
       if (i < order.length - 1) await breathe();   // un respiro entre revista y revista
     }
 
@@ -1649,11 +1824,16 @@ function setHalf(half, item) { half.replaceChildren(item.el); half.classList.tog
 function curOffset() { if (mode === 'single' || !SP.length) return 0; const [l, r] = SP[cur]; return l == null ? -397 : (r == null ? 397 : 0); }
 function bookW() { return mode === 'single' ? 794 : 1588; }
 
-function fitBook() {
+/* la escala a la que cabe el libro en el escenario (la usa también el
+   pintado de las ediciones en PDF, para pintar cada página a su tamaño real) */
+function bookScale() {
   const r = stage.getBoundingClientRect();
   // en una sola página (móvil) la revista aprovecha casi todo el ancho: las
   // flechas flotan sobre el margen y además se navega con toque y deslizamiento
-  scale = Math.min((r.width - (mode === 'single' ? 44 : 150)) / bookW(), (r.height - 40) / 1123, 1.05);
+  return Math.min((r.width - (mode === 'single' ? 44 : 150)) / bookW(), (r.height - 40) / 1123, 1.05);
+}
+function fitBook() {
+  scale = bookScale();
   bookouter.style.width = bookW() * scale + 'px';
   bookouter.style.height = 1123 * scale + 'px';
   book.style.transform = 'scale(' + scale + ') translateX(' + curOffset() + 'px)';
@@ -1674,6 +1854,7 @@ function updateChrome() {
   $('v-dots').innerHTML = SP.map((_, i) => '<button class="vdot' + (i === cur ? ' on' : '') + '" aria-label="Ir al pliego ' + (i + 1) + '" data-dot="' + i + '"></button>').join('');
   $('v-goto').value = String(curPageIndex());
   fitBook();
+  prefetchPdf(M);
 }
 
 function render() {
@@ -1792,17 +1973,39 @@ async function setIssue(id, pageIdx = 0) {
     c.classList.toggle('on', on);
     c.setAttribute('aria-selected', String(on));
   });
-  $('v-print').href = encodeURI(m.print || m.file);
+  setPrintButton(m);
   const load = $('v-load');
   if (!m.data) { load.hidden = false; }
   try { await loadIssue(m); }
-  catch (e) { load.hidden = true; $('v-ind').textContent = 'No se pudo cargar la edición'; return; }
+  catch (e) {
+    load.hidden = true;
+    // un PDF que no se deja leer aquí (p. ej. un CMS en otro dominio sin
+    // permisos CORS) todavía se puede abrir con el lector del navegador
+    if (isPdfIssue(m)) $('v-ind').innerHTML = 'No se ha podido abrir aquí · <a href="' + esc(encodeURI(m.pdf)) + '" target="_blank" rel="noopener">Abrir el PDF</a>';
+    else $('v-ind').textContent = 'No se pudo cargar la edición';
+    return;
+  }
   load.hidden = true;
   warmIssueImages(m);
   mode = computeMode();
   M = m; SP = buildSpreads(m.data.n); cur = indexToSpread(Math.min(pageIdx, m.data.n - 1));
   $('v-goto').innerHTML = m.data.labels.map((lb, i) => '<option value="' + i + '">' + String(i + 1).padStart(2, '0') + ' · ' + esc(lb) + '</option>').join('');
   render();
+}
+
+/* el botón de la barra del visor: la versión A4 imprimible de las revistas en
+   HTML o, en las de PDF, el propio PDF para descargar */
+function setPrintButton(m) {
+  const a = $('v-print'), u = printUrl(m), pdf = isPdfUrl(u);
+  a.hidden = !u;
+  if (!u) return;
+  a.href = encodeURI(u);
+  const t = pdf ? 'Descargar el PDF' : 'Versión A4 imprimible';
+  if (a.title !== t) {
+    a.title = t; a.setAttribute('aria-label', t);
+    a.innerHTML = '<i data-lucide="' + (pdf ? 'file-down' : 'printer') + '" class="lu"></i>';
+    if (window.lucide) lucide.createIcons();
+  }
 }
 
 window.openVisor = function (id, pageIdx = 0) {
@@ -1937,9 +2140,17 @@ async function boot() {
       : await fetch('data/content.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : null);
     if (json) {
       C = Object.assign({}, DEFAULTS, json);
-      MAGS = C.issues;
+      MAGS = C.issues || [];
     }
   } catch (_) { /* sin servidor o sin JSON: catálogo embebido */ }
+  // sin JSON (o sin ninguna edición legible): el catálogo embebido, pasado por
+  // la misma normalización que las de content.json y las del CMS
+  if (!MAGS.length || MAGS === DEFAULTS.issues) {
+    C = Object.assign({}, C, { site: Object.assign({}, DEFAULTS.site) });
+    MAGS = C.issues = window.EdemCMS && EdemCMS.normalizaEdicion
+      ? DEFAULTS.issues.map(e => EdemCMS.normalizaEdicion(e)).filter(Boolean)
+      : DEFAULTS.issues;
+  }
   renderAll();
   mountCovers();
   abrirVisorPorURL();
@@ -1999,11 +2210,11 @@ function abrirVisorPorURL() {
   const SKY = rgb('#fbfaf6'), SURF = rgb('#62abc2'), DEEP = rgb('#052635');
   const mixA = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
   // «Actualidad» y el kiosko ya no pintan su propio fondo: comparten el de
-  // .bajada (ver css/site.css), una sola rampa de #072837 a #06333f —el tono
+  // .bajada (ver css/site.css), una sola rampa de #062736 a #06333f —el tono
   // con el que abre «Conócenos»—. Estos son los tramos de ESA rampa que le
   // tocan a cada una (la junta cae más o menos a la mitad). Si se toca
   // .bajada, hay que tocar esto.
-  const ATOP = rgb('#072837'), ABOT = rgb('#062e3b');
+  const ATOP = rgb('#062736'), ABOT = rgb('#062e3b');
   const KTOP = rgb('#062e3b'), KBOT = rgb('#06333f');
   const PAPER = '#fbfaf6';
 

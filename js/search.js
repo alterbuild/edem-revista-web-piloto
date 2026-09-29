@@ -184,11 +184,13 @@
         });
       });
 
-      /* ediciones de la revista */
+      /* ediciones de la revista: las mismas que ve el resto de la página
+         (window.EdemContent, que ya trae las del CMS si lo hay) */
       try {
-        const r = await fetch('data/content.json', { cache: 'no-cache' });
-        if (r.ok) {
-          const c = await r.json();
+        const c = window.EdemContent
+          ? await window.EdemContent
+          : await fetch('data/content.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : null);
+        if (c) {
           (c.issues || []).forEach(i => {
             const hero = i.hero || {};
             items.push({

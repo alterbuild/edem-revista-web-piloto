@@ -187,7 +187,7 @@
         falso. Con fonts.load() la petición se lanza aquí y la espera es de
         verdad. Tope por si se atasca: con la de respaldo se escribe igual, y
         las medidas de las letras se toman sobre lo que haya puesto. */
-  const NEED = ['700 1em Archivo', 'italic 600 1em "Bodoni Moda"', '900 1em "Bodoni Moda"'];
+  const NEED = ['700 1em Archivo', 'italic 700 1em "Bodoni Moda"', '900 1em "Bodoni Moda"'];
   const fonts = document.fonts
     ? Promise.race([
       cssIn.then(() => Promise.all(NEED.map(f => document.fonts.load(f))))

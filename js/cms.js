@@ -22,6 +22,10 @@
    Para enchufar un CMS: data/noticias.json → "cms": { activo:true,
    tipo:"strapi|wordpress|contentful|hygraph|generico", endpoint:"…" }.
    Si la API falla, se cae con red al contenido local del JSON.
+
+   Y LAS EDICIONES DE LA REVISTA, igual: data/content.json → "cms"
+   (ver EDICIONES, al final). Con eso la redacción publica un número
+   subiendo su PDF al CMS: portada, kiosko, visor y buscador salen solos.
    ============================================================ */
 'use strict';
 
@@ -51,11 +55,14 @@
   const txt = v => (v == null ? '' : String(v)).trim();
 
   /* Quita el marcado de un fragmento HTML (títulos y entradillas de WordPress
-     vienen con <p> y entidades dentro). */
+     vienen con <p> y entidades dentro).
+     Con DOMParser y no con el innerHTML de un <div> suelto: un div, aunque no
+     esté en la página, CARGA las imágenes que se le metan, y un
+     <img src=x onerror=…> pegado en un campo del CMS ejecutaba su onerror. Lo
+     que devuelve DOMParser es un documento inerte: ni carga ni ejecuta nada. */
   function stripHtml(s) {
-    const d = document.createElement('div');
-    d.innerHTML = String(s ?? '');
-    return d.textContent.replace(/\s+/g, ' ').trim();
+    const doc = new DOMParser().parseFromString(String(s ?? ''), 'text/html');
+    return (doc.body ? doc.body.textContent : '').replace(/\s+/g, ' ').trim();
   }
 
   /* ---------- preajustes por CMS ----------
@@ -300,14 +307,44 @@
 
   /* URL de un medio, venga como venga del CMS: objeto asset, cadena suelta,
      protocol-relative (Contentful sirve así: //images.ctfassets.net/…) o ruta
-     relativa a la que hay que anteponer `baseMedios`. */
+     relativa a la que hay que anteponer `baseMedios`.
+     Las rutas que empiezan por «/» también van contra `baseMedios`: es como
+     sirve Strapi sus subidas (/uploads/revista.pdf) y, sin eso, se pedían al
+     dominio de la web en vez de al del CMS. */
   function medio(v, base) {
     if (isObj(v)) v = pick(v, 'url|src|source_url|fields.file.url');
     let u = txt(v);
     if (!u) return '';
     if (u.startsWith('//')) return 'https:' + u;
-    if (base && !/^(https?:|data:|\/)/.test(u)) return base.replace(/\/$/, '') + '/' + u;
+    if (base && !/^(https?:|data:|blob:)/i.test(u)) {
+      try { return new URL(u, base.replace(/\/?$/, '/')).href; } catch (_) { /* base mal escrita: tal cual */ }
+    }
     return u;
+  }
+
+  /* Contentful no mete los medios dentro de cada entrada: pone un enlace
+     {sys:{type:'Link', linkType:'Asset', id}} y el asset aparte, en
+     `includes`. Aquí se sustituye cada enlace por lo que apunta, para que
+     rutas como fields.pdf.fields.file.url funcionen tal cual. Con tope de
+     profundidad: dos entradas pueden enlazarse entre sí. */
+  function resuelveEnlaces(json) {
+    const inc = json && json.includes;
+    if (!inc) return json;
+    const idx = {};
+    ['Asset', 'Entry'].forEach(t => (inc[t] || []).forEach(x => { if (x && x.sys) idx[t + ':' + x.sys.id] = x; }));
+    const walk = (v, depth) => {
+      if (depth > 5) return v;
+      if (Array.isArray(v)) return v.map(x => walk(x, depth + 1));
+      if (!isObj(v)) return v;
+      if (v.sys && v.sys.type === 'Link') {
+        const t = idx[v.sys.linkType + ':' + v.sys.id];
+        return t ? walk(t, depth + 1) : v;
+      }
+      const o = {};
+      for (const k in v) o[k] = walk(v[k], depth + 1);
+      return o;
+    };
+    return Object.assign({}, json, { items: walk(json.items || [], 0) });
   }
 
   function normalizaNoticia(raw, map, base, plantillaMini) {
@@ -447,6 +484,7 @@
       bruto = await pideJSON(cfg.endpoint, cfg);
       cacheSet(clave, bruto, seg);
     }
+    if (cfg.tipo === 'contentful') bruto = resuelveEnlaces(bruto);
 
     const noticias = listaDe(bruto, map.lista).map(n => normalizaNoticia(n, map, base, cfg.miniatura)).filter(Boolean).sort(ORDEN);
     if (!noticias.length) throw new Error('El CMS no ha devuelto noticias reconocibles');
@@ -506,7 +544,8 @@
       try {
         const map = Object.assign({}, PRESETS[cfg.tipo] || PRESETS.generico, cfg.mapeo || {});
         const url = cfg.endpointNoticia.replace('{id}', encodeURIComponent(id));
-        const bruto = await pideJSON(url, cfg);
+        let bruto = await pideJSON(url, cfg);
+        if (cfg.tipo === 'contentful') bruto = resuelveEnlaces(bruto);
         const item = map.item ? pick(bruto, map.item) : bruto;
         const uno = normalizaNoticia(Array.isArray(item) ? item[0] : item, map, cfg.baseMedios || '', cfg.miniatura);
         if (uno) return uno;
@@ -516,5 +555,203 @@
     return noticias.find(n => n.id === id) || null;
   }
 
-  window.EdemCMS = { load, loadOne, pick, normalizaCuerpo, PRESETS };
+  /* ============================================================
+     EDICIONES DE LA REVISTA (data/content.json → issues)
+     ============================================================
+     Mismo principio que las noticias: la portada (js/app.js), el pie de las
+     tres páginas (js/shell.js) y el buscador reciben siempre el mismo modelo
+     de edición, salga de content.json o de un CMS headless.
+
+     Modelo normalizado:
+       { id, nr, title, chip, badge, badgeColor, desc, meta, note, fecha,
+         pdf, file, print, cover, pages, latest,
+         hero: { title, titleHtml, sub, lead } }
+       · pdf   — el PDF de la edición: lo que se sube al CMS, o una ruta del
+                 sitio (revistas/pdf/n3.pdf). El visor lo pinta página a página
+                 con js/revistas-pdf.js.
+       · file  — una revista maquetada en HTML (las de revistas/). Si una
+                 edición trae las dos cosas, el visor usa esta —se ve más nítida
+                 y pesa menos— y el PDF queda para descargar.
+       · cover — imagen de portada, opcional. Sin ella se pinta la primera
+                 página del PDF (o del HTML). Subirla ahorra a la portada de la
+                 web cargar PDF.js y la primera página de cada PDF.
+       · print — lo que abre el botón de imprimir o descargar; por defecto,
+                 el PDF.
+       · hero  — los textos que acompañan a la portada en la cabecera de la
+                 web cuando esa edición está delante de la pila.
+     Una edición sin id, sin título o sin nada que leer (ni pdf ni file) se
+     descarta: no habría forma de enseñarla.
+
+     Para enchufar un CMS: data/content.json → "cms": { activo:true,
+     tipo:"strapi|wordpress|contentful|hygraph|generico", endpoint:"…" }.
+     Si el CMS falla o tarda más de `espera` ms, se usan las locales. */
+
+  const PRESETS_EDICION = {
+    generico: {
+      lista: 'ediciones|issues|revistas|data|items|results|docs',
+      id: 'id|slug', numero: 'numero|number|num', nr: 'nr', title: 'title|titulo', chip: 'chip',
+      badge: 'badge|etiqueta', badgeColor: 'badgeColor|color',
+      desc: 'desc|descripcion|description|resumen|summary', meta: 'meta', note: 'note|nota',
+      fecha: 'fecha|date|publishedAt|published_at',
+      pdf: 'pdf|archivo|documento', file: 'file|html', print: 'print|imprimible',
+      cover: 'cover|portada|imagen|image', pages: 'pages|paginas',
+      heroTitle: 'hero.title|hero.titulo', heroTitleHtml: 'hero.titleHtml',
+      heroSub: 'hero.sub|subtitulo|subtitle|sub', heroLead: 'hero.lead|entradilla|lead',
+      latest: 'latest|ultima'
+    },
+    /* Strapi v4 (todo bajo `attributes`, medios en .data.attributes) y v5
+       (campos y medios en la raíz): las rutas alternativas cubren las dos. */
+    strapi: {
+      lista: 'data',
+      id: 'attributes.slug|slug|documentId|id', numero: 'attributes.numero|numero', nr: 'attributes.nr|nr',
+      title: 'attributes.titulo|titulo|attributes.title|title',
+      badge: 'attributes.etiqueta|etiqueta', badgeColor: 'attributes.color|color',
+      desc: 'attributes.descripcion|descripcion', meta: 'attributes.meta|meta', note: 'attributes.nota|nota',
+      fecha: 'attributes.fecha|fecha|attributes.publishedAt|publishedAt',
+      pdf: 'attributes.pdf.data.attributes.url|pdf.url',
+      cover: 'attributes.portada.data.attributes.formats.large.url|attributes.portada.data.attributes.url|portada.formats.large.url|portada.url',
+      pages: 'attributes.paginas|paginas',
+      heroSub: 'attributes.subtitulo|subtitulo', heroLead: 'attributes.entradilla|entradilla',
+      latest: 'attributes.ultima|ultima'
+    },
+    /* WordPress: un tipo de entrada «revista» con campos ACF. Los campos de
+       archivo de ACF tienen que devolver «File Array» o «File URL» (con
+       «File ID» solo llega un número y no hay de dónde sacar la dirección). */
+    wordpress: {
+      lista: '',
+      id: 'slug|id', numero: 'acf.numero', title: 'title.rendered|title',
+      badge: 'acf.etiqueta', badgeColor: 'acf.color', desc: 'acf.descripcion|excerpt.rendered',
+      note: 'acf.nota', fecha: 'date_gmt|date',
+      pdf: 'acf.pdf.url|acf.pdf',
+      cover: 'acf.portada.url|acf.portada|_embedded.wp:featuredmedia.0.source_url',
+      pages: 'acf.paginas', heroSub: 'acf.subtitulo', heroLead: 'acf.entradilla', latest: 'acf.ultima'
+    },
+    contentful: {
+      lista: 'items',
+      id: 'fields.slug|sys.id', numero: 'fields.numero', title: 'fields.titulo|fields.title',
+      badge: 'fields.etiqueta', badgeColor: 'fields.color', desc: 'fields.descripcion|fields.description',
+      note: 'fields.nota', fecha: 'fields.fecha|sys.createdAt',
+      pdf: 'fields.pdf.fields.file.url', cover: 'fields.portada.fields.file.url',
+      pages: 'fields.paginas', heroSub: 'fields.subtitulo', heroLead: 'fields.entradilla', latest: 'fields.ultima'
+    },
+    hygraph: {
+      lista: 'data.revistas|revistas|data.ediciones|ediciones',
+      id: 'slug|id', numero: 'numero', title: 'titulo|title',
+      badge: 'etiqueta', badgeColor: 'color', desc: 'descripcion',
+      note: 'nota', fecha: 'fecha|publishedAt',
+      pdf: 'pdf.url', cover: 'portada.url',
+      pages: 'paginas', heroSub: 'subtitulo', heroLead: 'entradilla', latest: 'ultima'
+    }
+  };
+
+  function normalizaEdicion(raw, map, base) {
+    if (!isObj(raw)) return null;
+    map = map || PRESETS_EDICION.generico;
+    const g = k => (map[k] ? pick(raw, map[k]) : undefined);
+
+    const id = txt(g('id'));
+    const title = stripHtml(g('title'));
+    const pdf = medio(g('pdf'), base);
+    const file = txt(g('file'));
+    if (!id || !title || !(pdf || file)) return null;
+
+    const fecha = txt(g('fecha')).slice(0, 10);
+    const num = txt(g('numero'));
+    const year = /^\d{4}/.test(fecha) ? fecha.slice(0, 4) : '';
+    const pages = Number(g('pages')) || 0;
+    const color = txt(g('badgeColor')).toLowerCase();
+    const soloPdf = pdf && !file;
+
+    // los textos de portada: se conservan los campos que ya traiga (content.json
+    // guarda también kicker, chips…, que lee el buscador) y encima los mapeados
+    const hero = Object.assign({}, isObj(raw.hero) ? raw.hero : {});
+    const heroTitle = stripHtml(g('heroTitle')), heroTitleHtml = txt(g('heroTitleHtml'));
+    const heroSub = stripHtml(g('heroSub')), heroLead = stripHtml(g('heroLead'));
+    if (heroTitle) hero.title = heroTitle;
+    if (heroTitleHtml) hero.titleHtml = heroTitleHtml;
+    if (heroSub) hero.sub = heroSub;
+    if (heroLead) hero.lead = heroLead;
+
+    return {
+      id, title, fecha, pages, pdf, file,
+      nr: txt(g('nr')) || (num ? 'Nº ' + num + (year ? ' · ' + year : '') : year),
+      chip: txt(g('chip')) || (num ? 'Nº ' + num + ' · ' + title : title),
+      badge: stripHtml(g('badge')),
+      badgeColor: COLORES.has(color) ? color : 'edem',
+      desc: stripHtml(g('desc')),
+      meta: txt(g('meta')) || (pages ? pages + ' páginas' + (soloPdf ? ' · PDF' : '') : (soloPdf ? 'Edición digital · PDF' : '')),
+      note: stripHtml(g('note')),
+      cover: medio(g('cover'), base),
+      print: medio(g('print'), base) || pdf || file,
+      latest: g('latest') === true || g('latest') === 'true' || g('latest') === 1,
+      hero
+    };
+  }
+
+  async function edicionesDelCMS(cfg) {
+    const map = Object.assign({}, PRESETS_EDICION[cfg.tipo] || PRESETS_EDICION.generico, cfg.mapeo || {});
+    const seg = cfg.cacheSegundos === 0 ? 0 : (cfg.cacheSegundos || 300);
+    const clave = 'edemtimes:ediciones:' + cfg.endpoint;
+    let bruto = cacheGet(clave, seg);
+    if (!bruto) {
+      bruto = await pideJSON(cfg.endpoint, cfg);
+      cacheSet(clave, bruto, seg);
+    }
+    if (cfg.tipo === 'contentful') bruto = resuelveEnlaces(bruto);
+    const lista = listaDe(bruto, map.lista).map(e => normalizaEdicion(e, map, cfg.baseMedios || '')).filter(Boolean);
+    // de la más nueva a la más vieja, si el CMS las fecha todas
+    if (lista.length && lista.every(e => e.fecha)) lista.sort((a, b) => b.fecha.localeCompare(a.fecha));
+    return lista;
+  }
+
+  /* Recibe el content.json tal cual y devuelve una copia con `issues`
+     normalizadas (del CMS si está activo y responde; si no, las locales) y con
+     `site.latest` apuntando a una edición que exista. La usa js/shell.js al
+     cargar content.json, así que TODA la web ve las mismas ediciones. */
+  async function ediciones(json) {
+    if (!json) return json;
+    const out = Object.assign({}, json, { site: Object.assign({}, json.site) });
+    out.issues = (json.issues || []).map(e => normalizaEdicion(e, PRESETS_EDICION.generico)).filter(Boolean);
+    out.issuesOrigen = 'local';
+
+    const cfg = json.cms || {};
+    if (cfg.activo && cfg.endpoint) {
+      try {
+        const espera = Number(cfg.espera) || 6000;
+        const remotas = await Promise.race([
+          edicionesDelCMS(cfg),
+          new Promise((_, no) => setTimeout(() => no(new Error('el CMS ha tardado más de ' + espera + ' ms')), espera))
+        ]);
+        if (!remotas.length) throw new Error('el CMS no ha devuelto ediciones con PDF o HTML');
+        out.issues = remotas;
+        out.issuesOrigen = 'cms';
+      } catch (e) {
+        // el CMS manda, pero si se cae la revista no desaparece de la web
+        console.warn('[EDEM Times] ediciones del CMS no disponibles, se usan las locales:', e.message);
+        out.issuesOrigen = 'local-fallback';
+      }
+    }
+
+    // la última: la que diga content.json (si viene de ahí y existe), la que el
+    // CMS marque como última, la más reciente por fecha o, si no, la primera
+    const ids = new Set(out.issues.map(e => e.id));
+    let latest = out.issuesOrigen === 'cms' ? '' : txt(out.site.latest);
+    if (!ids.has(latest)) {
+      const marcada = out.issues.find(e => e.latest);
+      const reciente = out.issues.filter(e => e.fecha).sort((a, b) => b.fecha.localeCompare(a.fecha))[0];
+      latest = (marcada || reciente || out.issues[0] || {}).id || '';
+    }
+    out.site.latest = latest;
+    // una edición recién subida al CMS sin etiqueta: la última se anuncia sola
+    if (out.issuesOrigen === 'cms') {
+      const ult = out.issues.find(e => e.id === latest);
+      if (ult && !ult.badge) { ult.badge = 'Última edición'; ult.badgeColor = 'lanzadera'; }
+    }
+    return out;
+  }
+
+  window.EdemCMS = {
+    load, loadOne, pick, normalizaCuerpo, PRESETS,
+    ediciones, normalizaEdicion, PRESETS_EDICION
+  };
 })();

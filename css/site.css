@@ -11,6 +11,17 @@ body{
   color:var(--text-body);
   font-size:16px;
   -webkit-font-smoothing:antialiased;
+  /* LA BODONI, NUNCA DE HILO. Bodoni Moda es variable también en tamaño óptico
+     (opsz 6–96) y, por defecto, el navegador lo ata al cuerpo de letra: a 60px
+     usa el corte de 60, el de titular de lujo, con los perfiles finos como un
+     pelo. Era lo que se veía «demasiado fino» en la cursiva del hero, en el pie
+     de la pila de portadas, en el «times.» del logotipo y en los rótulos del
+     relato bajo el agua. Fijado aquí en 14 (el ajuste de .disp que ya estaba
+     aprobado) lo HEREDA cualquier texto en Bodoni del sitio, también los que se
+     añadan mañana sin acordarse de ponerlo. A la Archivo no le afecta: no tiene
+     eje de tamaño óptico y el navegador ignora el valor. */
+  font-optical-sizing:none;
+  font-variation-settings:'opsz' 14;
 }
 body.lock{overflow:hidden}
 a{color:var(--text-link);text-decoration:none}
@@ -22,7 +33,10 @@ button{font:inherit}
 
 /* Tipografía editorial */
 .disp{font-family:var(--font-display);font-weight:900;font-optical-sizing:none;font-variation-settings:'opsz' 14;letter-spacing:-.015em}
-.disp-i{font-family:var(--font-display);font-style:italic;font-weight:600;letter-spacing:-.01em}
+/* La cursiva sube de 600 a 700: con el tamaño óptico bajo (ver body) ya tiene
+   perfiles firmes, y el peso de más es lo que la sostiene al lado del negro de
+   los titulares. 700 es el tope que se pide a Google Fonts para la cursiva. */
+.disp-i{font-family:var(--font-display);font-style:italic;font-weight:700;letter-spacing:-.01em}
 .over{font-size:11px;letter-spacing:.28em;text-transform:uppercase;font-weight:800}
 .wrap{max-width:var(--container);margin:0 auto;padding:0 28px;padding-left:max(28px,env(safe-area-inset-left));padding-right:max(28px,env(safe-area-inset-right))}
 
@@ -86,7 +100,7 @@ html.sp-on{overflow:hidden}
 
 /* ---- «times.», a máquina ---- */
 .sp-type{position:relative;display:inline-block;--cut:0px;
-  font-family:var(--font-display);font-style:italic;font-weight:600;
+  font-family:var(--font-display);font-style:italic;font-weight:700;
   font-size:clamp(36px,6.4vw,62px);line-height:1;color:var(--text-strong)}
 /* el filo del recorte salta de letra en letra; los -0.3em de arriba y abajo son
    para no rebanar el asta de la «t» ni el punto */
@@ -158,7 +172,7 @@ main>section[id],main>div>section[id]{scroll-margin-top:76px}
 .hbar{height:68px;display:flex;align-items:center;gap:26px}
 .brand{display:flex;align-items:baseline;gap:8px;flex-shrink:0}
 .brand img{height:22px;width:auto}
-.brand .t{font-family:var(--font-display);font-style:italic;font-weight:600;font-size:24px;color:var(--text-strong);line-height:1}
+.brand .t{font-family:var(--font-display);font-style:italic;font-weight:700;font-size:24px;color:var(--text-strong);line-height:1}
 /* el punto azul cierra el logotipo, como en los titulares de la revista */
 .brand .t .pt{font-style:normal;color:var(--edem-teal-500)}
 nav.main{display:flex;gap:26px;font-size:14px;font-weight:600}
@@ -411,7 +425,10 @@ html.sbusca-on{overflow:hidden}
      lo natural. En escritorio vale 0. */
   --vbar:0px;
   --padB:calc(var(--band) - var(--sh) * .02 + 16px + var(--vbar));
-  padding:92px 0 var(--padB);
+  /* --padT: el hueco de arriba, cabecera incluida (ver el corte de escritorio
+     más abajo: en ordenador crece con el alto de la pantalla) */
+  --padT:92px;
+  padding:var(--padT) 0 var(--padB);
   /* LA FRANJA de la barra inferior de Safari iOS 26.
      El hero (sticky, alto = lvh) acaba en el borde del viewport de LAYOUT
      (innerHeight). Con la barra flotante «cristal líquido» queda DEBAJO una franja
@@ -453,6 +470,23 @@ html.sbusca-on{overflow:hidden}
 .hero p.lead{font-size:17px;line-height:1.65;color:var(--text-muted);max-width:520px;margin-top:20px}
 .hero .acts{display:flex;align-items:center;gap:14px;margin-top:32px;flex-wrap:wrap}
 .heroCopy{position:relative}
+
+/* --- el texto que cambia con la portada (ver renderHero en js/app.js) ---
+   Titular, subtítulo y entradilla llevan una capa por edición apiladas en la
+   MISMA celda de rejilla: cada pieza mide lo que su capa más alta, así que al
+   cambiar de número no se mueve nada de lo que hay debajo. Los titulares se
+   apoyan abajo (el corto queda pegado a su subtítulo, el aire sobra por
+   arriba); el resto arranca arriba. Al cambiar, la que sale se va rápido y la
+   que entra llega un pelo después, con el mismo deslizamiento de la página.
+   --fit encoge un titular largo para que quepa en una línea (lo calcula
+   fitHeroTitles). La que no está a la vista lleva aria-hidden desde el JS. */
+.htitle,.hsub,.hlead{display:grid}
+.hslide{grid-area:1/1;align-self:start;opacity:0;transform:translate3d(0,14px,0);visibility:hidden;
+  transition:opacity .28s var(--ease-standard),transform .4s var(--ease-standard),visibility 0s linear .4s}
+.hslide.on{opacity:1;transform:none;visibility:visible;
+  transition:opacity .5s var(--ease-out) .14s,transform .7s var(--ease-out) .14s,visibility 0s}
+.htitle .hslide{align-self:end;font-size:calc(1em * var(--fit,1))}
+@media (prefers-reduced-motion:reduce){.hslide,.hslide.on{transition:none}}
 
 /* entrada escalonada del texto */
 @keyframes heroRise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
@@ -572,9 +606,16 @@ html.sbusca-on{overflow:hidden}
 /* ---------- inmersión (el relato bajo el agua) ----------
    Cada «beat» recibe --ph de js/app.js: -1 = aún no ha entrado, 0 = centrado,
    1 = ya ha salido. Solo se animan transform y opacity. */
-.deep{position:absolute;inset:0;z-index:5;overflow:hidden;pointer-events:none;display:grid;opacity:var(--deepP)}
+/* clip-path además de overflow: las burbujas van en position:fixed (ver
+   .bubbles) y a un fixed el overflow de un antepasado no lo recorta; el
+   clip-path sí. */
+.deep{position:absolute;inset:0;z-index:5;overflow:hidden;clip-path:inset(0);pointer-events:none;display:grid;opacity:var(--deepP)}
+/* La última parada es OPACA y es exactamente el color con el que arranca la
+   bajada (#062736, ver .bajada). Antes era rgba(5,38,53,.99) y el 1% que se
+   transparentaba dependía de lo que hubiera debajo: medido, la costura quedaba
+   a un nivel de color de la bajada. Así casan al píxel pase lo que pase. */
 .deepTint{position:absolute;inset:-12%;background:
-  radial-gradient(120% 88% at 50% -12%,rgba(146,214,232,.5),rgba(13,74,96,.93) 52%,rgba(5,38,53,.99) 100%)}
+  radial-gradient(120% 88% at 50% -12%,rgba(146,214,232,.5),rgba(13,74,96,.93) 52%,#062736 100%)}
 
 /* haces de luz que entran desde la superficie.
    Se apagan antes de tocar el fondo del hero. Los haces van girados 14°, así que
@@ -594,11 +635,18 @@ html.sbusca-on{overflow:hidden}
 .rays span:nth-child(3){left:74%;animation-duration:21s;animation-delay:-9s;opacity:.55}
 @keyframes sway{from{transform:rotate(11deg) translate3d(-14px,0,0)}to{transform:rotate(17deg) translate3d(16px,0,0)}}
 
-/* burbujas (las genera js/app.js). Como los rayos, se desvanecen antes del
-   borde de abajo: una burbuja cortada en seco contra la junta la delataría. */
-.bubbles{position:absolute;inset:0;overflow:hidden;
-  -webkit-mask-image:linear-gradient(180deg,#000 82%,transparent 98%);
-  mask-image:linear-gradient(180deg,#000 82%,transparent 98%)}
+/* LAS BURBUJAS SON DEL AGUA, NO DE LA SECCIÓN (las genera js/app.js, aguaViva).
+   Antes cada tramo tenía las suyas: las de la inmersión se desvanecían antes
+   del borde de abajo del hero y las de la bajada eran otras, pocas y lentas
+   —alguna subía a 8px por segundo, parecía clavada—. Justo en la costura se
+   pasaba de burbujas vivas a burbujas quietas y eso delataba el corte.
+   Ahora hay UN solo campo de burbujas fijo a la pantalla (position:fixed) y
+   dos ventanas que lo dejan ver: el agua del hero (.deep) y la de la bajada
+   (.bdeep). Las dos copias llevan las mismas burbujas con el mismo reloj, así
+   que cuando la costura cruza la pantalla una burbuja pasa de una sección a la
+   otra sin enterarse. Cada ventana recorta con clip-path (ver .deep y .bdeep).
+   Siguen siendo puro compositor: transform y opacity. */
+.bubbles{position:fixed;inset:0;overflow:hidden;pointer-events:none}
 .bubbles span{position:absolute;bottom:-8vh;border-radius:50%;
   border:1px solid rgba(255,255,255,.26);
   background:radial-gradient(circle at 30% 26%,rgba(255,255,255,.55) 0 14%,rgba(255,255,255,.05) 46%,rgba(255,255,255,0) 66%);
@@ -687,7 +735,8 @@ html.sbusca-on{overflow:hidden}
    placa no se quede más ancha que la revista cuando en móvil la portada
    encoge. Los cortes de abajo (ver «responsive») cambian ESTA variable, no el
    ancho de .deck. */
-.heroDeck{--deck-w:min(350px,82%,calc((var(--heroH) - 92px - var(--padB) - 96px) / 1.414));
+/* --deck-ui: lo que se reserva para la placa del pie y el aire entre ambas. */
+.heroDeck{--deck-ui:96px;--deck-w:min(350px,82%,calc((var(--heroH) - var(--padT) - var(--padB) - var(--deck-ui)) / 1.414));
   position:relative;display:flex;flex-direction:column;align-items:center;gap:18px}
 /* touch-action:pan-y — el navegador se queda con el scroll vertical y nosotros
    solo reclamamos el gesto cuando es claramente horizontal (ver bindDeck en
@@ -751,7 +800,7 @@ html.sbusca-on{overflow:hidden}
   opacity:0;transform:translateY(6px);transition:opacity .45s var(--ease-out),transform .45s var(--ease-out)}
 .deckcap.on{opacity:1;transform:none}
 .deckcap .cnr{font-size:10px;letter-spacing:.2em;text-transform:uppercase;font-weight:800;color:var(--edem-teal-600)}
-.deckcap .ct{font-family:var(--font-display);font-style:italic;font-weight:600;font-size:19px;line-height:1.1;
+.deckcap .ct{font-family:var(--font-display);font-style:italic;font-weight:700;font-size:19px;line-height:1.1;
   color:var(--text-strong);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .deckdots{display:flex;gap:7px;flex:none}
 /* Los puntos son el mando para cambiar de portada, así que cada uno necesita
@@ -808,15 +857,14 @@ html.sbusca-on{overflow:hidden}
    Antes el degradado subía a #0a4152 a media altura y esa panza de luz caía de
    lleno en el kiosko, que se leía como un panel con fondo propio —sobre todo
    cuando «Actualidad» no llegaba a pintarse y el kiosko salía justo detrás de
-   la inmersión—. Ahora es una sola rampa, de #072837 a #06333f, tan suave que
+   la inmersión—. Ahora es una sola rampa, de #062736 a #06333f, tan suave que
    se lee como un único fondo; lo que distingue una sección de otra es el
    contenido, no el color.
 
    Los dos extremos SÍ siguen atados a sus vecinos:
-   · arriba, #072837 es el color con el que acaba la inmersión del hero
-     (.deepTint cierra en rgba(5,38,53,.99) sobre el papel del body; medido, no
-     estimado: el degradado radial ya llega a su última parada bastante antes
-     del borde de abajo, así que ahí el color es plano);
+   · arriba, #062736 es el color con el que acaba la inmersión del hero: la
+     última parada de .deepTint, que es opaca (el degradado radial llega a ella
+     bastante antes del borde de abajo, así que ahí el color es plano);
    · abajo, #06333f es el fondo con el que abre «Conócenos» (--jbg).
    Además el degradado sale y entra plano en los dos extremos (mesetas del 0-6%
    y del 94-100%): sin cambio de pendiente en la costura, no hay raya.
@@ -830,39 +878,23 @@ html.sbusca-on{overflow:hidden}
    pelo de luz justo en la costura. Con el solape no hay fila que mezclar. El
    padding equivalente devuelve el contenido a su sitio. */
 .bajada{position:relative;margin-top:-2px;padding-top:2px;
-  background:linear-gradient(180deg,#072837 0,#072837 6%,#06333f 94%,#06333f 100%)}
+  background:linear-gradient(180deg,#062736 0,#062736 6%,#06333f 94%,#06333f 100%)}
 
-/* --- el agua sigue: los adornos de la bajada ---
-   Una sola capa para las dos secciones, detrás de todo:
-   · la NIEVE MARINA, las motas que flotan en el agua honda: una tesela de SVG
-     que se repite, quieta a propósito — una capa del alto de dos secciones
-     moviéndose sería una capa de compositor enorme viva todo el rato;
-   · unas pocas BURBUJAS, las mismas de la inmersión, que siguen subiendo por
-     todo el alto. Las siembra js/app.js (bajadaViva) cuando la bajada se acerca
-     a pantalla, con el recorrido recortado para que ninguna llegue a la costura
-     con el hero; solo se animan con transform/opacity y se paran en cuanto la
-     bajada sale de pantalla (.bajada.live).
-   La nieve se desvanece antes de los dos bordes: sin corte seco contra la
-   inmersión, que no tiene, ni contra «Conócenos». */
-.bdeep{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.bsnow{position:absolute;inset:0;opacity:.5;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='460' height='460'%3E%3Cg fill='%23d9f1f7'%3E%3Ccircle cx='187.8' cy='379.3' r='0.84' fill-opacity='0.60'/%3E%3Ccircle cx='420.3' cy='189.7' r='0.55' fill-opacity='0.66'/%3E%3Ccircle cx='325.3' cy='198.2' r='1.65' fill-opacity='0.52'/%3E%3Ccircle cx='365.9' cy='72.9' r='1.03' fill-opacity='0.67'/%3E%3Ccircle cx='151.3' cy='342.6' r='1.59' fill-opacity='0.26'/%3E%3Ccircle cx='391.0' cy='299.6' r='0.70' fill-opacity='0.61'/%3E%3Ccircle cx='416.6' cy='150.6' r='1.10' fill-opacity='0.43'/%3E%3Ccircle cx='103.7' cy='351.0' r='0.80' fill-opacity='0.32'/%3E%3Ccircle cx='424.7' cy='371.5' r='1.72' fill-opacity='0.55'/%3E%3Ccircle cx='193.2' cy='182.2' r='1.02' fill-opacity='0.51'/%3E%3Ccircle cx='20.2' cy='33.4' r='0.76' fill-opacity='0.69'/%3E%3Ccircle cx='235.4' cy='208.8' r='1.06' fill-opacity='0.54'/%3E%3Ccircle cx='340.7' cy='238.9' r='0.55' fill-opacity='0.72'/%3E%3Ccircle cx='321.6' cy='402.0' r='1.57' fill-opacity='0.48'/%3E%3Ccircle cx='112.4' cy='169.6' r='1.49' fill-opacity='0.35'/%3E%3Ccircle cx='71.0' cy='333.0' r='0.83' fill-opacity='0.61'/%3E%3Ccircle cx='369.8' cy='19.8' r='0.77' fill-opacity='0.63'/%3E%3Ccircle cx='87.3' cy='165.4' r='0.74' fill-opacity='0.71'/%3E%3Ccircle cx='118.8' cy='278.6' r='0.55' fill-opacity='0.26'/%3E%3Ccircle cx='338.7' cy='297.0' r='0.67' fill-opacity='0.29'/%3E%3Ccircle cx='424.0' cy='120.6' r='0.87' fill-opacity='0.45'/%3E%3Ccircle cx='61.7' cy='109.7' r='0.66' fill-opacity='0.63'/%3E%3Ccircle cx='358.9' cy='425.6' r='0.72' fill-opacity='0.71'/%3E%3Ccircle cx='108.7' cy='429.1' r='0.67' fill-opacity='0.68'/%3E%3Ccircle cx='0.8' cy='387.2' r='0.58' fill-opacity='0.50'/%3E%3Ccircle cx='379.7' cy='31.6' r='0.87' fill-opacity='0.33'/%3E%3Ccircle cx='349.1' cy='129.7' r='0.64' fill-opacity='0.59'/%3E%3Ccircle cx='156.9' cy='1.6' r='0.68' fill-opacity='0.70'/%3E%3Ccircle cx='166.9' cy='134.2' r='1.34' fill-opacity='0.38'/%3E%3Ccircle cx='423.9' cy='296.1' r='0.83' fill-opacity='0.36'/%3E%3Ccircle cx='327.1' cy='233.1' r='0.55' fill-opacity='0.45'/%3E%3Ccircle cx='348.4' cy='19.4' r='1.08' fill-opacity='0.64'/%3E%3Ccircle cx='21.7' cy='13.6' r='0.56' fill-opacity='0.44'/%3E%3Ccircle cx='348.2' cy='25.2' r='0.56' fill-opacity='0.30'/%3E%3C/g%3E%3C/svg%3E");
-  background-size:460px 460px;
-  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 560px,#000 calc(100% - 360px),transparent 100%);
-  mask-image:linear-gradient(180deg,transparent 0,#000 560px,#000 calc(100% - 360px),transparent 100%)}
-.bbubbles{position:absolute;inset:0}
-.bbubbles span{position:absolute;border-radius:50%;opacity:0;
-  border:1px solid rgba(255,255,255,.24);
-  background:radial-gradient(circle at 30% 26%,rgba(255,255,255,.5) 0 14%,rgba(255,255,255,.05) 46%,rgba(255,255,255,0) 66%);
-  animation:bbub linear infinite paused}
-.bajada.live .bbubbles span{animation-play-state:running}
-@keyframes bbub{
-  0%{transform:translate3d(0,0,0) scale(.7);opacity:0}
-  14%{opacity:.7}
-  78%{opacity:.42}
-  100%{transform:translate3d(var(--dx,14px),var(--rise,-420px),0) scale(1.12);opacity:0}
-}
-@media (prefers-reduced-motion:reduce){.bbubbles{display:none}}
+/* --- el agua sigue: las burbujas de la bajada ---
+   Son las MISMAS de la inmersión: un campo fijo a la pantalla que esta capa
+   deja ver solo dentro de la bajada (clip-path; ver .bubbles). Por eso siguen
+   subiendo al mismo ritmo al cruzar la costura con el hero.
+   Aquí vivía también una «nieve marina»: motas quietas en una tesela. Quietas
+   mientras todo lo demás se mueve se leían como burbujas congeladas —y el hero
+   no las tenía, así que marcaban justo dónde empezaba la sección—. Fuera.
+   Abajo, antes de «Conócenos», las burbujas se funden con el fondo (::after):
+   el degradado acaba en el mismo #06333f, así que se van sin línea de corte.
+   Fuera de pantalla la capa se oculta (.bajada sin .live) pero el reloj de
+   las burbujas sigue corriendo: al volver siguen casando con las del hero. */
+.bdeep{position:absolute;inset:0;pointer-events:none;overflow:hidden;clip-path:inset(0)}
+.bdeep::after{content:'';position:absolute;left:0;right:0;bottom:0;height:min(42vh,380px);
+  background:linear-gradient(180deg,rgba(6,51,63,0),#06333f 88%)}
+.bajada:not(.live) .bdeep{visibility:hidden}
 
 /* la retícula de las dos secciones: raíl clavado a la izquierda y el
    contenido desfilando al lado */
@@ -1350,7 +1382,7 @@ footer.site{background:var(--ink-900);color:var(--ink-300)}
    La de la marca manda menos que antes porque ahora hay una columna más. */
 .fgrid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1.15fr 1fr;gap:30px;padding-top:56px;padding-bottom:56px}
 footer.site img.flogo{height:22px}
-footer.site .tag{font-family:var(--font-display);font-style:italic;font-size:21px;color:#fff;margin-top:14px}
+footer.site .tag{font-family:var(--font-display);font-style:italic;font-weight:700;font-size:21px;color:#fff;margin-top:14px}
 footer.site .col p.h{font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:800;color:var(--ink-400);margin-bottom:14px}
 footer.site .col a,footer.site .col button.aslink{display:block;color:var(--ink-300);font-size:14.5px;padding:4px 0;background:none;border:0;cursor:pointer;text-align:left;width:100%}
 footer.site .col a:hover,footer.site .col button.aslink:hover{color:var(--edem-teal-200)}
@@ -1373,6 +1405,14 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
 .pg.void{background:transparent}
 .coverslot .pg{position:absolute;top:0;left:0;transform-origin:0 0}
 .pg iframe{width:794px;height:1123px;border:0;display:block;pointer-events:none}
+/* portada como imagen: la subida con la edición o la página 1 de su PDF
+   (ver coverImage en js/app.js) */
+.coverslot .cvimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#fff}
+/* página de una edición en PDF: la imagen ya pintada, a lo que mida la página
+   (si el PDF no es A4 exacto queda centrada sobre el blanco del papel) */
+.pgpdf img{width:100%;height:100%;object-fit:contain;display:block;user-select:none;-webkit-user-select:none}
+.pgpdf.pgfail::after{content:'No se ha podido pintar esta página';position:absolute;inset:0;display:grid;place-items:center;
+  padding:40px;text-align:center;font:600 26px/1.4 var(--font-body);color:var(--ink-400)}
 
 /* ---------- visor ---------- */
 .visor{position:fixed;inset:0;z-index:100;background:radial-gradient(1200px 700px at 50% 30%,#12262e,#08141a 75%);display:flex;flex-direction:column}
@@ -1768,4 +1808,29 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
    1400 px — más allá la línea de texto se hace incómoda de seguir */
 @media(min-width:1680px){
   :root{--container:1400px}
+}
+
+/* ============================================================
+   HERO EN ORDENADOR: AIRE BAJO LA CABECERA
+   ============================================================ */
+/* La pila de portadas se llevaba TODO el alto que le dejaba la escena, así que
+   quedaba a 33px de la cabecera en cualquier pantalla: en un portátil
+   (1366×660, 1470×830…) se veía pegada a la barra. Ahora el hueco de arriba
+   crece con el alto —30px de aire como poco, 58 como mucho, 6,2vh en medio— y
+   la pila encoge lo que haga falta para respetarlo (su ancho sale de --padT).
+   Va al final para ganar a los cortes de arriba sin subir especificidad. */
+@media (min-width:1021px){
+  .hero{--padT:calc(69px + clamp(30px,6.2vh,58px))}
+}
+/* En las pantallas bajas el texto también cede: titular y subtítulo se atan al
+   alto, la entradilla baja medio punto y los huecos se aprietan, para que todo
+   quepa entre la cabecera y la escena sin rozar ninguna de las dos. */
+@media (min-width:1021px) and (max-height:800px){
+  .hero h1{font-size:clamp(50px,min(6.4vw,11.8vh),98px);margin-top:0}
+  .hero .sub{font-size:clamp(19px,min(2vw,3.3vh),26px);margin-top:10px}
+  .hero p.lead{font-size:15.5px;line-height:1.55;margin-top:14px}
+  .hero .acts{margin-top:24px}
+  .heroDeck{gap:12px;--deck-ui:84px}
+  .deckui{padding:8px 12px 8px 14px}
+  .deckcap .ct{font-size:17px}
 }
