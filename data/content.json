@@ -72,6 +72,7 @@
       "badgeColor": "lanzadera",
       "desc": "Crónica del Hackathon, entrevista cruzada alumno × CEO, radar Lanzadera, métricas de Angels y pasatiempos.",
       "meta": "24 páginas · edición física + digital · 2026",
+      "note": "¡La más gorda: 24 páginas!",
       "hero": {
         "kicker": "Nº 2 · 2026 · Última edición",
         "titleHtml": "Trac&shy;ción<span class=\"pt\">.</span>",
@@ -91,7 +92,8 @@
       "badge": "Contracorriente",
       "badgeColor": "edem",
       "desc": "El número fundacional: el manual de supervivencia en la Marina, tipografía brutal, sellos, radar Lanzadera y duotonos.",
-      "meta": "10 páginas · edición física + digital · 2026"
+      "meta": "10 páginas · edición física + digital · 2026",
+      "note": "El primero de verdad"
     },
     {
       "id": "n1",
@@ -103,7 +105,8 @@
       "badge": "Archivo",
       "badgeColor": "angels",
       "desc": "La primera maqueta del piloto: el origen de EDEM Times, de portada a contraportada.",
-      "meta": "10 páginas · maqueta inicial"
+      "meta": "10 páginas · maqueta inicial",
+      "note": "El borrador cero"
     }
   ],
   "articles": [

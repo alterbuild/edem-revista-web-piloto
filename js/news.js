@@ -160,9 +160,48 @@
      La antigua sección «En este número» pasa a ser la portada del
      diario: apertura + tres titulares + puerta al portal.
      ============================================================ */
+  /* COPIA DE RESERVA del bloque: las siete noticias que pinta la portada
+     (apertura + seis), con solo los campos que usa tarjeta(). Entra ÚNICAMENTE
+     si no se puede leer data/noticias.json —la página abierta como archivo, sin
+     servidor, o el JSON caído—: antes, en ese caso, la sección se escondía
+     entera y el kiosko quedaba pegado a la inmersión, como si «Actualidad» no
+     existiera. Con servidor (y en producción) manda siempre el JSON o el CMS.
+     Se saca de data/noticias.json; si cambian las noticias de portada conviene
+     refrescarla, aunque no es imprescindible: solo se ve si el JSON falla. */
+  const RESERVA = {
+    secciones: [
+      { id: 'campus', nombre: 'Campus', color: 'edem' },
+      { id: 'emprende', nombre: 'Emprende', color: 'lanzadera' },
+      { id: 'inversion', nombre: 'Inversión', color: 'angels' },
+      { id: 'alumni', nombre: 'Alumni', color: 'neutral' },
+      { id: 'agenda', nombre: 'Agenda', color: 'edem' }
+    ],
+    noticias: [
+      { id: 'hackathon-2026-cierre', seccion: 'campus', portada: 1, fecha: '2026-07-22', lectura: 2, autor: 'Marta Gil',
+        titulo: 'El Hackathon de EDEM cierra con cinco proyectos y una startup que ya factura',
+        entradilla: '48 horas, 120 alumnos y doce mentores en el edificio. El jurado premió una plataforma de logística inversa que cerró su primer cliente el lunes siguiente.',
+        img: 'assets/img/perfil-ee.jpg', alt: 'Equipo de alumnos trabajando de madrugada durante el Hackathon de EDEM' },
+      { id: 'lanzadera-convocatoria-otono', seccion: 'emprende', portada: 2, fecha: '2026-07-20', lectura: 1,
+        titulo: 'Lanzadera abre la convocatoria de otoño: esto es lo que mira el comité antes de decir que sí', img: 'assets/img/eco-lanzadera.jpg' },
+      { id: 'angels-inversiones-primer-semestre', seccion: 'inversion', portada: 3, fecha: '2026-07-18', lectura: 1,
+        titulo: 'Angels cierra el semestre con tres compañías nuevas en cartera', img: 'assets/img/eco-angels.jpg' },
+      { id: 'redaccion-abre-numero-3', seccion: 'campus', fecha: '2026-07-17', lectura: 1,
+        titulo: 'La redacción abre el número 3: buscamos doce manos más', img: 'assets/img/intro-grados.jpg' },
+      { id: 'open-day-julio', seccion: 'campus', fecha: '2026-07-15', lectura: 1,
+        titulo: 'Así fue el Open Day: 600 familias, 40 alumnos guía y un campus que no paró', img: 'assets/img/openday-ux.jpg' },
+      { id: 'cafeteria-horario-continuo', seccion: 'campus', fecha: '2026-07-14', lectura: 1,
+        titulo: 'La cafetería cambia de horario y de carta: qué pasa a partir de septiembre', img: 'assets/img/openday-desarrollo.jpg' },
+      { id: 'alumni-primer-ano-fuera', seccion: 'alumni', fecha: '2026-07-11', lectura: 1,
+        titulo: 'De las aulas al comité de dirección: tres alumni cuentan su primer año fuera', img: 'assets/img/intro-ee.jpg' }
+    ]
+  };
+
   async function bloqueHome() {
     const host = $('dgrid'); if (!host) return;
-    const { noticias, secciones } = await window.EdemCMS.load();
+    // sin cms.js o sin JSON legible (origen «vacio»): la copia de reserva
+    let datos = window.EdemCMS ? await window.EdemCMS.load().catch(() => null) : null;
+    if (!datos || datos.origen === 'vacio') datos = RESERVA;
+    const { noticias, secciones } = datos;
     if (!noticias.length) { const s = $('actualidad'); if (s) s.hidden = true; return; }
     const sec = indexaSecciones(secciones);
 
@@ -185,6 +224,28 @@
     const nota = $('actualidad-note');
     if (nota) nota.textContent = 'Última publicada, ' + relativa(noticias[0].fecha) + '.';
     iconos(); reveals();
+    reancla();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(reancla);
+  }
+
+  /* EL ANCLA QUE SE QUEDA CORTA. Quien llega con index.html#kiosko (el menú del
+     portal de noticias lleva ahí) salta al kiosko ANTES de que este bloque se
+     pinte; al crecer «Actualidad» —mil píxeles de noticias— el kiosko baja y la
+     página se queda a media noticia. Chrome lo compensa solo (anclaje de
+     scroll); Safari no. Así que, si el destino del ancla va detrás de este
+     bloque y el usuario aún no ha tocado el scroll, se repite el salto. */
+  let tocado = false;
+  ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(t =>
+    addEventListener(t, () => { tocado = true; }, { once: true, passive: true }));
+  function reancla() {
+    const id = decodeURIComponent(location.hash.slice(1));
+    if (!id || tocado) return;
+    const dest = document.getElementById(id), sec = $('actualidad');
+    if (!dest || !sec || !(sec.compareDocumentPosition(dest) & Node.DOCUMENT_POSITION_FOLLOWING)) return;
+    // 'instant' salta sin la animación de scroll-behavior:smooth; los Safari
+    // viejos no lo conocen y lanzan error con un valor que no conocen
+    try { dest.scrollIntoView({ behavior: 'instant', block: 'start' }); }
+    catch (_) { dest.scrollIntoView(true); }
   }
 
   /* ============================================================

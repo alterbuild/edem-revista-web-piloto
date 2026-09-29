@@ -803,11 +803,14 @@ html.sbusca-on{overflow:hidden}
    lados haya exactamente el mismo color. Con un fondo único y monótono no hay
    nada que casar y la bajada se lee de un tirón.
 
-   El kiosko ya no «sale del agua»: lleva el mismo color y el mismo material que
-   «Lo último», su predecesora. El degradado se mueve muy poco —de #072837 a
-   #0a4152 y vuelta— y todo el tramo se lee como un único fondo; lo que
-   diferencia una sección de otra son los adornos (espejados) y el contenido, no
-   el color.
+   Y ES EL MISMO AGUA DE LA INMERSIÓN. El relato bajo el mar acaba en un azul
+   profundo plano; la bajada arranca en ese tono y ya no se vuelve a aclarar.
+   Antes el degradado subía a #0a4152 a media altura y esa panza de luz caía de
+   lleno en el kiosko, que se leía como un panel con fondo propio —sobre todo
+   cuando «Actualidad» no llegaba a pintarse y el kiosko salía justo detrás de
+   la inmersión—. Ahora es una sola rampa, de #072837 a #06333f, tan suave que
+   se lee como un único fondo; lo que distingue una sección de otra es el
+   contenido, no el color.
 
    Los dos extremos SÍ siguen atados a sus vecinos:
    · arriba, #072837 es el color con el que acaba la inmersión del hero
@@ -815,9 +818,10 @@ html.sbusca-on{overflow:hidden}
      estimado: el degradado radial ya llega a su última parada bastante antes
      del borde de abajo, así que ahí el color es plano);
    · abajo, #06333f es el fondo con el que abre «Conócenos» (--jbg).
-   Además el degradado sale y entra plano en los dos extremos (mesetas del 0-8%
-   y del 92-100%): sin cambio de pendiente en la costura, no hay raya.
-   Si se toca un extremo hay que tocar el de al lado (.hero .deepTint / #conocenos).
+   Además el degradado sale y entra plano en los dos extremos (mesetas del 0-6%
+   y del 94-100%): sin cambio de pendiente en la costura, no hay raya.
+   Si se toca un extremo hay que tocar el de al lado (.hero .deepTint /
+   #conocenos) y los tonos de barTint() en js/app.js.
 
    El margen negativo mete el fondo 2px POR DEBAJO del hero. No es para casar
    colores —ya casan— sino por el recorte: el hero es sticky con overflow:hidden
@@ -826,55 +830,53 @@ html.sbusca-on{overflow:hidden}
    pelo de luz justo en la costura. Con el solape no hay fila que mezclar. El
    padding equivalente devuelve el contenido a su sitio. */
 .bajada{position:relative;margin-top:-2px;padding-top:2px;
-  background:linear-gradient(180deg,
-    #072837 0,      /* meseta: entra al mismo ritmo (ninguno) con el que baja la inmersión */
-    #072837 8%,
-    #08333f 26%,
-    #0a4152 55%,
-    #0a4152 82%,    /* el kiosko se queda en el tono con el que cierra «Lo último» */
-    #083c4c 92%,
-    #06333f 100%)}  /* meseta de salida hacia «Conócenos» */
+  background:linear-gradient(180deg,#072837 0,#072837 6%,#06333f 94%,#06333f 100%)}
 
-/* ---------- kiosko ----------
-   Mismo fondo y mismo material que «Lo último»; la cabecera se queda clavada
-   mientras las portadas desfilan al lado. */
-/* ojo: nada de overflow:hidden aquí — anularía el sticky de .ksticky.
-   El recorte de los adornos lo hace .kbg. */
-#kiosko{position:relative;padding:96px 0 110px}
-/* Los adornos se apagan antes de llegar a los bordes de su sección. Antes se
-   recortaban en seco contra el borde (overflow:hidden) y hacía falta taparlos
-   con una franja opaca; esa franja era justo la que creaba el pico de
-   luminancia en la junta. Con la máscara, la trama y el aro se desvanecen solos
-   y no hay nada que tapar. */
-#kiosko .kbg,#actualidad .kbg{position:absolute;inset:0;pointer-events:none;overflow:hidden;
-  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 20%,#000 80%,transparent 100%);
-  mask-image:linear-gradient(180deg,transparent 0,#000 20%,#000 80%,transparent 100%)}
-/* Aquí vivían dos «orbes» (.kglow g1/g2): dos círculos enormes y desenfocados,
-   uno azul arriba y otro naranja abajo, que hacían de resplandor de fondo. Se
-   quitaron a propósito: quietos y sin nada que los justifique se leían como
-   manchas sobre un fondo que ahora es liso. El adorno se queda en la trama de
-   puntos y el aro, que sí tienen dibujo. */
-.kdots{position:absolute;right:4%;top:12%;width:min(30vw,340px);height:300px;
-  background-image:radial-gradient(rgba(255,255,255,.35) 1.4px,transparent 1.5px);background-size:18px 18px;opacity:.5;
-  -webkit-mask-image:radial-gradient(closest-side,#000,transparent);mask-image:radial-gradient(closest-side,#000,transparent)}
-.kring{position:absolute;left:-6%;bottom:-18%;width:min(46vw,540px);aspect-ratio:1;
-  border:1.5px dashed rgba(255,255,255,.22);border-radius:50%;animation:ringspin 90s linear infinite}
-@keyframes ringspin{to{transform:rotate(360deg)}}
+/* --- el agua sigue: los adornos de la bajada ---
+   Una sola capa para las dos secciones, detrás de todo:
+   · la NIEVE MARINA, las motas que flotan en el agua honda: una tesela de SVG
+     que se repite, quieta a propósito — una capa del alto de dos secciones
+     moviéndose sería una capa de compositor enorme viva todo el rato;
+   · unas pocas BURBUJAS, las mismas de la inmersión, que siguen subiendo por
+     todo el alto. Las siembra js/app.js (bajadaViva) cuando la bajada se acerca
+     a pantalla, con el recorrido recortado para que ninguna llegue a la costura
+     con el hero; solo se animan con transform/opacity y se paran en cuanto la
+     bajada sale de pantalla (.bajada.live).
+   La nieve se desvanece antes de los dos bordes: sin corte seco contra la
+   inmersión, que no tiene, ni contra «Conócenos». */
+.bdeep{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.bsnow{position:absolute;inset:0;opacity:.5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='460' height='460'%3E%3Cg fill='%23d9f1f7'%3E%3Ccircle cx='187.8' cy='379.3' r='0.84' fill-opacity='0.60'/%3E%3Ccircle cx='420.3' cy='189.7' r='0.55' fill-opacity='0.66'/%3E%3Ccircle cx='325.3' cy='198.2' r='1.65' fill-opacity='0.52'/%3E%3Ccircle cx='365.9' cy='72.9' r='1.03' fill-opacity='0.67'/%3E%3Ccircle cx='151.3' cy='342.6' r='1.59' fill-opacity='0.26'/%3E%3Ccircle cx='391.0' cy='299.6' r='0.70' fill-opacity='0.61'/%3E%3Ccircle cx='416.6' cy='150.6' r='1.10' fill-opacity='0.43'/%3E%3Ccircle cx='103.7' cy='351.0' r='0.80' fill-opacity='0.32'/%3E%3Ccircle cx='424.7' cy='371.5' r='1.72' fill-opacity='0.55'/%3E%3Ccircle cx='193.2' cy='182.2' r='1.02' fill-opacity='0.51'/%3E%3Ccircle cx='20.2' cy='33.4' r='0.76' fill-opacity='0.69'/%3E%3Ccircle cx='235.4' cy='208.8' r='1.06' fill-opacity='0.54'/%3E%3Ccircle cx='340.7' cy='238.9' r='0.55' fill-opacity='0.72'/%3E%3Ccircle cx='321.6' cy='402.0' r='1.57' fill-opacity='0.48'/%3E%3Ccircle cx='112.4' cy='169.6' r='1.49' fill-opacity='0.35'/%3E%3Ccircle cx='71.0' cy='333.0' r='0.83' fill-opacity='0.61'/%3E%3Ccircle cx='369.8' cy='19.8' r='0.77' fill-opacity='0.63'/%3E%3Ccircle cx='87.3' cy='165.4' r='0.74' fill-opacity='0.71'/%3E%3Ccircle cx='118.8' cy='278.6' r='0.55' fill-opacity='0.26'/%3E%3Ccircle cx='338.7' cy='297.0' r='0.67' fill-opacity='0.29'/%3E%3Ccircle cx='424.0' cy='120.6' r='0.87' fill-opacity='0.45'/%3E%3Ccircle cx='61.7' cy='109.7' r='0.66' fill-opacity='0.63'/%3E%3Ccircle cx='358.9' cy='425.6' r='0.72' fill-opacity='0.71'/%3E%3Ccircle cx='108.7' cy='429.1' r='0.67' fill-opacity='0.68'/%3E%3Ccircle cx='0.8' cy='387.2' r='0.58' fill-opacity='0.50'/%3E%3Ccircle cx='379.7' cy='31.6' r='0.87' fill-opacity='0.33'/%3E%3Ccircle cx='349.1' cy='129.7' r='0.64' fill-opacity='0.59'/%3E%3Ccircle cx='156.9' cy='1.6' r='0.68' fill-opacity='0.70'/%3E%3Ccircle cx='166.9' cy='134.2' r='1.34' fill-opacity='0.38'/%3E%3Ccircle cx='423.9' cy='296.1' r='0.83' fill-opacity='0.36'/%3E%3Ccircle cx='327.1' cy='233.1' r='0.55' fill-opacity='0.45'/%3E%3Ccircle cx='348.4' cy='19.4' r='1.08' fill-opacity='0.64'/%3E%3Ccircle cx='21.7' cy='13.6' r='0.56' fill-opacity='0.44'/%3E%3Ccircle cx='348.2' cy='25.2' r='0.56' fill-opacity='0.30'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:460px 460px;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 560px,#000 calc(100% - 360px),transparent 100%);
+  mask-image:linear-gradient(180deg,transparent 0,#000 560px,#000 calc(100% - 360px),transparent 100%)}
+.bbubbles{position:absolute;inset:0}
+.bbubbles span{position:absolute;border-radius:50%;opacity:0;
+  border:1px solid rgba(255,255,255,.24);
+  background:radial-gradient(circle at 30% 26%,rgba(255,255,255,.5) 0 14%,rgba(255,255,255,.05) 46%,rgba(255,255,255,0) 66%);
+  animation:bbub linear infinite paused}
+.bajada.live .bbubbles span{animation-play-state:running}
+@keyframes bbub{
+  0%{transform:translate3d(0,0,0) scale(.7);opacity:0}
+  14%{opacity:.7}
+  78%{opacity:.42}
+  100%{transform:translate3d(var(--dx,14px),var(--rise,-420px),0) scale(1.12);opacity:0}
+}
+@media (prefers-reduced-motion:reduce){.bbubbles{display:none}}
 
-/* la retícula del kiosko, compartida con «Actualidad»: raíl clavado a la
-   izquierda y la parrilla desfilando al lado */
+/* la retícula de las dos secciones: raíl clavado a la izquierda y el
+   contenido desfilando al lado */
 #kiosko .kwrap,#actualidad .kwrap{position:relative;z-index:1;display:grid;grid-template-columns:minmax(230px,300px) 1fr;gap:56px;align-items:start}
 .ksticky{position:sticky;top:104px}
 #kiosko .shead,#actualidad .shead{border-top-color:rgba(255,255,255,.28);margin-bottom:18px}
 #kiosko .shead h2,#actualidad .shead h2{color:#fff}
+#kiosko .skick{color:var(--edem-teal-200)}
 .knote{font-size:15.5px;line-height:1.6;color:rgba(255,255,255,.72)}
-.kcount{display:inline-block;margin-top:20px;padding:7px 14px;border-radius:var(--radius-pill);
-  border:1px solid rgba(255,255,255,.28);color:#fff;font-size:11.5px;font-weight:800;letter-spacing:.18em;text-transform:uppercase}
 /* Salida del raíl al portal de noticias. Es la única llamada a la acción de la
    columna, así que va como botón y no como enlace: sólido en el teal de la casa
-   sobre el agua, esquina recta —la misma del papel y de las fichas del kiosko—
-   y la flecha en su propio disco, que se enciende y se separa al pasar por
-   encima. La sombra es la de las fichas, para que pese lo mismo que ellas. */
+   sobre el agua, esquina recta —la misma del papel y de las revistas— y la
+   flecha en su propio disco, que se enciende y se separa al pasar por encima.
+   La sombra es la de las revistas colgadas, para que pese lo mismo que ellas. */
 .kmore{display:flex;width:fit-content;align-items:center;gap:14px;margin-top:26px;
   padding:15px 18px 15px 24px;border-radius:3px;
   background:var(--edem-teal-500);color:#fff;font-size:16px;font-weight:800;letter-spacing:-.005em;
@@ -887,40 +889,130 @@ html.sbusca-on{overflow:hidden}
 .kmore .lu{width:20px;height:20px;flex:none;padding:5px;box-sizing:content-box;border-radius:50%;
   background:rgba(255,255,255,.16);transition:background var(--dur) var(--ease-standard)}
 .kmore:hover .lu{background:rgba(255,255,255,.28)}
-/* Las fichas del kiosko: la portada manda.
-   Nada de passe-partout gris ni de hoja blanca flotando — eso peleaba con el
-   arte de la cubierta. La portada va a sangre, con su propia geometría recta,
-   y debajo cuelga una ficha de vidrio oscuro que pertenece al fondo marino. */
-.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:30px 24px}
-.kcard{position:relative;display:flex;flex-direction:column;
-  background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.045));
-  -webkit-backdrop-filter:blur(14px) saturate(150%);backdrop-filter:blur(14px) saturate(150%);
-  border:1px solid rgba(255,255,255,.16);border-radius:3px;   /* recto, como el papel */
-  box-shadow:0 22px 48px rgba(3,26,36,.42);
-  transition:transform var(--dur) var(--ease-standard),box-shadow var(--dur) var(--ease-standard),border-color var(--dur) var(--ease-standard)}
-.kcard:hover{transform:translateY(-8px);border-color:rgba(255,255,255,.34);
-  box-shadow:0 40px 84px rgba(3,26,36,.6)}
-/* La cubierta ocupa todo el ancho de la ficha, sin marco ni margen. Sin velos
-   encima (ensuciaban las portadas claras): solo un filo fino que marca dónde
-   acaba el papel y empieza la ficha. */
-.kcv{position:relative;overflow:hidden;background:var(--ink-900);
-  border-bottom:1px solid rgba(255,255,255,.16)}
-.kcv .coverslot{width:100%;max-width:none;border-radius:0;box-shadow:none;cursor:pointer;
-  transition:transform .5s var(--ease-standard)}
-.kcard:hover .coverslot{transform:scale(1.035)}
-/* el distintivo, como una pegatina sobre la revista */
-.kbadge{position:absolute;top:0;left:0;z-index:3;padding:6px 12px;border-radius:0 0 3px 0;
-  color:#fff;font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
-  box-shadow:0 6px 16px rgba(3,26,36,.35)}
-.kbody{padding:20px 20px 22px;display:flex;flex-direction:column;gap:7px;flex:1}
-.kbody .nr{font-size:10.5px;letter-spacing:.24em;font-weight:800;color:var(--edem-teal-200);text-transform:uppercase}
-.kbody h3{font-size:25px;color:#fff;line-height:1.05}
-.kbody p{font-size:13.5px;line-height:1.55;color:rgba(255,255,255,.68);flex:1}
-.kmeta{font-size:12px;color:rgba(255,255,255,.46);font-weight:600;
-  padding-top:12px;border-top:1px solid rgba(255,255,255,.14)}
-.kacts{display:flex;gap:9px;margin-top:12px}
-.kacts .btn{padding:10px 14px;font-size:13.5px;flex:1;border-radius:2px}
-/* sobre el fondo profundo el botón secundario se dibuja en claro */
+
+/* ---------- kiosko: colgadas como en el kiosko de toda la vida ----------
+   Las ediciones cuelgan de un cabo con pinzas de madera, como las revistas en
+   el quiosco de la esquina. Es el único sitio de la portada que trata la
+   revista como lo que es, un objeto: papel con su canto (más grueso cuantas
+   más páginas tiene), una sombra que cae hacia abajo y cada una colgada un
+   pelo torcida, que es como quedan cuando alguien las cuelga a mano. Debajo,
+   una nota de la redacción escrita a mano (content.json → issues[].note) y la
+   ficha con la tipografía de la casa, sin caja: sobre el agua, como el resto.
+
+   Cómo entra: la cabecera y las revistas SUBEN con el mismo deslizamiento de
+   toda la página (.rv), el cabo se desenrolla de izquierda a derecha (.kropes)
+   y cada revista, al llegar, da dos o tres vaivenes hasta quedarse quieta
+   (.khang). Todo con transform, opacity y un clip-path sobre una capa quieta:
+   el cabo es un SVG que solo se redibuja cuando cambia el ancho. */
+/* ojo: nada de overflow:hidden aquí — anularía el sticky de .ksticky. El
+   recorte del cabo lo hace .kropes. */
+#kiosko{position:relative;padding:96px 0 110px}
+
+/* la cuenta, escrita a mano con una flecha hacia el tendedero. El giro va en
+   el <span>: el <p> lleva .rv, que manda sobre su transform */
+.khand{margin-top:24px;font-family:var(--font-hand);font-size:22px;line-height:1.1;color:#f3e6c4}
+.khand span{display:inline-block;margin-right:8px;vertical-align:bottom;transform:rotate(-2.5deg);transform-origin:0 100%}
+.khand svg{display:inline-block;width:46px;height:22px;vertical-align:bottom;margin-bottom:9px;opacity:.85}
+
+/* el cabo: una capa del ancho de la sección que recorta lo que se sale de la
+   pantalla. El SVG se desenrolla con un clip-path cuando asoma (.on) */
+.kropes{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.kropes svg{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;
+  -webkit-clip-path:inset(0 100% 0 0);clip-path:inset(0 100% 0 0);
+  transition:-webkit-clip-path 1.1s cubic-bezier(.45,.05,.25,1),clip-path 1.1s cubic-bezier(.45,.05,.25,1)}
+.kropes.on svg{-webkit-clip-path:inset(0 0 0 0);clip-path:inset(0 0 0 0)}
+/* cáñamo de dos cabos: el color de fondo, el trenzado encima (trazos cortos
+   oscuros) y un hilo de luz por arriba */
+.krope-base{fill:none;stroke:#d8c69e;stroke-width:4.2;stroke-linecap:round}
+.krope-twist{fill:none;stroke:#a48b5f;stroke-width:4.2;stroke-dasharray:2.2 2.8;opacity:.75}
+.krope-hi{fill:none;stroke:#fff6de;stroke-width:1;stroke-dasharray:2.2 2.8;stroke-dashoffset:1.4;opacity:.45;transform:translateY(-1px)}
+/* la argolla donde se ata, junto al raíl */
+.kanchor{fill:none;stroke:#c7a565;stroke-width:2.4}
+.kanchor-pin{fill:#8f7440}
+/* la pinza libre del último cabo, con su etiqueta de papel escrita a mano
+   (ver ropeKiosko). Aparece cuando el cabo ya se ha desenrollado. La caja
+   mide 0×0 y cae en el mismo punto que el borde de arriba de una revista, así
+   que la pinza (.kpin, la misma de las revistas) queda a la misma altura. */
+.kfree{position:absolute;width:0;height:0;opacity:0;transition:opacity .6s var(--ease-out) .9s}
+.kropes.on .kfree{opacity:1}
+.ktag{position:absolute;left:0;top:1px;display:block;white-space:nowrap;text-align:center;
+  padding:9px 13px 8px;background:#f2e9d2;color:#15323b;
+  font-family:var(--font-hand);font-size:18px;line-height:1.08;
+  transform:translateX(-50%) rotate(3deg);transform-origin:50% 0;
+  box-shadow:0 10px 18px -6px rgba(2,14,20,.55)}
+.ktag b{display:block;font-weight:400;color:#c8401f}
+
+/* el tendedero: las revistas en filas; cada fila tiene su cabo */
+.kline{position:relative}
+.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));
+  column-gap:clamp(28px,3.2vw,48px);row-gap:90px;padding-top:42px}
+.kitem{position:relative;display:flex;flex-direction:column;min-width:0}
+/* la subida, escalonada: cada revista llega un pelo después que la anterior */
+.kitem.rv{transition-delay:calc(var(--i,0) * 110ms)}
+
+/* la revista colgada gira desde la pinza, arriba al centro. Dos capas porque
+   son dos movimientos que no deben pisarse: .khang lleva la inclinación de
+   reposo y el vaivén de llegada; .kbob, el enderezarse al pasar por encima
+   (con un rebote en la curva: se balancea en vez de encajar) */
+.khang{position:relative;transform-origin:50% 0;transform:rotate(var(--tilt,0deg))}
+.kbob{position:relative;transform-origin:50% 0;transition:transform .9s cubic-bezier(.3,1.65,.5,1)}
+.kitem:hover .kbob,.kitem:focus-within .kbob{transform:rotate(calc(var(--tilt,0deg) * -1))}
+/* al llegar: dos o tres vaivenes cada vez más cortos hasta quedarse quieta */
+.kitem.in .khang{animation:ksettle 2.2s ease-in-out calc(var(--i,0) * 110ms + 60ms) both}
+@keyframes ksettle{
+  0%{transform:rotate(calc(var(--tilt,0deg) + 7deg))}
+  22%{transform:rotate(calc(var(--tilt,0deg) - 4deg))}
+  44%{transform:rotate(calc(var(--tilt,0deg) + 2.2deg))}
+  64%{transform:rotate(calc(var(--tilt,0deg) - 1deg))}
+  83%{transform:rotate(calc(var(--tilt,0deg) + .35deg))}
+  100%{transform:rotate(var(--tilt,0deg))}
+}
+
+/* la pinza: madera clara y muelle de metal. Muerde el borde de arriba junto
+   con el cabo, que pasa por su boca (el cabo va detrás, en .kropes) */
+.kpin{position:absolute;left:50%;top:-34px;z-index:4;width:14px;height:42px;margin-left:-7px;pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 48'%3E%3Cpath d='M5.4 2.2h6.8c1.2 0 2 .9 2 2l-.6 41c0 1-.8 1.8-1.8 1.8H6.2c-1 0-1.8-.8-1.8-1.8l-.8-41c0-1.1.7-2 1.8-2z' fill='%23021018' fill-opacity='.4' transform='translate(1.3 1.2)'/%3E%3Cpath d='M3.4 2.6C3.4 1.4 4.2.6 5.4.6h2.4v46H5.6c-1 0-1.6-.7-1.7-1.6z' fill='%23e3c490'/%3E%3Cpath d='M8.2.6h2.4c1.2 0 2 .8 2 2l-.5 42.4c-.1.9-.7 1.6-1.7 1.6H8.2z' fill='%23c99f5f'/%3E%3Cpath d='M7.7.6h.6v46h-.6z' fill='%238c6634' fill-opacity='.8'/%3E%3Cpath d='M4.7 3.4v39' stroke='%23f6e4c0' stroke-width='.8' stroke-linecap='round' opacity='.85'/%3E%3Crect x='1' y='23.6' width='14' height='6.6' rx='3.3' fill='%23aeb9bd'/%3E%3Cpath d='M3.5 24l1.8 5.8M6.7 24l1.8 5.8M9.9 24l1.8 5.8' stroke='%236f7d82' stroke-width='.9' stroke-linecap='round'/%3E%3Crect x='2' y='23.9' width='12' height='1.8' rx='.9' fill='%23e4eaec' opacity='.7'/%3E%3C/svg%3E") center/100% 100% no-repeat}
+
+/* el papel: la portada viva y, detrás, el canto de las páginas —dos hojas de
+   canto, o cuatro si la edición pasa de 20 páginas (.thick)— y una sombra que
+   cae hacia abajo, que es hacia donde tira una revista colgada */
+.kmag{position:relative;background:#fbfaf6;
+  box-shadow:1px 1px 0 #efe8d6,2px 2px 0 #d3c9b3,
+    0 16px 22px -8px rgba(2,14,20,.6),0 34px 58px -12px rgba(2,14,20,.5);
+  transition:box-shadow .5s var(--ease-standard)}
+.kmag.thick{box-shadow:1px 1px 0 #f1eadb,2px 2px 0 #d7cdb8,3px 3px 0 #ede5d2,4px 4px 0 #cbc0a8,
+    0 16px 22px -8px rgba(2,14,20,.6),0 34px 58px -12px rgba(2,14,20,.5)}
+.kitem:hover .kmag{box-shadow:1px 1px 0 #efe8d6,2px 2px 0 #d3c9b3,
+    0 22px 30px -8px rgba(2,14,20,.62),0 52px 86px -14px rgba(2,14,20,.58)}
+.kitem:hover .kmag.thick{box-shadow:1px 1px 0 #f1eadb,2px 2px 0 #d7cdb8,3px 3px 0 #ede5d2,4px 4px 0 #cbc0a8,
+    0 22px 30px -8px rgba(2,14,20,.62),0 52px 86px -14px rgba(2,14,20,.58)}
+.kmag .coverslot{display:block;width:100%;cursor:pointer}
+/* la pegatina de la última edición: redonda, en el coral de la casa y pegada
+   de través sobre la esquina, como las del quiosco */
+/* Va medio fuera de la esquina a propósito: las portadas ya llevan sus propios
+   sellos arriba a la derecha y encima de ellos no se leía ninguno de los dos */
+.ksticker{position:absolute;top:-30px;right:-30px;z-index:5;width:62px;height:62px;border-radius:50%;
+  display:grid;place-items:center;padding-top:2px;
+  background:var(--lanzadera);color:#fff;font-family:var(--font-hand);font-size:18px;line-height:1;
+  transform:rotate(14deg);box-shadow:0 8px 16px rgba(2,14,20,.42)}
+.ksticker::before{content:'';position:absolute;inset:5px;border-radius:50%;border:1.5px dashed rgba(255,255,255,.6)}
+
+/* la ficha, sin caja: sobre el agua como el resto de la bajada */
+.kinfo{display:flex;flex-direction:column;align-items:flex-start;gap:7px;padding-top:30px}
+/* la nota de la redacción, a mano y del color de su edición, con la flecha
+   señalando la revista */
+.kscrawl{display:flex;align-items:flex-start;gap:4px;margin:0 0 8px -6px;
+  font-family:var(--font-hand);font-size:23px;line-height:1.05;color:var(--hand,#f3e6c4)}
+.kscrawl svg{flex:none;width:30px;height:24px;margin-top:-12px}
+.kinfo .nr{font-size:10.5px;letter-spacing:.24em;font-weight:800;color:var(--edem-teal-200);text-transform:uppercase}
+.kinfo .nr b{font-weight:800;color:var(--hand,var(--edem-teal-200))}
+.kinfo h3{font-size:26px;color:#fff;line-height:1.04}
+.kdesc{font-size:14px;line-height:1.55;color:rgba(255,255,255,.7)}
+.kmeta{align-self:stretch;font-size:12px;color:rgba(255,255,255,.48);font-weight:600;
+  padding-top:11px;margin-top:3px;border-top:1px solid rgba(255,255,255,.14)}
+.kacts{display:flex;gap:9px;margin-top:10px}
+.kacts .btn{padding:10px 16px;font-size:13.5px;border-radius:2px}
+/* sobre el agua el botón secundario se dibuja en claro */
 #kiosko .kacts .btn.out{color:#fff;border-color:rgba(255,255,255,.34);background:transparent}
 #kiosko .kacts .btn.out:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.6)}
 
@@ -1488,18 +1580,33 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
   #kiosko{padding:72px 0 84px}
   #kiosko .kwrap,#actualidad .kwrap{grid-template-columns:1fr;gap:28px}
   .ksticky{position:static}
+  /* con el raíl encima, el tendedero ocupa todo el ancho y el cabo entra y
+     sale por los bordes de la pantalla; la flecha de la cuenta mira abajo */
+  .kgrid{grid-template-columns:repeat(auto-fill,minmax(196px,1fr));row-gap:76px}
+  /* aquí el hueco entre revistas es más estrecho: la pegatina asoma menos */
+  .ksticker{top:-24px;right:-17px}
+  .khand{margin-top:18px}
+  .khand svg{transform:rotate(60deg);margin-bottom:0}
   #suscribete .wrap.in{grid-template-columns:1fr}
   .fgrid{grid-template-columns:1fr 1fr}
 }
 @media(max-width:680px){
   .wrap{padding:0 20px;padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right))}
-  /* dos portadas por fila aunque el móvil sea estrecho: a una sola columna la
-     cubierta a sangre se come la pantalla entera */
-  .kgrid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:22px 14px}
-  .kbody{padding:15px 14px 16px}
-  .kbody h3{font-size:20px}
-  .kbody p{font-size:12.5px}
-  .kacts{flex-direction:column;gap:7px}
+  /* dos revistas por cabo aunque el móvil sea estrecho: a una sola columna la
+     cubierta se come la pantalla entera. Todo lo colgado encoge un punto
+     —pinza, pegatina, nota— para que no pese más que la portada */
+  .kgrid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));column-gap:18px;row-gap:62px;padding-top:36px}
+  .kpin{top:-29px;width:12px;height:36px;margin-left:-6px}
+  .ksticker{width:50px;height:50px;top:-20px;right:-13px;font-size:14.5px}
+  .ksticker::before{inset:4px}
+  .kinfo{padding-top:22px;gap:6px}
+  .kscrawl{font-size:19px;margin-bottom:4px}
+  .kscrawl svg{width:24px;height:20px;margin-top:-9px}
+  .kinfo h3{font-size:20px}
+  .kdesc{font-size:12.5px}
+  .kacts{flex-direction:column;align-self:stretch;gap:7px}
+  .kacts .btn{padding:10px 12px}
+  .khand{font-size:22px}
   /* en móvil la ficha se parte: foto arriba, texto debajo, y se deja de apilar
      (tres tarjetas montadas no caben en alto sin comerse el texto) */
   /* el índice del ecosistema sobra en móvil: sin el raíl clavado no navega nada

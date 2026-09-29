@@ -16,6 +16,7 @@ const DEFAULTS = {
       badge: 'Última edición', badgeColor: 'lanzadera',
       desc: 'Crónica del Hackathon, entrevista cruzada alumno × CEO, radar Lanzadera, métricas de Angels y pasatiempos.',
       meta: '24 páginas · edición física + digital · 2026',
+      note: '¡La más gorda: 24 páginas!',
       hero: {
         kicker: 'Nº 2 · 2026 · Última edición',
         titleHtml: 'Trac&shy;ción<span class="pt">.</span>',
@@ -30,14 +31,16 @@ const DEFAULTS = {
       nr: 'Nº 1 · 2026', title: 'Bienvenidos a EDEM', chip: 'Nº 1 · Contracorriente',
       badge: 'Contracorriente', badgeColor: 'edem',
       desc: 'El número fundacional: el manual de supervivencia en la Marina, tipografía brutal, sellos, radar Lanzadera y duotonos.',
-      meta: '10 páginas · edición física + digital · 2026'
+      meta: '10 páginas · edición física + digital · 2026',
+      note: 'El primero de verdad'
     },
     {
       id: 'n1', file: 'revistas/n1.html', print: 'revistas/n1-print.html',
       nr: 'Nº 1 · maqueta', title: 'Bienvenidos a EDEM', chip: 'Nº 1 · maqueta',
       badge: 'Archivo', badgeColor: 'angels',
       desc: 'La primera maqueta del piloto: el origen de EDEM Times, de portada a contraportada.',
-      meta: '10 páginas · maqueta inicial'
+      meta: '10 páginas · maqueta inicial',
+      note: 'El borrador cero'
     }
   ],
   articles: [
@@ -363,16 +366,137 @@ function updateDeckUI() {
   document.querySelectorAll('.ddot').forEach(d => d.classList.toggle('on', d.dataset.deckdot === deckOrder[0]));
 }
 
+/* ---------- el kiosko: las ediciones, colgadas de un cabo ----------
+   Cada revista cuelga de su pinza un pelo torcida. La inclinación va fija por
+   posición (K_TILT) y no al azar: así no cambia de una visita a otra y dos
+   vecinas nunca caen hacia el mismo lado. Debajo, la nota que deja la
+   redacción (content.json → issues[].note), escrita a mano en el color de su
+   edición; la última lleva pegatina. El canto de papel es más grueso si la
+   edición pasa de 20 páginas (lo dice su `meta`). */
+const K_TILT = [-1.7, 1.3, -0.9, 1.5, -1.2, 0.8];
+/* los colores de edición, aclarados para leerse a mano sobre el agua (el
+   índigo de Angels tal cual no se ve) */
+const K_HAND = { lanzadera: '#ff9f86', edem: '#8fd8ea', angels: '#c6c3ff', neutral: '#f3e6c4' };
+// la flecha de la nota: sube hacia la revista
+const K_ARROW = '<svg viewBox="0 0 30 24" aria-hidden="true" focusable="false"><path d="M27 21c-8.5.6-15.2-3.6-19-13.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3.6 11.2 7.5 5.4l4.7 4.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+// la de la cuenta del raíl: señala el tendedero (en una columna el CSS la gira hacia abajo)
+const K_POINT = '<svg viewBox="0 0 62 30" aria-hidden="true" focusable="false"><path d="M2 25c9 3 21-.5 29-8.5C37 10.6 45 7 55.5 7.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M49.5 2.6 57 7.9l-6.6 6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
 function renderKiosko() {
-  $('kgrid').innerHTML = MAGS.map(m =>
-    '<article class="kcard rv">' +
-    '<div class="kcv"><span class="kbadge" style="background:' + color(m.badgeColor) + '">' + esc(m.badge) + '</span>' +
-    '<div class="coverslot" data-mag="' + m.id + '" role="button" tabindex="0" title="Leer en el visor" aria-label="Leer ' + esc(m.nr) + ' en el visor"><span class="cslabel"><span>EDEM Times</span><span>' + esc(m.nr) + '</span></span></div></div>' +
-    '<div class="kbody"><span class="nr">' + esc(m.nr) + '</span><h3 class="disp">' + esc(m.title) + '</h3><p>' + esc(m.desc) + '</p><span class="kmeta">' + esc(m.meta) + '</span>' +
-    '<div class="kacts"><button class="btn pri" data-visor="' + m.id + '"><i data-lucide="book-open" class="lu"></i> Leer</button>' +
-    '<a class="btn out" href="' + encodeURI(m.print) + '" target="_blank" rel="noopener"><i data-lucide="printer" class="lu"></i> A4</a></div></div></article>').join('');
+  const latest = latestIssue();
+  $('kgrid').innerHTML = MAGS.map((m, i) => {
+    const pages = parseInt((/(\d+)\s*p[áa]g/i.exec(m.meta || '') || [])[1], 10) || 0;
+    return '<article class="kitem rv" style="--i:' + i + ';--tilt:' + K_TILT[i % K_TILT.length] + 'deg;--hand:' + (K_HAND[m.badgeColor] || K_HAND.neutral) + '">' +
+      '<div class="khang"><div class="kbob">' +
+      '<i class="kpin" aria-hidden="true"></i>' +
+      '<div class="kmag' + (pages > 20 ? ' thick' : '') + '"><div class="coverslot" data-mag="' + m.id + '" role="button" tabindex="0" title="Leer en el visor" aria-label="Leer ' + esc(m.nr) + ' en el visor"><span class="cslabel"><span>EDEM Times</span><span>' + esc(m.nr) + '</span></span></div></div>' +
+      (m === latest ? '<span class="ksticker" aria-hidden="true">¡Nuevo!</span>' : '') +
+      '</div></div>' +
+      '<div class="kinfo">' +
+      (m.note ? '<p class="kscrawl">' + K_ARROW + '<span>' + esc(m.note) + '</span></p>' : '') +
+      '<span class="nr">' + esc(m.nr) + (m.badge ? ' · <b>' + esc(m.badge) + '</b>' : '') + '</span>' +
+      '<h3 class="disp">' + esc(m.title) + '</h3>' +
+      '<p class="kdesc">' + esc(m.desc) + '</p>' +
+      '<span class="kmeta">' + esc(m.meta) + '</span>' +
+      '<div class="kacts"><button class="btn pri" data-visor="' + m.id + '"><i data-lucide="book-open" class="lu"></i> Leer</button>' +
+      '<a class="btn out" href="' + encodeURI(m.print) + '" target="_blank" rel="noopener"><i data-lucide="printer" class="lu"></i> A4</a></div>' +
+      '</div></article>';
+  }).join('');
   const n = MAGS.length;
-  $('kcount').textContent = n + (n === 1 ? ' edición' : ' ediciones');
+  $('kcount').innerHTML = '<span>' + n + (n === 1 ? ' edición' : ' ediciones') + '… y las que vienen</span>' + K_POINT;
+  bindKiosko();
+}
+
+/* El cabo: una curva por fila de revistas que pasa por sus pinzas. Entre dos
+   pinzas cuelga —más cuanto más largo es el tramo— y por los extremos sube
+   hacia donde está atado: con el raíl al lado, a una argolla junto a él; en
+   una columna, fuera de la pantalla por los dos lados.
+   Las posiciones salen de offsetLeft/offsetTop, que son las del layout SIN
+   transform: da igual que las revistas estén a media subida (.rv) o
+   balanceándose, el cabo se tiende donde van a quedar. */
+function ropeKiosko() {
+  const sec = $('kiosko'), svg = $('krope'), line = $('kline');
+  if (!sec || !svg || !line) return;
+  const pos = el => {
+    let x = 0, y = 0;
+    while (el && el !== sec) { x += el.offsetLeft; y += el.offsetTop; el = el.offsetParent; }
+    return { x, y };
+  };
+  const rows = [];
+  sec.querySelectorAll('.khang').forEach(h => {
+    const p = pos(h), pt = { x: p.x + h.offsetWidth / 2, y: p.y + 3 };   // la boca de la pinza
+    const row = rows.find(r => Math.abs(r.y - pt.y) < 8);
+    if (row) row.pts.push(pt); else rows.push({ y: pt.y, pts: [pt] });
+  });
+  rows.sort((a, b) => a.y - b.y).forEach(r => r.pts.sort((a, b) => a.x - b.x));
+  const W = sec.clientWidth, lx = pos(line).x;
+  const tied = lx > 160;                       // raíl al lado: argolla junto a él
+  const ax = tied ? lx - 24 : -18;
+  const f = v => v.toFixed(1);
+
+  /* LA PINZA LIBRE. Si al último cabo le sobra sitio —una columna vacía en la
+     última fila, o margen de sobra a la derecha de la última revista—, ahí
+     espera una pinza vacía con una etiqueta a mano: «¿El Nº 3? ¡lo haces tú!».
+     Es la cuenta del raíl («… y las que vienen») hecha objeto, y el guiño a
+     «Conócenos». Si no hay hueco de verdad, no se pone: nunca empuja nada. */
+  let free = null;
+  const last = rows[rows.length - 1];
+  if (last) {
+    const first = rows[0].pts, lp = last.pts[last.pts.length - 1];
+    const pitch = first.length > 1 ? first[1].x - first[0].x : 0;
+    const half = sec.querySelector('.khang').offsetWidth / 2;
+    if (pitch && last.pts.length < first.length) free = { x: lp.x + pitch, y: last.y };
+    else if (W - (lp.x + half) >= 130) free = { x: (lp.x + half + W) / 2, y: last.y };
+    if (free) last.pts.push(free);
+  }
+  const ropes = $('kropes');
+  let tag = ropes && ropes.querySelector('.kfree');
+  if (free && ropes) {
+    if (!tag) { tag = document.createElement('div'); tag.className = 'kfree'; ropes.appendChild(tag); }
+    const nr = /(\d+)/.exec(latestIssue().nr || '');
+    tag.style.left = f(free.x) + 'px';
+    tag.style.top = f(free.y - 3) + 'px';
+    tag.innerHTML = '<i class="kpin"></i><span class="ktag">¿El ' + (nr ? 'Nº ' + (+nr[1] + 1) : 'próximo') + '?<b>¡lo haces tú!</b></span>';
+  } else if (tag) tag.remove();
+
+  let d = '', rings = '';
+  rows.forEach(r => {
+    const pts = [{ x: ax, y: r.y - (tied ? 16 : 30) }, ...r.pts, { x: W + 18, y: r.y - 34 }];
+    d += 'M' + f(pts[0].x) + ' ' + f(pts[0].y);
+    for (let i = 1; i < pts.length; i++) {
+      const a = pts[i - 1], b = pts[i];
+      const sag = Math.min(44, Math.max(8, Math.hypot(b.x - a.x, b.y - a.y) * .07));
+      // Bézier cuadrática con el control al doble de la flecha: su punto más
+      // bajo cae justo `sag` por debajo de la cuerda
+      d += ' Q' + f((a.x + b.x) / 2) + ' ' + f((a.y + b.y) / 2 + sag * 2) + ' ' + f(b.x) + ' ' + f(b.y);
+    }
+    d += ' ';
+    if (tied) rings += '<circle class="kanchor" cx="' + f(ax) + '" cy="' + f(pts[0].y - 4.5) + '" r="5.5"/>' +
+      '<rect class="kanchor-pin" x="' + f(ax - 1.6) + '" y="' + f(pts[0].y - 16) + '" width="3.2" height="7" rx="1.2"/>';
+  });
+  svg.innerHTML = '<path class="krope-base" d="' + d + '"/><path class="krope-twist" d="' + d + '"/><path class="krope-hi" d="' + d + '"/>' + rings;
+}
+
+let kioskoBound = false;
+function bindKiosko() {
+  ropeKiosko();
+  if (kioskoBound) return;
+  kioskoBound = true;
+  // se vuelve a tender al cambiar el ancho, al llegar las fuentes y cada vez que
+  // las revistas cambian de alto (el texto de las fichas empuja la fila siguiente)
+  onMeasure(ropeKiosko);
+  const grid = $('kgrid'), ropes = $('kropes'), line = $('kline');
+  if ('ResizeObserver' in window && grid) new ResizeObserver(() => ropeKiosko()).observe(grid);
+  // el cabo se desenrolla en cuanto el tendedero asoma por abajo: así va por
+  // delante de las revistas, que suben un poco después (.rv)
+  if (!ropes || !line) return;
+  if (REDUCED.matches || !('IntersectionObserver' in window)) { ropes.classList.add('on'); return; }
+  const io = new IntersectionObserver(es => {
+    if (!es[0].isIntersecting) return;
+    ropes.classList.add('on');
+    io.disconnect();
+  }, { rootMargin: '0px' });
+  io.observe(line);
 }
 
 /* El sumario «En este número» ya no existe: su sitio lo ocupa «Actualidad», la
@@ -891,6 +1015,39 @@ function observeReveals() {
   }
   document.querySelectorAll('.rv:not(.in)').forEach(el => revealIO.observe(el));
 }
+
+/* ================= el agua de la bajada =================
+   Las burbujas de la inmersión siguen subiendo por «Actualidad» y el kiosko:
+   muchas menos, repartidas por todo el alto de .bajada. Se siembran la primera
+   vez que la bajada se acerca a pantalla —para entonces «Actualidad» ya ha
+   pintado y el alto es el de verdad— y ninguna sube más allá de 40px por
+   debajo de la costura con el hero, así que ninguna se corta contra ese borde.
+   Después es puro CSS (transform/opacity), y sin .live se quedan paradas
+   mientras la bajada está fuera de pantalla. */
+(function bajadaViva() {
+  const baj = $('bajada'), host = $('bbubbles');
+  if (!baj || !host || REDUCED.matches) return;
+  function sow() {
+    const H = baj.offsetHeight || 1, n = innerWidth < 700 ? 7 : 12;
+    for (let i = 0; i < n; i++) {
+      const b = document.createElement('span'), size = 4 + Math.random() * 9;
+      const top = H * (.1 + Math.random() * .86);
+      const rise = Math.max(60, Math.min(360 + Math.random() * 420, top - 40));
+      b.style.cssText = 'left:' + (Math.random() * 100).toFixed(2) + '%;top:' + (top / H * 100).toFixed(2) + '%;' +
+        'width:' + size.toFixed(1) + 'px;height:' + size.toFixed(1) + 'px;' +
+        '--dx:' + (Math.random() * 50 - 25).toFixed(0) + 'px;--rise:-' + rise.toFixed(0) + 'px;' +
+        'animation-duration:' + (12 + Math.random() * 12).toFixed(1) + 's;animation-delay:-' + (Math.random() * 20).toFixed(1) + 's';
+      host.appendChild(b);
+    }
+  }
+  if (!('IntersectionObserver' in window)) { sow(); baj.classList.add('live'); return; }
+  let sown = false;
+  new IntersectionObserver(es => {
+    const on = es[0].isIntersecting;
+    if (on && !sown) { sown = true; sow(); }
+    baj.classList.toggle('live', on);
+  }, { rootMargin: '25% 0px' }).observe(baj);
+}());
 
 /* ================= inmersión: el mar sube y aparece el relato =================
    Mientras dura #heroPin el hero queda clavado (sticky). El recorrido se reparte
@@ -1842,11 +1999,12 @@ function abrirVisorPorURL() {
   const SKY = rgb('#fbfaf6'), SURF = rgb('#62abc2'), DEEP = rgb('#052635');
   const mixA = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
   // «Actualidad» y el kiosko ya no pintan su propio fondo: comparten el de
-  // .bajada (ver css/site.css). Estos son los tramos de ESE degradado que le
-  // tocan a cada una — el kiosko cierra en el #06333f con el que abre
-  // «Conócenos». Si se toca .bajada, hay que tocar esto.
-  const ATOP = rgb('#072837'), ABOT = rgb('#0a4152');
-  const KTOP = rgb('#0a4152'), KBOT = rgb('#06333f');
+  // .bajada (ver css/site.css), una sola rampa de #072837 a #06333f —el tono
+  // con el que abre «Conócenos»—. Estos son los tramos de ESA rampa que le
+  // tocan a cada una (la junta cae más o menos a la mitad). Si se toca
+  // .bajada, hay que tocar esto.
+  const ATOP = rgb('#072837'), ABOT = rgb('#062e3b');
+  const KTOP = rgb('#062e3b'), KBOT = rgb('#06333f');
   const PAPER = '#fbfaf6';
 
   // Secciones con fondo propio bajo el hero, en orden de documento. Un par de

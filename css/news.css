@@ -116,20 +116,15 @@
    1 · BLOQUE «ACTUALIDAD» DE LA HOME
    ============================================================ */
 /* Ya no es papel: la sección va entre la inmersión y el kiosko, así que se
-   compone con el mismo material que el kiosko —fondo marino, raíl clavado y
+   compone sobre el mismo agua que el kiosko —fondo marino, raíl clavado y
    fichas de vidrio oscuro— y las dos se leen como un solo tramo de bajada.
-   SIN FONDO PROPIO a propósito: el degradado lo pinta .bajada, el contenedor que
-   envuelve esta sección y el kiosko (ver css/site.css). Es lo que hace que la
-   inmersión, «Lo último» y el kiosko se lean como una sola bajada sin costuras:
-   mientras cada sección pintaba su trozo, en cada junta se veía una raya aunque
-   los colores casaran al píxel.
-   Ojo: nada de overflow:hidden aquí — anularía el sticky de .ksticky. El
-   recorte de los adornos lo hace .kbg. */
+   SIN FONDO NI ADORNOS PROPIOS a propósito: el degradado, la nieve marina y
+   las burbujas los pinta .bajada, el contenedor que envuelve esta sección y el
+   kiosko (ver css/site.css). Es lo que hace que la inmersión, «Lo último» y el
+   kiosko se lean como una sola bajada sin costuras: mientras cada sección
+   pintaba su trozo —y sus propios adornos—, se leían como bloques aparte.
+   Ojo: nada de overflow:hidden aquí — anularía el sticky de .ksticky. */
 #actualidad{position:relative;padding:92px 0 104px}
-/* los mismos adornos del kiosko, espejados: se reconoce el material sin que las
-   dos secciones seguidas sean literalmente la misma imagen. La máscara vertical
-   que los desvanece antes de los bordes está en css/site.css. */
-#actualidad .kbg{transform:scaleX(-1)}
 #actualidad .skick{color:var(--edem-teal-200)}
 /* el titular de esta sección sí parte en varias líneas dentro del raíl (el del
    kiosko cabe en una): sin interlineado propio el hueco entre líneas se abría */
@@ -152,14 +147,16 @@
 .dall:hover{background:var(--edem-teal-700);color:#fff;gap:20px}
 .dall .lu{width:18px;height:18px}
 
-/* --- las piezas del diario, en el vidrio oscuro del kiosko ---
-   Misma receta que .kcard: vidrio sobre el agua, esquina recta de papel y una
-   sombra fría y larga. Cambia el material, no la maqueta: la apertura, los
-   titulares y la puerta al portal siguen siendo los del periódico. */
+/* --- las piezas del diario, en vidrio oscuro sobre el agua ---
+   Vidrio sobre el agua, esquina recta de papel y una sombra fría y larga.
+   Cambia el material, no la maqueta: la apertura, los titulares y la puerta al
+   portal siguen siendo los del periódico. */
 /* Aquí la tarjeta SÍ es una caja: se le devuelve el marco, el relleno y el
-   levantarse al pasar por encima que la versión de papel ya no tiene. */
+   levantarse al pasar por encima que la versión de papel ya no tiene.
+   SIN backdrop-filter: detrás solo hay agua lisa —el desenfoque no cambiaba
+   nada que se viera— y con las burbujas de la bajada pasando por debajo
+   obligaría a Safari a volver a difuminar la ficha en cada fotograma. */
 #actualidad .ncard{background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.045));
-  -webkit-backdrop-filter:blur(14px) saturate(150%);backdrop-filter:blur(14px) saturate(150%);
   border:1px solid rgba(255,255,255,.16);border-radius:3px;overflow:hidden;padding-top:0;
   box-shadow:0 22px 48px rgba(3,26,36,.42);
   transition:transform var(--dur) var(--ease-standard),box-shadow var(--dur) var(--ease-standard),border-color var(--dur) var(--ease-standard)}
@@ -205,8 +202,7 @@
 #actualidad .nago{color:rgba(255,255,255,.46)}
 #actualidad .nthumb{border-radius:2px}
 #actualidad .dall{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);
-  border-radius:3px;
-  -webkit-backdrop-filter:blur(14px) saturate(150%);backdrop-filter:blur(14px) saturate(150%)}
+  border-radius:3px}
 #actualidad .dall:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.55)}
 
 /* ============================================================

@@ -85,6 +85,9 @@
   --font-display:'Bodoni Moda',Georgia,'Times New Roman',serif;
   --font-sans:'Archivo','Helvetica Neue',Arial,sans-serif;
   --font-body:'Archivo','Helvetica Neue',Arial,sans-serif;
+  /* Hand: the editors' handwritten notes (kiosko). Only index.html requests the
+     webfont; the fallbacks are the system handwriting faces of macOS/Windows. */
+  --font-hand:'Covered By Your Grace','Bradley Hand','Segoe Print',cursive;
 
   /* Type scale (editorial, generous) */
   --fs-display:clamp(3rem,6vw,5.5rem); /* @kind font */

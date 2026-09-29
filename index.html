@@ -24,7 +24,7 @@
 <link rel="preload" as="image" fetchpriority="high" href="assets/edem-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="css/tokens.css?v=20260929j">
+<link rel="stylesheet" href="css/tokens.css?v=20260929p">
 <!-- De Archivo se pide SOLO el eje de peso. Antes se pedían también la cursiva y
      el eje de ANCHURA (wdth 62..125) y el sitio no usa ninguno de los dos: todas
      las cursivas son de Bodoni (--font-display) y font-stretch solo aparece en
@@ -36,14 +36,18 @@
      contestar fonts.googleapis.com. Ahora se precarga y se aplica en cuanto
      llega (`media=print` + `onload`). El cambio de Georgia a Bodoni que eso
      deja al aire NO se ve: la cortina de carga (#splash, ver js/splash.js)
-     está encima y se retira justo cuando document.fonts.ready resuelve. -->
-<link rel="preload" as="style" fetchpriority="high" href="https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&amp;family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&amp;display=swap">
-<link id="gfonts" rel="stylesheet" media="print" href="https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&amp;family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&amp;display=swap"
+     está encima y se retira justo cuando document.fonts.ready resuelve.
+     La tercera familia, Covered By Your Grace, es la letra A MANO de las notas
+     de la redacción en el kiosko (--font-hand). Va en la misma petición y solo
+     en esta página; son 16 KB (subset latin) y el navegador no la descarga
+     hasta que pinta un texto que la usa. -->
+<link rel="preload" as="style" fetchpriority="high" href="https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&amp;family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&amp;family=Covered+By+Your+Grace&amp;display=swap">
+<link id="gfonts" rel="stylesheet" media="print" href="https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&amp;family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&amp;family=Covered+By+Your+Grace&amp;display=swap"
       onload="this.media='all';window.__gfontsIn=1;dispatchEvent(new Event('edem:gfonts'))">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&amp;family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&amp;display=swap"><style>#splash{display:none}</style></noscript>
-<link rel="stylesheet" href="css/site.css?v=20260929j">
-<link rel="stylesheet" href="css/news.css?v=20260929j">
-<script src="js/icons.js?v=20260929j" defer></script>
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&amp;family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&amp;family=Covered+By+Your+Grace&amp;display=swap"><style>#splash{display:none}</style></noscript>
+<link rel="stylesheet" href="css/site.css?v=20260929p">
+<link rel="stylesheet" href="css/news.css?v=20260929p">
+<script src="js/icons.js?v=20260929p" defer></script>
 </head>
 <body>
 
@@ -117,8 +121,8 @@
       <i class="gull g1"></i><i class="gull g2"></i><i class="gull g3"></i>
     </div>
     <div class="hscape">
-      <img class="hl hfar" src="assets/hero/marina-ciudad.svg?v=20260929j" alt="" width="1600" height="340" decoding="async">
-      <img class="hl hnear" src="assets/hero/marina-muelle.svg?v=20260929j" alt="" width="1600" height="340" decoding="async">
+      <img class="hl hfar" src="assets/hero/marina-ciudad.svg?v=20260929p" alt="" width="1600" height="340" decoding="async">
+      <img class="hl hnear" src="assets/hero/marina-muelle.svg?v=20260929p" alt="" width="1600" height="340" decoding="async">
     </div>
   </div>
   <div class="wrap grid">
@@ -182,20 +186,26 @@
      junta se veía una raya: el degradado bajaba hasta la costura y volvía a
      subir justo después, y el ojo lee ese pico como una línea aunque el color
      sea el mismo a los dos lados. Con un único fondo continuo no hay juntas que
-     casar. -->
-<div class="bajada">
+     casar.
+     Y el fondo es EL MISMO AGUA de la inmersión: el tono con el que acaba el
+     relato bajo el mar, y encima una sola capa de adornos para las dos
+     secciones (.bdeep): nieve marina quieta y unas pocas burbujas que siguen
+     subiendo. Antes cada sección traía los suyos (una trama de puntos y un aro
+     girando) y eran justo lo que las hacía leerse como dos bloques aparte. -->
+<div class="bajada" id="bajada">
+<div class="bdeep" aria-hidden="true"><span class="bsnow"></span><span class="bbubbles" id="bbubbles"></span></div>
 
 <!-- ACTUALIDAD · las noticias destacadas del portal digital
      Va nada más salir de la inmersión y antes del kiosko: primero lo que ha
-     pasado esta semana, después el papel. Comparte material y retícula con el
-     kiosko —fondo de fondo marino, raíl clavado a la izquierda y fichas de
-     vidrio oscuro— para que las dos secciones se lean como un solo tramo de
-     bajada en vez de como dos bloques pegados.
+     pasado esta semana, después el papel. Comparte fondo y retícula con el
+     kiosko —el agua de la bajada y el raíl clavado a la izquierda— para que las
+     dos secciones se lean como un solo tramo de bajada en vez de como dos
+     bloques pegados.
      El contenido sale de data/noticias.json (o del CMS headless, ver js/cms.js)
-     y lo pinta js/news.js. -->
+     y lo pinta js/news.js. Si no se puede leer (la página abierta como archivo,
+     sin servidor), js/news.js pinta una copia de reserva: la sección no
+     desaparece y el kiosko nunca se queda solo detrás de la inmersión. -->
 <section id="actualidad">
-  <!-- los mismos adornos del kiosko, espejados (ver css/news.css) -->
-  <div class="kbg" aria-hidden="true"><span class="kdots"></span><span class="kring"></span></div>
   <div class="wrap kwrap">
     <div class="ksticky">
       <div class="shead rv">
@@ -209,18 +219,30 @@
   </div>
 </section>
 
-<!-- KIOSKO -->
+<!-- KIOSKO · «colgadas como en el kiosko de toda la vida»
+     Las ediciones cuelgan de un cabo con pinzas de madera, como las revistas en
+     el quiosco de la esquina, y bajo cada una la redacción ha dejado una nota a
+     mano. Las revistas las pinta renderKiosko() (js/app.js) con content.json →
+     issues; la nota es el campo `note` de cada edición. -->
 <section id="kiosko">
-  <div class="kbg" aria-hidden="true"><span class="kdots"></span><span class="kring"></span></div>
+  <!-- El cabo. Lo dibuja js/app.js (ropeKiosko) pasando por las pinzas de cada
+       fila, así que siempre cae donde están las revistas, con el ancho y el
+       número de filas que toquen. Va en su propia capa, a lo ancho de la
+       sección, porque sale por el borde de la pantalla y hay que recortarlo:
+       la sección no puede llevar overflow:hidden (anularía el sticky del raíl). -->
+  <div class="kropes" id="kropes" aria-hidden="true"><svg id="krope" focusable="false"></svg></div>
   <div class="wrap kwrap">
     <div class="ksticky">
       <div class="shead rv">
+        <span class="skick over">La revista</span>
         <h2 class="disp">El kiosko</h2>
       </div>
-      <p class="knote">Todas las ediciones, de la primera a la última.<br>Se abren en el visor con efecto papel.</p>
-      <span class="kcount" id="kcount"></span>
+      <p class="knote rv">Todas las ediciones, de la primera a la última, colgadas como en el kiosko de toda la vida. Descuelga una y se abre en el visor con efecto papel.</p>
+      <p class="khand rv" id="kcount"></p>
     </div>
-    <div class="kgrid" id="kgrid"></div>
+    <div class="kline" id="kline">
+      <div class="kgrid" id="kgrid"></div>
+    </div>
   </div>
 </section>
 
@@ -479,13 +501,13 @@
   </div>
 </div>
 
-<script src="js/cms.js?v=20260929j" defer></script>
-<script src="js/search.js?v=20260929j" defer></script>
+<script src="js/cms.js?v=20260929p" defer></script>
+<script src="js/search.js?v=20260929p" defer></script>
 <!-- shell.js va ANTES que app.js: deja lista window.EdemContent (el fetch único
      de content.json) y pinta la cabecera y el pie comunes -->
-<script src="js/shell.js?v=20260929j" defer></script>
-<script src="js/splash.js?v=20260929j" defer></script>
-<script src="js/app.js?v=20260929j" defer></script>
-<script src="js/news.js?v=20260929j" defer></script>
+<script src="js/shell.js?v=20260929p" defer></script>
+<script src="js/splash.js?v=20260929p" defer></script>
+<script src="js/app.js?v=20260929p" defer></script>
+<script src="js/news.js?v=20260929p" defer></script>
 </body>
 </html>
