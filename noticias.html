@@ -18,7 +18,7 @@
 <link rel="preload" as="image" fetchpriority="high" href="assets/edem-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="css/tokens.css?v=20261004o">
+<link rel="stylesheet" href="css/tokens.css?v=20261004q">
 <!-- Archivo: solo el eje de peso (ver index.html). Las cursivas del sitio son de
      Bodoni y font-stretch solo se usa dentro de las revistas.
      Y ADEMÁS YA NO BLOQUEA EL PINTADO: era el único recurso de terceros en el
@@ -31,16 +31,16 @@
 <link id="gfonts" rel="stylesheet" media="print" href="https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&amp;family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&amp;display=swap"
       onload="this.media='all';window.__gfontsIn=1;dispatchEvent(new Event('edem:gfonts'))">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&amp;family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&amp;display=swap"><style>#splash{display:none}</style></noscript>
-<link rel="stylesheet" href="css/site.css?v=20261004o">
-<link rel="stylesheet" href="css/news.css?v=20261004o">
-<script src="js/icons.js?v=20261004o" defer></script>
-<script src="js/cms.js?v=20261004o" defer></script>
-<script src="js/search.js?v=20261004o" defer></script>
-<script src="js/news.js?v=20261004o" defer></script>
+<link rel="stylesheet" href="css/site.css?v=20261004q">
+<link rel="stylesheet" href="css/news.css?v=20261004q">
+<script src="js/icons.js?v=20261004q" defer></script>
+<script src="js/cms.js?v=20261004q" defer></script>
+<script src="js/search.js?v=20261004q" defer></script>
+<script src="js/news.js?v=20261004q" defer></script>
 <!-- shell.js va antes: pinta la cabecera y el pie comunes (content.json → chrome) -->
-<script src="js/shell.js?v=20261004o" defer></script>
-<script src="js/splash.js?v=20261004o" defer></script>
-<script src="js/chrome.js?v=20261004o" defer></script>
+<script src="js/shell.js?v=20261004q" defer></script>
+<script src="js/splash.js?v=20261004q" defer></script>
+<script src="js/chrome.js?v=20261004q" defer></script>
 </head>
 <body>
 
@@ -164,28 +164,37 @@
   </div>
 </section>
 
-<!-- SUSCRÍBETE -->
-<section id="suscribete">
-  <div class="wrap in">
-    <div class="rv">
-      <p class="over" style="color:var(--edem-teal-200)">Novedades</p>
-      <h2 class="disp" style="margin-top:10px">Recibe las noticias de <span class="disp-i">EDEM Times</span></h2>
-      <p class="desc">Un correo con lo publicado en el portal y el aviso de cada nueva edición de la revista. Nada más.</p>
-    </div>
-    <div class="rv">
-      <form id="sub-form" novalidate>
-        <label class="hp" aria-hidden="true">No rellenes este campo<input type="text" name="empresa" tabindex="-1" autocomplete="off"></label>
-        <input type="email" name="email" required placeholder="tu@email.com" aria-label="Tu email" autocomplete="email">
-        <button class="btn pri" type="submit">Suscribirme</button>
-      </form>
-      <p id="sub-msg" role="status" aria-live="polite"></p>
-      <p class="legal">Al suscribirte aceptas la <a href="https://edem.eu/privacidad/" target="_blank" rel="noopener">política de privacidad</a> de EDEM.</p>
+<!-- SUSCRÍBETE · el boletín del portal.
+     En claro, como el resto del diario (en la portada sigue oscuro): filete
+     grueso arriba, antetítulo con icono como «Lo último» y dos columnas
+     separadas por un filete vertical, igual que la portada de Actualidad.
+     El formulario es el de siempre: lo atiende js/chrome.js. -->
+<section id="suscribete" class="subclaro" aria-labelledby="sub-h">
+  <div class="wrap">
+    <div class="subin">
+      <div class="subtxt rv">
+        <p class="subkick"><i data-lucide="mail" class="lu"></i> El boletín</p>
+        <h2 class="disp" id="sub-h">Recibe las noticias de <span class="disp-i">EDEM Times</span><span class="pt">.</span></h2>
+        <p class="desc">Un correo con lo publicado en el portal y el aviso de cada nueva edición de la revista. Nada más.</p>
+      </div>
+      <div class="subform rv">
+        <form id="sub-form" novalidate>
+          <label class="hp" aria-hidden="true">No rellenes este campo<input type="text" name="empresa" tabindex="-1" autocomplete="off"></label>
+          <label class="sublbl" for="sub-email">Tu correo</label>
+          <div class="subrow">
+            <input type="email" id="sub-email" name="email" required placeholder="tu@email.com" autocomplete="email">
+            <button class="btn pri" type="submit"><i data-lucide="mail" class="lu"></i> Suscribirme</button>
+          </div>
+        </form>
+        <p id="sub-msg" role="status" aria-live="polite"></p>
+        <p class="legal">Al suscribirte aceptas la <a href="https://edem.eu/privacidad/" target="_blank" rel="noopener">política de privacidad</a> de EDEM.</p>
+      </div>
     </div>
   </div>
 </section>
 </main>
 
-<div class="pezband" aria-hidden="true"><img src="assets/pez-footer.png" alt="" width="162" height="65" loading="lazy" decoding="async"></div>
+<div class="pezband claro" aria-hidden="true"><img src="assets/pez-footer.png" alt="" width="162" height="65" loading="lazy" decoding="async"></div>
 
 <!-- el pie entero lo pinta js/shell.js con content.json → chrome.footer -->
 <footer class="site" id="sitefoot"></footer>

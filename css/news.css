@@ -598,3 +598,55 @@
   .adato{flex-direction:column;gap:8px}
   .arel{padding:46px 0 56px;margin-top:40px}
 }
+
+/* ============================================================
+   EL BOLETÍN, EN CLARO (noticias.html y noticia.html)
+   En el portal la suscripción iba en el petróleo de la portada y era lo único
+   oscuro del diario. Ahora va en papel y con las piezas de la portada de
+   Actualidad: filete grueso arriba, antetítulo con icono como «Lo último» y
+   dos columnas separadas por un filete vertical. En la portada (index.html)
+   sigue oscuro: allí, de la bajada al pie, ya no vuelve el papel.
+   La banda del pez sigue el fondo del bloque para que no haya costura; en el
+   pie en cortina es el canto que sube y destapa el pie.
+   ============================================================ */
+#suscribete.subclaro{background:var(--paper-deep);color:var(--text-body);padding:clamp(40px,4.5vw,64px) 0 clamp(24px,2.6vw,40px)}
+.subin{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);border-top:2px solid var(--ink-900);padding-top:26px}
+.subtxt{padding-right:clamp(28px,4vw,60px)}
+.subform{padding-left:clamp(28px,4vw,60px);border-left:1px solid var(--border-strong);
+  display:flex;flex-direction:column;justify-content:center}
+.subkick{display:flex;align-items:center;gap:9px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  font-weight:800;color:var(--edem-teal-700)}
+.subkick .lu{width:15px;height:15px}
+#suscribete.subclaro h2{color:var(--ink-900);font-size:clamp(32px,3.3vw,46px);line-height:1.08;margin-top:14px;max-width:15em}
+#suscribete.subclaro .disp-i{color:var(--edem-teal-600)}
+#suscribete.subclaro h2 .pt{color:var(--edem-teal-500)}
+#suscribete.subclaro p.desc{color:var(--text-muted);font-size:16px;line-height:1.6;margin-top:14px;max-width:34em}
+#suscribete.subclaro form{display:block}
+.sublbl{display:block;font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:800;color:var(--ink-500);margin-bottom:10px}
+.subrow{display:flex;gap:10px}
+#suscribete.subclaro input[type=email]{flex:1;min-width:0;padding:14px 16px;border-radius:var(--radius-sm);
+  background:#fff;border:1px solid var(--ink-300);color:var(--ink-900);font:inherit;font-size:15px;
+  transition:border-color var(--dur) var(--ease-standard),box-shadow var(--dur) var(--ease-standard)}
+#suscribete.subclaro input::placeholder{color:var(--ink-400)}
+#suscribete.subclaro input:focus{outline:none;border-color:var(--edem-teal-500);box-shadow:0 0 0 3px rgba(0,138,173,.16)}
+#suscribete.subclaro #sub-msg{color:var(--edem-teal-700);font-weight:600}
+#suscribete.subclaro #sub-msg.err{color:var(--danger)}
+#suscribete.subclaro .legal{color:var(--ink-500);font-size:12px;margin-top:4px}
+#suscribete.subclaro .legal a{color:var(--text-link)}
+#suscribete.subclaro .legal a:hover{color:var(--text-link-hover)}
+
+/* el pez sobre papel: sin el halo petróleo (era para que no se perdiera en
+   el oscuro) y con una sombra más corta, que en claro pesaba demasiado */
+.pezband.claro{background:var(--paper-deep)}
+.pezband.claro::before{display:none}
+.pezband.claro img{filter:drop-shadow(0 8px 12px rgba(12,30,36,.3))}
+
+@media(max-width:860px){
+  .subin{grid-template-columns:1fr}
+  .subtxt{padding-right:0}
+  .subform{border-left:0;padding-left:0;border-top:1px solid var(--border-strong);margin-top:26px;padding-top:24px}
+}
+@media(max-width:680px){
+  #suscribete.subclaro h2{font-size:30px}
+  .subrow{flex-direction:column}
+}
