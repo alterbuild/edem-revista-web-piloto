@@ -71,11 +71,6 @@ const DEFAULTS = {
       { area: 'Edición', t: 'Edita', d: 'Cierra temas, corrige, decide el sumario. Se aprende haciendo — y aquí se hace una revista de verdad.' }
     ]
   },
-  ecosystem: [
-    { name: 'EDEM', role: 'Formar', color: 'edem', url: 'https://edem.eu/', logo: 'assets/edem-logo-white.png', desc: 'Escuela de empresarios y directivos en Valencia. Grados, másteres y alta dirección con una regla: se aprende haciendo.', img: 'assets/img/eco-edem.jpg', focus: '26% 50%', alt: 'Fachada de EDEM en la Marina de València, con la grúa del puerto al lado', meta: 'Aquí se hace esta revista' },
-    { name: 'Lanzadera', role: 'Acelerar', color: 'lanzadera', url: 'https://lanzadera.es/', logo: 'assets/logo-lanzadera-white.png', desc: 'La aceleradora que empuja startups desde el muelle de la Marina hasta el mercado. Su radar llena páginas de esta revista.', img: 'assets/img/eco-lanzadera.jpg', focus: '36% 50%', alt: 'Equipo de una startup trabajando en las oficinas de Lanzadera', meta: 'Sección «Radar Lanzadera»' },
-    { name: 'Angels', role: 'Invertir', color: 'angels', url: 'https://www.angelscapital.es/', logo: 'assets/logo-angels-white.png', desc: 'La sociedad de inversión de Juan Roig. Capital y criterio para los líderes que eligen la opción difícil.', img: 'assets/img/eco-angels.jpg', alt: 'Público de inversores en el Investors Day de Angels', meta: 'Sección «Angels»' }
-  ],
   social: [
     { id: 'linkedin', label: 'LinkedIn', url: 'https://www.linkedin.com/school/edem-escuela-de-empresarios/' },
     { id: 'instagram', label: 'Instagram', url: 'https://www.instagram.com/edemempresarios/' },
@@ -668,45 +663,6 @@ function renderJoin() {
       (staff.foot ? '<p class="jsh-foot">' + esc(staff.foot) + '</p>' : '') +
     '</div>';
 
-}
-
-/* ---------- Ecosistema: Marina de Empresas ----------
-   Tres fichas en fila, en el orden en que empujan a una persona (formar →
-   acelerar → invertir) y unidas por una línea con flecha. La foto va en
-   duotono del color de cada marca —el mismo con el que firma su sección en la
-   revista— y recupera su color al pasar por encima.
-   Antes era un mazo de fichas sticky que se montaban unas sobre otras: el raíl
-   repetía los tres nombres, entre ficha y ficha quedaba media pantalla vacía y
-   la de debajo asomaba recortada. Ahora no hay nada clavado ni medido con el
-   scroll: el fondo de señales que se desplazaba con --ecoP también se ha ido. */
-// las luces del duotono: el color de cada marca aclarado (las sombras son el
-// fondo de la sección, el mismo para las tres)
-const ECO_TONES = { edem: '#9ad6e6', lanzadera: '#ffb39b', angels: '#b3b1f2', neutral: '#cfd9dc' };
-const hostOf = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (_) { return ''; } };
-
-function renderEcosystem() {
-  const list = C.ecosystem || [];
-  $('egrid').innerHTML = list.map((e, i) =>
-    '<article class="ecard rv" style="--acc:' + color(e.color) + ';--hi:' + (ECO_TONES[e.color] || ECO_TONES.neutral) + ';--d:' + (i * 0.12).toFixed(2) + 's">' +
-      '<div class="ecard-step" aria-hidden="true"><span class="n">' + String(i + 1).padStart(2, '0') + '</span><span class="ln"></span>' +
-        (i < list.length - 1 ? '<i class="ar"></i>' : '') + '</div>' +
-      '<figure class="ecard-ph">' +
-        (e.img ? '<img class="ecard-img" src="' + esc(e.img) + '" alt="' + esc(e.alt || '') + '" loading="lazy" decoding="async"' +
-          (e.focus ? ' style="object-position:' + esc(e.focus) + '"' : '') + '>' : '') +
-        // la marca firma con su logotipo en blanco, no con el nombre escrito
-        (e.logo
-          ? '<img class="ecard-logo" src="' + esc(e.logo) + '" alt="' + esc(e.name) + '" loading="lazy" decoding="async">'
-          : '<span class="ecard-logo disp">' + esc(e.name) + '</span>') +
-      '</figure>' +
-      '<div class="ecard-body">' +
-        '<h3 class="ecard-verb disp">' + esc(e.role) + '<span class="pt">.</span><span class="vh"> ' + esc(e.name) + '</span></h3>' +
-        '<p class="ecard-desc">' + esc(e.desc) + '</p>' +
-        (e.meta ? '<p class="ecard-meta">' + esc(e.meta) + '</p>' : '') +
-        (e.url ? '<a class="ecard-link" href="' + esc(e.url) + '" target="_blank" rel="noopener">' +
-          '<span>' + esc(hostOf(e.url) || 'Visitar ' + e.name) + '</span><i data-lucide="arrow-up-right" class="lu"></i>' +
-          '<span class="vh"> (web de ' + esc(e.name) + ', se abre en otra pestaña)</span></a>' : '') +
-      '</div>' +
-    '</article>').join('');
 }
 
 /* El pie (y los enlaces de la cabecera) los pinta js/shell.js, que es común a
@@ -1908,7 +1864,7 @@ window.addEventListener('resize', () => { if (!visor.hidden) applyMode(); });
 
 /* ================= arranque ================= */
 function renderAll() {
-  renderHero(); renderKiosko(); renderJoin(); renderEcosystem();
+  renderHero(); renderKiosko(); renderJoin();
   $('v-issues').innerHTML = MAGS.map(m => '<button class="vchip" role="tab" data-id="' + m.id + '" data-visor-issue="' + m.id + '">' + esc(m.chip) + '</button>').join('');
   $('v-issues').onclick = e => { const c = e.target.closest('[data-visor-issue]'); if (c) setIssue(c.dataset.visorIssue, 0); };
   lucide.createIcons();
@@ -2003,15 +1959,15 @@ function abrirVisorPorURL() {
   // .bajada, hay que tocar esto.
   const ATOP = rgb('#062736'), ABOT = rgb('#062e3b');
   const KTOP = rgb('#062e3b'), KBOT = rgb('#06333f');
-  // «Conócenos» arranca en ese mismo #06333f y baja hasta el #0e2129 con el
-  // que sigue el ecosistema (ver #conocenos en css/site.css)
+  // «Conócenos» arranca en ese mismo #06333f y baja hasta el #0e2129
+  // (ver #conocenos en css/site.css)
   const JTOP = KBOT, JBOT = rgb('#0e2129');
   const PAPER = '#fbfaf6';
 
   // Secciones con fondo propio bajo el hero, en orden de documento. Un par de
   // colores en vez de uno significa degradado: se interpola según lo metido que
   // esté el borde inferior de la pantalla en la sección.
-  const zones = [['actualidad', [ATOP, ABOT]], ['kiosko', [KTOP, KBOT]], ['conocenos', [JTOP, JBOT]], ['ecosistema', '#0e2129'], ['suscribete', PAPER]]
+  const zones = [['actualidad', [ATOP, ABOT]], ['kiosko', [KTOP, KBOT]], ['conocenos', [JTOP, JBOT]], ['suscribete', PAPER]]
     .map(([id, color]) => ({ el: $(id), color }))
     .filter(z => z.el);
   const foot = document.querySelector('footer.site');

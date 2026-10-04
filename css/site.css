@@ -1086,8 +1086,9 @@ html.sbusca-on{overflow:hidden}
    colgado del scroll.
    EL FONDO ENLAZA LAS DOS SECCIONES VECINAS. Arranca plano en #06333f, el tono
    con el que acaba la bajada (sin raya en la costura: ver .bajada), y baja
-   hasta #0e2129, el fondo del ecosistema, que sigue sin junta. Si se toca un
-   extremo hay que tocar el vecino y los tonos de barTint() en js/app.js. */
+   hasta #0e2129 (antes enlazaba con el ecosistema, quitado el 04-10-2026; ahora
+   le sigue «Suscríbete», que es un bloque aparte). Si se toca un extremo hay
+   que tocar los tonos de barTint() en js/app.js. */
 #conocenos{position:relative;overflow:hidden;color:#fff;padding:clamp(88px,9vw,124px) 0 clamp(56px,5.5vw,80px);
   background:linear-gradient(180deg,#06333f 0,#06333f 6%,#0e2129 100%)}
 /* la luz que cae sobre la hoja: un halo suave detrás del papel */
@@ -1171,86 +1172,6 @@ html.sbusca-on{overflow:hidden}
   transition:opacity .3s var(--ease-out) 1.05s,transform .55s cubic-bezier(.34,1.56,.64,1) 1.05s}
 .jsheetwrap.in .jstamp{opacity:1;transform:rotate(12deg)}
 
-/* ---------- ecosistema: Marina de Empresas ----------
-   Tres fichas en fila, en el orden en que empujan a una persona —formar,
-   acelerar, invertir— y unidas por la línea de su color, con flecha hacia la
-   siguiente. Cada foto va en DUOTONO del color de su marca (el mismo con el
-   que firma su sección en la revista): las tres fotos son de luz y gama muy
-   distintas —cielo, oficina, escenario morado— y así se leen como una serie.
-   Al pasar por encima recuperan su color.
-   Antes era un mazo de fichas sticky con un fondo de señales que se movía con
-   el scroll; nada de eso queda: ni sticky ni JavaScript de scroll. */
-#ecosistema{position:relative;padding:clamp(56px,6vw,84px) 0 clamp(80px,8vw,108px);color:#fff;
-  background:radial-gradient(70% 46% at 50% 100%,rgba(0,138,173,.09),transparent 72%),#0e2129}
-.ehd{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,80px);align-items:end;
-  margin-bottom:clamp(44px,5vw,66px)}
-#ecosistema .shead{border-top-color:rgba(255,255,255,.28);margin-bottom:0}
-#ecosistema .shead h2{color:#fff;font-size:clamp(32px,3.6vw,48px)}
-#ecosistema .skick{color:var(--edem-teal-200)}
-.ecointro{font-size:16.5px;line-height:1.7;color:rgba(255,255,255,.72);max-width:52ch}
-
-.egrid{--gap:clamp(22px,2.6vw,40px);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap)}
-/* El color de marca puro no vale para texto sobre este fondo (Angels da 1,6:1):
-   --accText es el mismo color aclarado, por encima de 4,5:1 en los tres, y
-   --accLn uno intermedio para las líneas, que también tienen que verse. */
-.ecard{--accText:rgba(255,255,255,.86);--accLn:var(--acc);display:flex;flex-direction:column;min-width:0}
-@supports (color:color-mix(in srgb,red,white)){
-  .ecard{--accText:color-mix(in srgb,var(--acc) 55%,white);--accLn:color-mix(in srgb,var(--acc) 80%,white)}
-}
-.ecard.rv{transition-delay:var(--d,0s)}
-/* el número y la línea que lo lleva a la siguiente ficha. La línea se mete en
-   el hueco entre fichas y acaba en flecha justo antes del número de al lado */
-.ecard-step{display:flex;align-items:center;gap:12px;margin-bottom:18px}
-.ecard:not(:last-child) .ecard-step{margin-right:calc(var(--gap) * -1 + 10px)}
-.ecard-step .n{font-family:var(--font-display);font-weight:900;font-size:14px;letter-spacing:.04em;color:var(--accText)}
-.ecard-step .ln{flex:1;height:2px;border-radius:2px;background:var(--accLn);transform-origin:left;transform:scaleX(0);
-  transition:transform 1s var(--ease-out) calc(var(--d,0s) + .25s)}
-.ecard-step .ar{flex:none;width:8px;height:8px;margin-left:-13px;border-top:2px solid var(--accLn);border-right:2px solid var(--accLn);
-  transform:rotate(45deg);opacity:0;transition:opacity .3s var(--ease-out) calc(var(--d,0s) + 1.05s)}
-.ecard.in .ecard-step .ln{transform:none}
-.ecard.in .ecard-step .ar{opacity:1}
-
-/* --- la foto en duotono ---
-   Capas: la foto en grises; encima su color claro multiplicando (las luces se
-   tiñen de la marca) y un azul noche aclarando (las sombras se quedan en el
-   tono de la sección). El velo de abajo es para que el logotipo se lea: mide
-   lo mismo en píxeles con cualquier recorte, porque el logotipo también. */
-.ecard-ph{position:relative;margin:0;aspect-ratio:5/6;overflow:hidden;border-radius:2px;background:#10303b;isolation:isolate;
-  box-shadow:0 26px 50px -24px rgba(2,14,20,.7)}
-.ecard-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  filter:grayscale(1) contrast(1.12) brightness(1.06);
-  transition:filter .7s var(--ease-standard),transform 1.2s var(--ease-out)}
-.ecard-ph::before,.ecard-ph::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;transition:opacity .7s var(--ease-standard)}
-.ecard-ph::before{background:var(--hi);mix-blend-mode:multiply}
-.ecard-ph::after{background:#123441;mix-blend-mode:lighten}
-.ecard-shade{position:absolute;inset:0;z-index:2;pointer-events:none;
-  background:linear-gradient(0deg,rgba(8,24,31,.9) 0,rgba(8,24,31,.62) 64px,rgba(8,24,31,.22) 128px,rgba(8,24,31,0) 190px)}
-.ecard-logo{position:absolute;left:clamp(18px,1.8vw,26px);bottom:clamp(18px,1.8vw,24px);z-index:3;
-  height:clamp(22px,2vw,28px);width:auto;max-width:calc(100% - 44px);object-fit:contain;object-position:left bottom}
-span.ecard-logo{height:auto;font-size:22px;color:#fff;letter-spacing:.08em;text-transform:uppercase}
-/* solo con ratón: en el móvil el :hover se queda pegado al tocar y la foto
-   perdía el duotono para siempre */
-@media (hover:hover){
-  .ecard:hover .ecard-img{filter:grayscale(0) contrast(1) brightness(1);transform:scale(1.04)}
-  .ecard:hover .ecard-ph::before,.ecard:hover .ecard-ph::after{opacity:0}
-}
-
-/* --- el texto --- */
-.ecard-body{display:flex;flex-direction:column;gap:10px;flex:1;padding-top:24px}
-.ecard-verb{font-size:clamp(32px,3vw,44px);line-height:1;color:#fff;letter-spacing:-.02em}
-.ecard-verb .pt{color:var(--accText)}
-.ecard-desc{font-size:15px;line-height:1.65;color:rgba(255,255,255,.7);max-width:40ch}
-.ecard-meta{display:inline-flex;align-items:center;gap:10px;margin-top:2px;
-  font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--accText)}
-.ecard-meta::before{content:'';width:18px;height:2px;background:var(--accLn);flex:none}
-/* la salida a la web de cada iniciativa, al pie y alineada en las tres */
-.ecard-link{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto;
-  padding:16px 0 2px;border-top:1px solid rgba(255,255,255,.14);
-  font-size:14px;font-weight:700;color:#fff;transition:color var(--dur) var(--ease-standard),border-color var(--dur) var(--ease-standard)}
-.ecard-link .lu{width:18px;height:18px;color:var(--accText);transition:transform var(--dur) var(--ease-standard)}
-.ecard-link:hover{color:var(--accText);border-color:var(--accLn)}
-.ecard-link:hover .lu{transform:translate(3px,-3px)}
-
 /* ---------- SUSCRÍBETE (novedades) ---------- */
 #suscribete{background:var(--surface-dark);color:var(--text-on-dark);padding:64px 0}
 #suscribete .wrap.in{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
@@ -1300,12 +1221,13 @@ footer.site .col .soc a,.soc a{width:40px;height:40px;padding:0;border-radius:50
 .soc svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 /* La mancheta a todo el ancho, como el «Wordware™» de wordware.ai: el mismo
    «EDEM times.» de la cabecera (logotipo + cursiva, alineados por la base y en
-   las mismas proporciones: 22px de logo y 8px de hueco por cada 24 de letra),
-   con el cuerpo calculado para llenar justo el ancho de la caja: el conjunto
-   mide 6,88 veces su tamaño de letra. */
-.fmarkwrap{container-type:inline-size;padding-bottom:clamp(14px,2vw,30px)}
-.fmark{display:flex;align-items:baseline;gap:.3333em;width:max-content;max-width:100%;
-  font-size:12.6vw;font-size:calc(100cqw / 6.9);line-height:1;white-space:nowrap}
+   las mismas proporciones: 22px de logo y 8px de hueco por cada 24 de letra).
+   El cuerpo exacto para llenar la caja lo pone fitMark() en js/shell.js
+   midiendo (con cqw, el Safari del Mac la sacaba cortada por la derecha); este
+   de aquí es solo el de partida y se queda corto a propósito. */
+.fmarkwrap{padding-bottom:clamp(14px,2vw,30px)}
+.fmark{display:flex;align-items:baseline;gap:.3333em;width:max-content;
+  font-size:min(11.5vw,170px);line-height:1;white-space:nowrap}
 .fmark img{height:.9167em;width:auto}
 .fmark .t{font-family:var(--font-display);font-style:italic;font-weight:700;letter-spacing:-.01em;color:var(--paper)}
 .fmark .t .pt{font-style:normal;color:var(--edem-teal-300)}
@@ -1509,19 +1431,10 @@ html.pie-cortina .pezband{border-radius:0 0 var(--pie-r) var(--pie-r);box-shadow
   .gull.g2{left:auto;right:22%;bottom:calc(var(--band) + var(--vbar) - var(--sh) * .06)}
   .gull.g3{display:none}
   .beat .kicker{margin-bottom:14px}
-  /* Conócenos y el ecosistema pasan a una columna. La hoja de la mancheta
-     conserva un ancho de página (no se estira a lo ancho de la tableta) y
-     cada ficha del ecosistema se tumba: foto a la izquierda, texto al lado. */
+  /* Conócenos pasa a una columna. La hoja de la mancheta conserva un ancho
+     de página (no se estira a lo ancho de la tableta). */
   .jgrid{grid-template-columns:1fr;gap:56px}
   .jsheetwrap{max-width:600px;width:calc(100% - 14px)}
-  .ehd{grid-template-columns:1fr;gap:16px;align-items:start}
-  .egrid{grid-template-columns:1fr;gap:48px}
-  .ecard{display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);column-gap:30px;align-items:start}
-  .ecard-step{grid-column:1/-1}
-  .ecard:not(:last-child) .ecard-step{margin-right:0}
-  .ecard-step .ar{display:none}
-  .ecard-ph{aspect-ratio:1/1}
-  .ecard-body{padding-top:0;height:100%}
   /* el kiosko y la actualidad pasan a una columna: la cabecera deja de estar clavada */
   #kiosko{padding:72px 0 84px}
   #kiosko .kwrap,#actualidad .kwrap{grid-template-columns:1fr;gap:28px}
@@ -1558,7 +1471,6 @@ html.pie-cortina .pezband{border-radius:0 0 var(--pie-r) var(--pie-r);box-shadow
   .kacts .btn{padding:10px 12px}
   .khand{font-size:22px}
   #conocenos{padding:64px 0 52px}
-  #ecosistema{padding-top:44px}
   /* la mancheta en el teléfono: menos margen de papel, la pegatina más pequeña
      y metida hacia dentro para que no se salga de la pantalla */
   .jsheetwrap{width:calc(100% - 10px);margin-right:10px}
@@ -1572,13 +1484,6 @@ html.pie-cortina .pezband{border-radius:0 0 var(--pie-r) var(--pie-r);box-shadow
   .jsh-nr{font-size:9.5px;letter-spacing:.18em}
   /* la hoja de detrás gira menos: en una página tan alta, 2,4° asomaban una cuña enorme */
   .jsheetwrap::before{transform:translate(8px,8px) rotate(1.1deg)}
-  /* el ecosistema vuelve a ponerse de pie: foto arriba, apaisada, y texto debajo */
-  /* align-items vuelve a stretch: el start de la tableta, en columna flexible,
-     encogía la foto y la línea a ancho cero */
-  .ecard{display:flex;align-items:stretch}
-  .ecard-ph{aspect-ratio:16/10}
-  .ecard-body{padding-top:20px}
-  .ecard-verb{font-size:36px}
   #kiosko{padding:56px 0 64px}
   nav.main,.hbar .hacts{display:none}
   .menubtn{display:grid}

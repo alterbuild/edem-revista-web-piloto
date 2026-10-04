@@ -33,7 +33,6 @@
       { label: 'Kiosko', href: '#kiosko', icon: 'library' },
       { label: 'Actualidad', href: 'noticias.html', icon: 'newspaper', menu: true },
       { label: 'Conócenos', href: '#conocenos', icon: 'book-marked' },
-      { label: 'Ecosistema', href: '#ecosistema', icon: 'waypoints' },
       { label: 'Suscríbete', href: '#suscribete', icon: 'mail' }
     ],
     footer: {
@@ -236,7 +235,37 @@
         '<span class="fnote">' + esc(base.note || '') + '</span>' +
       '</div></div>';
 
+    fitMark(foot);
     cortina(foot);
+  }
+
+  /* La mancheta llena justo el ancho de su caja. Se mide aquí y no con
+     unidades cqw en el CSS: el Safari del Mac las resolvía contra la ventana
+     en vez de contra la caja y la mancheta se salía por la derecha, cortada.
+     Se pinta a un cuerpo de prueba, se mide y se escala: vale en cualquier
+     navegador y con cualquier métrica de la letra (la Bodoni de reserva, la
+     que tarda en llegar…). */
+  function fitMark(foot) {
+    const wrap = foot.querySelector('.fmarkwrap'), mark = foot.querySelector('.fmark');
+    if (!wrap || !mark) return;
+    let last = -1;
+    const fit = force => {
+      const cs = getComputedStyle(wrap);
+      const room = wrap.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      if (room <= 0 || (room === last && force !== true)) return;
+      last = room;
+      mark.style.fontSize = '100px';
+      const w = mark.getBoundingClientRect().width;
+      // un pelo por debajo: el redondeo de subpíxeles no debe asomar por fuera
+      if (w > 0) mark.style.fontSize = (Math.floor(100 * room / w * 0.998 * 100) / 100) + 'px';
+    };
+    fit();
+    // el ancho de la caja (ventana, barra de scroll…) y la letra cuando llega
+    if (window.ResizeObserver) new ResizeObserver(() => fit()).observe(wrap);
+    else addEventListener('resize', () => fit());
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => fit(true));
+    const img = mark.querySelector('img');
+    if (img && !img.complete) img.addEventListener('load', () => fit(true), { once: true });
   }
 
   /* ---------- el pie en cortina ----------

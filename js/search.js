@@ -140,7 +140,6 @@
     { titulo: 'Actualidad', desc: 'El portal de noticias: campus, emprendimiento, inversión y alumni.', url: 'noticias.html', icono: 'newspaper', clave: 'noticias diario actualidad' },
     { titulo: 'Kiosko de revistas', desc: 'Todas las ediciones, de la primera a la última, en el visor.', url: 'index.html#kiosko', icono: 'library', clave: 'kiosko ediciones numeros archivo hemeroteca' },
     { titulo: 'Conócenos', desc: 'Cómo participar en la revista: escribir, fotografiar, ilustrar o proponer temas.', url: 'index.html#conocenos', icono: 'book-marked', clave: 'participar redaccion equipo escribir colaborar' },
-    { titulo: 'Ecosistema', desc: 'EDEM, Lanzadera y Angels: la Marina de Empresas.', url: 'index.html#ecosistema', icono: 'waypoints', clave: 'marina empresas lanzadera angels edem' },
     { titulo: 'Suscríbete', desc: 'Un correo con cada nueva edición y lo publicado en el portal.', url: 'index.html#suscribete', icono: 'mail', clave: 'newsletter boletin correo email suscripcion suscribirme suscribirse apuntarme alta' }
   ];
 
