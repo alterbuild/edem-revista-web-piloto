@@ -213,19 +213,60 @@
     const legal = (base.legal || []).map(l =>
       '<a href="' + esc(l.href) + '" target="_blank" rel="noopener">' + esc(l.label) + '</a>').join(' · ');
 
+    // la mancheta a todo el ancho del pie, como el «Wordware™» de wordware.ai:
+    // el logotipo va en SVG (el PNG de 800px se ve borroso a este tamaño)
+    const home = link({ href: 'index.html' });
+
     foot.innerHTML =
       '<div class="wrap fgrid">' +
         '<div class="col brandcol">' +
-          '<img class="flogo" src="assets/edem-logo-white.png" alt="EDEM" width="88" height="22">' +
           '<p class="tag">' + esc(f.tagline || '') + '</p>' +
           '<div class="soc" id="soc">' + soc + '</div>' +
         '</div>' + cols +
       '</div>' +
+      '<div class="wrap fmarkwrap">' +
+        '<a class="fmark" href="' + esc(home.href) + '"' + home.extra + ' aria-label="EDEM Times — portada">' +
+          '<img src="assets/edem-logo-paper.svg" alt="" width="800" height="188" loading="lazy" decoding="async">' +
+          '<span class="t">times<span class="pt">.</span></span>' +
+        '</a>' +
+      '</div>' +
       '<div class="fbase"><div class="wrap">' +
         '<span>' + esc(String(base.copyright || '').replace('{year}', new Date().getFullYear())) + '</span>' +
         '<span>' + legal + '</span>' +
-        '<span>' + esc(base.note || '') + '</span>' +
+        '<span class="fnote">' + esc(base.note || '') + '</span>' +
       '</div></div>';
+
+    cortina(foot);
+  }
+
+  /* ---------- el pie en cortina ----------
+     Como en wordware.ai: el pie se queda quieto pegado al fondo de la pantalla,
+     DETRÁS de la página, y es la página —con las esquinas de abajo redondeadas—
+     la que sube y lo va destapando (site.css, html.pie-cortina).
+     Solo si cabe entero bajo la cabecera: si no, su parte de arriba no se vería
+     nunca (al subir la tapa la cortina y al bajar, la barra), así que en una
+     pantalla baja vuelve a ser un pie normal. Se mide contra el alto PEQUEÑO
+     de la pantalla (100svh: con las barras de Safari a la vista) para que
+     esconderlas o sacarlas al hacer scroll no lo haga ir y venir. */
+  function cortina(foot) {
+    const root = document.documentElement;
+    const head = document.querySelector('header.site .hbar') || document.querySelector('header.site');
+    const probe = document.createElement('div');
+    probe.setAttribute('aria-hidden', 'true');
+    probe.style.cssText = 'position:fixed;top:0;left:0;width:0;height:100vh;height:100svh;visibility:hidden;pointer-events:none';
+    document.body.appendChild(probe);
+    const fit = () => {
+      const room = probe.offsetHeight - (head ? head.offsetHeight : 0);
+      // en cortina el pie se mete --pie-r bajo el canto (ver site.css): ese
+      // trozo no se ve y no cuenta; si contara, ponerla lo haría dejar de caber
+      // y quitarla, volver a caber, y así sin fin
+      const on = root.classList.contains('pie-cortina');
+      const h = foot.offsetHeight - (on ? parseFloat(getComputedStyle(root).getPropertyValue('--pie-r')) || 0 : 0);
+      root.classList.toggle('pie-cortina', h > 0 && h <= room);
+    };
+    fit();
+    if (window.ResizeObserver) new ResizeObserver(fit).observe(foot);
+    addEventListener('resize', fit);
   }
 
   /* el sistema de diseño solo existe en la portada (lo monta app.js) */

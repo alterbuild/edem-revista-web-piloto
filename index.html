@@ -24,7 +24,7 @@
 <link rel="preload" as="image" fetchpriority="high" href="assets/edem-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="css/tokens.css?v=20260929u">
+<link rel="stylesheet" href="css/tokens.css?v=20261004n">
 <!-- De Archivo se pide SOLO el eje de peso. Antes se pedían también la cursiva y
      el eje de ANCHURA (wdth 62..125) y el sitio no usa ninguno de los dos: todas
      las cursivas son de Bodoni (--font-display) y font-stretch solo aparece en
@@ -45,9 +45,9 @@
 <link id="gfonts" rel="stylesheet" media="print" href="https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&amp;family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&amp;family=Covered+By+Your+Grace&amp;display=swap"
       onload="this.media='all';window.__gfontsIn=1;dispatchEvent(new Event('edem:gfonts'))">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&amp;family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&amp;family=Covered+By+Your+Grace&amp;display=swap"><style>#splash{display:none}</style></noscript>
-<link rel="stylesheet" href="css/site.css?v=20260929u">
-<link rel="stylesheet" href="css/news.css?v=20260929u">
-<script src="js/icons.js?v=20260929u" defer></script>
+<link rel="stylesheet" href="css/site.css?v=20261004n">
+<link rel="stylesheet" href="css/news.css?v=20261004n">
+<script src="js/icons.js?v=20261004n" defer></script>
 </head>
 <body>
 
@@ -121,8 +121,8 @@
       <i class="gull g1"></i><i class="gull g2"></i><i class="gull g3"></i>
     </div>
     <div class="hscape">
-      <img class="hl hfar" src="assets/hero/marina-ciudad.svg?v=20260929u" alt="" width="1600" height="340" decoding="async">
-      <img class="hl hnear" src="assets/hero/marina-muelle.svg?v=20260929u" alt="" width="1600" height="340" decoding="async">
+      <img class="hl hfar" src="assets/hero/marina-ciudad.svg?v=20261004n" alt="" width="1600" height="340" decoding="async">
+      <img class="hl hnear" src="assets/hero/marina-muelle.svg?v=20261004n" alt="" width="1600" height="340" decoding="async">
     </div>
   </div>
   <div class="wrap grid">
@@ -256,54 +256,46 @@
 
 </div><!-- /.bajada -->
 
-<!-- CONÓCENOS · la invitación a hacer la revista -->
-<!-- La sección se clava (.jstage sticky) mientras el scroll va encendiendo
-     una a una las formas de participar. Contenido en data/content.json → join. -->
+<!-- CONÓCENOS · la invitación a hacer la revista
+     La sección es una página de la propia revista: la MANCHETA (el «staff» que
+     firma cada número) del número que viene, con los puestos abiertos y el hueco
+     del nombre esperando a quien lo quiera. Va como objeto de papel sobre el
+     agua, igual que las revistas del kiosko.
+     Todo sale de data/content.json → join (lo pinta renderJoin() en js/app.js). -->
 <section id="conocenos">
-  <div class="jstage">
-    <!-- fondos flat: una escena de formas planas por cada forma de participar,
-         se relevan con el scroll y tiñen las cajas de la derecha -->
-    <div class="jbg" id="jscenes" aria-hidden="true"></div>
-    <div class="wrap jwrap">
+  <div class="wrap">
+    <div class="jgrid">
       <div class="jcopy">
-        <span class="kicker over jkick"><span class="dot"></span><span id="join-kicker">Conócenos</span></span>
-        <h2 class="disp jtitle" id="join-title"></h2>
-        <p class="jlead" id="join-lead"></p>
-        <div class="jacts" id="join-acts"></div>
+        <div class="shead rv">
+          <span class="skick over" id="join-kicker">Conócenos</span>
+          <h2 class="disp jtitle" id="join-title"></h2>
+        </div>
+        <p class="jlead rv" id="join-lead"></p>
+        <div class="jacts rv" id="join-acts"></div>
+        <ul class="jfacts rv" id="join-facts"></ul>
       </div>
-      <div class="jright">
-        <ol class="jroles" id="jroles"></ol>
-        <div class="jprog" aria-hidden="true"><span id="jbar"></span></div>
-      </div>
+      <!-- la mancheta: cada puesto es un enlace al correo de la redacción con el
+           puesto ya escrito en el asunto -->
+      <div class="jsheetwrap rv" id="jstaff"></div>
     </div>
-    <div class="jticker" aria-hidden="true"><div class="jtrack" id="jtrack"></div></div>
   </div>
 </section>
 
-<!-- ECOSISTEMA -->
+<!-- ECOSISTEMA · Marina de Empresas
+     Tres iniciativas en fila, en el orden en que empujan a una persona: formar,
+     acelerar, invertir. Cada una con su foto en duotono del color de su marca
+     —el mismo con el que firma su sección de la revista— y una línea que la une
+     con la siguiente. Contenido en data/content.json → ecosystem. -->
 <section id="ecosistema">
-  <!-- Fondo de señalética: dos tramas que cubren la sección entera y se
-       desplazan con el scroll a distinta velocidad (--ecoP, de 0 a 1, lo
-       escribe js/app.js). La fina marca el compás; encima, las señales de
-       orientación —galones, dianas, flechas, bifurcaciones— van más rápido y
-       en diagonal. Uniforme de arriba abajo: no hay piezas sueltas. -->
-  <div class="ebg" aria-hidden="true">
-    <span class="eweave"></span>
-    <span class="esigns"></span>
-    <span class="efade"></span>
-  </div>
-  <div class="wrap ecowrap">
-    <!-- raíl fijo: mientras las tres fichas pasan por delante, el titular y el
-         índice se quedan clavados y solo cambia la iniciativa activa. -->
-    <aside class="ecorail">
+  <div class="wrap">
+    <header class="ehd">
       <div class="shead rv">
         <span class="skick over">El ecosistema</span>
         <h2 class="disp">Marina de Empresas</h2>
       </div>
       <p class="ecointro rv">Formar, acelerar e invertir: tres iniciativas de Juan Roig en la Marina de València con una misma misión — impulsar a los que eligen la opción difícil. Cada sección de la revista lleva el color de su barrio.</p>
-      <ol class="econav rv" id="econav"></ol>
-    </aside>
-    <div class="ecostack" id="egrid"></div>
+    </header>
+    <div class="egrid" id="egrid"></div>
   </div>
 </section>
 
@@ -509,16 +501,16 @@
   </div>
 </div>
 
-<script src="js/cms.js?v=20260929u" defer></script>
-<script src="js/search.js?v=20260929u" defer></script>
+<script src="js/cms.js?v=20261004n" defer></script>
+<script src="js/search.js?v=20261004n" defer></script>
 <!-- shell.js va ANTES que app.js: deja lista window.EdemContent (el fetch único
      de content.json) y pinta la cabecera y el pie comunes -->
-<script src="js/shell.js?v=20260929u" defer></script>
-<script src="js/splash.js?v=20260929u" defer></script>
+<script src="js/shell.js?v=20261004n" defer></script>
+<script src="js/splash.js?v=20261004n" defer></script>
 <!-- ediciones en PDF (las que se suben al CMS): portada y páginas del visor.
      Pesa 5 KB; PDF.js, que es lo gordo, solo se descarga si hay que pintar un PDF -->
-<script src="js/revistas-pdf.js?v=20260929u" defer></script>
-<script src="js/app.js?v=20260929u" defer></script>
-<script src="js/news.js?v=20260929u" defer></script>
+<script src="js/revistas-pdf.js?v=20261004n" defer></script>
+<script src="js/app.js?v=20261004n" defer></script>
+<script src="js/news.js?v=20261004n" defer></script>
 </body>
 </html>

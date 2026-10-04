@@ -1,6 +1,8 @@
 {
   "_ayuda": "Este archivo controla todo el contenido de la home de EDEM Times. Edítalo (o genera uno igual desde tu CMS) y la web se actualiza sin tocar código. Campos de color permitidos: edem, lanzadera, angels, neutral.",
-  "site": { "latest": "n2" },
+  "site": {
+    "latest": "n2"
+  },
   "cms": {
     "_ayuda": "EDICIONES DESDE UN CMS (Strapi, WordPress, Contentful, Hygraph o cualquier API que devuelva JSON). Con activo:true la web pide las ediciones a endpoint y solo usa las de «issues» de este archivo si el CMS falla o tarda más de espera ms. tipo dice cómo se leen los campos (strapi | wordpress | contentful | hygraph | generico) y mapeo cambia el que haga falta, p. ej. { \"pdf\": \"attributes.archivo.data.attributes.url\" }. baseMedios se antepone a las rutas de medios que no son absolutas (en Strapi, la dirección del CMS: https://cms.ejemplo.com). headers sirve para una clave de API de SOLO LECTURA (nunca una de escritura: este archivo es público). Cada edición del CMS lleva: titulo, slug (o id), numero, fecha y pdf (el archivo subido); y, si se quiere, portada (imagen; sin ella se usa la primera página del PDF), descripcion, subtitulo y entradilla (los textos que acompañan a la portada en la cabecera de la web), etiqueta, color (edem | lanzadera | angels | neutral), nota (la nota a mano del kiosko), paginas y ultima (sí/no). La última edición es la marcada como ultima o, si ninguna, la de fecha más reciente. Si el PDF se sirve desde otro dominio, ese servidor tiene que permitir CORS (cabecera Access-Control-Allow-Origin) y conviene exportarlo optimizado para web.",
     "activo": false,
@@ -20,13 +22,43 @@
     "_ayuda": "Cabecera y pie de TODAS las páginas (portada, portal de noticias y noticia): se escriben una vez aquí y js/shell.js los pinta en las tres. «#seccion» se queda dentro de la página si esa sección existe y si no salta a index.html#seccion; el enlace a la página en la que estás no se pinta; «icon» es un icono de js/icons.js y solo se ve en el menú móvil; «menu: true» = solo en el menú móvil, nunca en la barra; «pages» limita un enlace a ciertas páginas.",
     "navMax": 4,
     "nav": [
-      { "label": "Buscar", "icon": "search", "action": "buscar", "menu": true },
-      { "label": "Portada", "href": "index.html", "icon": "anchor" },
-      { "label": "Kiosko", "href": "#kiosko", "icon": "library" },
-      { "label": "Actualidad", "href": "noticias.html", "icon": "newspaper", "menu": true },
-      { "label": "Conócenos", "href": "#conocenos", "icon": "book-marked" },
-      { "label": "Ecosistema", "href": "#ecosistema", "icon": "waypoints" },
-      { "label": "Suscríbete", "href": "#suscribete", "icon": "mail" }
+      {
+        "label": "Buscar",
+        "icon": "search",
+        "action": "buscar",
+        "menu": true
+      },
+      {
+        "label": "Portada",
+        "href": "index.html",
+        "icon": "anchor"
+      },
+      {
+        "label": "Kiosko",
+        "href": "#kiosko",
+        "icon": "library"
+      },
+      {
+        "label": "Actualidad",
+        "href": "noticias.html",
+        "icon": "newspaper",
+        "menu": true
+      },
+      {
+        "label": "Conócenos",
+        "href": "#conocenos",
+        "icon": "book-marked"
+      },
+      {
+        "label": "Ecosistema",
+        "href": "#ecosistema",
+        "icon": "waypoints"
+      },
+      {
+        "label": "Suscríbete",
+        "href": "#suscribete",
+        "icon": "mail"
+      }
     ],
     "footer": {
       "tagline": "Empresarios formando a empresarios",
@@ -34,38 +66,89 @@
         {
           "h": "EDEM Times",
           "links": [
-            { "label": "Portada", "href": "index.html" },
-            { "label": "Actualidad", "href": "noticias.html" },
-            { "label": "Kiosko de revistas", "href": "#kiosko" },
-            { "label": "Participar en la revista", "href": "#conocenos" }
+            {
+              "label": "Portada",
+              "href": "index.html"
+            },
+            {
+              "label": "Actualidad",
+              "href": "noticias.html"
+            },
+            {
+              "label": "Kiosko de revistas",
+              "href": "#kiosko"
+            },
+            {
+              "label": "Participar en la revista",
+              "href": "#conocenos"
+            }
           ]
         },
-        { "h": "Ediciones", "issues": true },
+        {
+          "h": "Ediciones",
+          "issues": true
+        },
         {
           "h": "Marina de Empresas",
           "links": [
-            { "label": "EDEM Escuela de Empresarios", "href": "https://edem.eu/" },
-            { "label": "Lanzadera", "href": "https://lanzadera.es/" },
-            { "label": "Angels", "href": "https://www.angelscapital.es/" },
-            { "label": "Marina de Empresas", "href": "https://marinadeempresas.es/" }
+            {
+              "label": "EDEM Escuela de Empresarios",
+              "href": "https://edem.eu/"
+            },
+            {
+              "label": "Lanzadera",
+              "href": "https://lanzadera.es/"
+            },
+            {
+              "label": "Angels",
+              "href": "https://www.angelscapital.es/"
+            },
+            {
+              "label": "Marina de Empresas",
+              "href": "https://marinadeempresas.es/"
+            }
           ]
         },
         {
           "h": "Recursos",
           "links": [
-            { "label": "Suscríbete a las novedades", "href": "#suscribete" },
-            { "label": "Proponer un tema", "href": "mailto:comunicacion@edem.es?subject=Tengo%20un%20tema%20para%20EDEM%20Times" },
-            { "label": "Contacto", "href": "mailto:comunicacion@edem.es" },
-            { "label": "Sistema de diseño", "action": "ds", "pages": ["index.html"] }
+            {
+              "label": "Suscríbete a las novedades",
+              "href": "#suscribete"
+            },
+            {
+              "label": "Proponer un tema",
+              "href": "mailto:comunicacion@edem.es?subject=Tengo%20un%20tema%20para%20EDEM%20Times"
+            },
+            {
+              "label": "Contacto",
+              "href": "mailto:comunicacion@edem.es"
+            },
+            {
+              "label": "Sistema de diseño",
+              "action": "ds",
+              "pages": [
+                "index.html"
+              ]
+            }
           ]
         }
       ],
       "base": {
         "copyright": "© {year} EDEM · Escuela de Empresarios",
         "legal": [
-          { "label": "Aviso legal", "href": "https://edem.eu/aviso-legal/" },
-          { "label": "Privacidad", "href": "https://edem.eu/privacidad/" },
-          { "label": "Cookies", "href": "https://edem.eu/politica-de-cookies/" }
+          {
+            "label": "Aviso legal",
+            "href": "https://edem.eu/aviso-legal/"
+          },
+          {
+            "label": "Privacidad",
+            "href": "https://edem.eu/privacidad/"
+          },
+          {
+            "label": "Cookies",
+            "href": "https://edem.eu/politica-de-cookies/"
+          }
         ],
         "note": "Parte de Marina de Empresas · Lanzadera · Angels"
       }
@@ -91,7 +174,11 @@
         "num": "2",
         "sub": "El arte de hacer que las cosas funcionen",
         "lead": "24 páginas a toda máquina: la crónica del Hackathon desde dentro, una entrevista cruzada alumno × mentora, el radar de Lanzadera, las métricas que mira Angels y pasatiempos para el trayecto de vuelta.",
-        "chips": ["24 páginas", "Edición física + digital", "Marina de Empresas"]
+        "chips": [
+          "24 páginas",
+          "Edición física + digital",
+          "Marina de Empresas"
+        ]
       }
     },
     {
@@ -159,19 +246,48 @@
     }
   ],
   "join": {
-    "_ayuda": "Sección «Conócenos»: la invitación a participar en la revista. Las formas de participar se encienden una a una con el scroll.",
+    "_ayuda": "Sección «Conócenos»: la invitación a participar en la revista, presentada como la mancheta (el staff) del próximo número. Cada puesto de `roles` es una fila (area = nombre del puesto, t = verbo, d = qué se hace) y enlaza al correo de `cta` con el verbo añadido al asunto. `facts` son las tres comprobaciones bajo los botones.",
     "kicker": "Conócenos",
     "titleHtml": "La revista<br>la haces tú<span class=\"pt\">.</span>",
     "lead": "EDEM Times la escriben, la fotografían y la maquetan alumnos de EDEM. No hace falta experiencia previa: hace falta tener ganas de contar lo que pasa aquí dentro. Cada edición abre la redacción — y siempre queda sitio.",
-    "note": "Redacción abierta a todos los grados y másteres",
-    "cta": { "label": "Quiero participar", "url": "mailto:comunicacion@edem.es?subject=Quiero%20participar%20en%20EDEM%20Times" },
-    "roles": [
-      { "t": "Escribe", "d": "Crónicas, entrevistas, columnas y hasta los pasatiempos. Si tienes algo que contar, tienes página." },
-      { "t": "Fotografía", "d": "El campus, la Marina, los eventos. Una buena foto abre sección y se queda en el papel." },
-      { "t": "Diseña", "d": "Maqueta, ilustra, inventa portadas. El papel admite cualquier idea que aguante la imprenta." },
-      { "t": "Edita", "d": "Cierra temas, corrige, decide el sumario. Se aprende haciendo — y aquí se hace una revista de verdad." }
+    "cta": {
+      "label": "Quiero participar",
+      "url": "mailto:comunicacion@edem.es?subject=Quiero%20participar%20en%20EDEM%20Times"
+    },
+    "facts": [
+      "Abierta a todos los grados y másteres",
+      "Sin experiencia previa",
+      "Cada número abre la redacción"
     ],
-    "ticker": ["Escribe", "Fotografía", "Diseña", "Edita", "Difunde", "Entrevista", "Propón"]
+    "staff": {
+      "label": "Staff",
+      "title": "Quién hace este número",
+      "slot": "¿tú?",
+      "stamp": "¡Se busca!",
+      "foot": "Pulsa un puesto y escribe a la redacción: el asunto ya va puesto."
+    },
+    "roles": [
+      {
+        "area": "Redacción",
+        "t": "Escribe",
+        "d": "Crónicas, entrevistas, columnas y hasta los pasatiempos. Si tienes algo que contar, tienes página."
+      },
+      {
+        "area": "Imagen",
+        "t": "Fotografía",
+        "d": "El campus, la Marina, los eventos. Una buena foto abre sección y se queda en el papel."
+      },
+      {
+        "area": "Diseño y maquetación",
+        "t": "Diseña",
+        "d": "Maqueta, ilustra, inventa portadas. El papel admite cualquier idea que aguante la imprenta."
+      },
+      {
+        "area": "Edición",
+        "t": "Edita",
+        "d": "Cierra temas, corrige, decide el sumario. Se aprende haciendo — y aquí se hace una revista de verdad."
+      }
+    ]
   },
   "ecosystem": [
     {
@@ -183,7 +299,8 @@
       "desc": "Escuela de empresarios y directivos en Valencia. Grados, másteres y alta dirección con una regla: se aprende haciendo.",
       "img": "assets/img/eco-edem.jpg",
       "alt": "Fachada de EDEM en la Marina de València, con la grúa del puerto al lado",
-      "meta": "Aquí se hace esta revista"
+      "meta": "Aquí se hace esta revista",
+      "focus": "26% 50%"
     },
     {
       "name": "Lanzadera",
@@ -194,7 +311,8 @@
       "desc": "La aceleradora que empuja startups desde el muelle de la Marina hasta el mercado. Su radar llena páginas de esta revista.",
       "img": "assets/img/eco-lanzadera.jpg",
       "alt": "Equipo de una startup trabajando en las oficinas de Lanzadera",
-      "meta": "Sección «Radar Lanzadera»"
+      "meta": "Sección «Radar Lanzadera»",
+      "focus": "36% 50%"
     },
     {
       "name": "Angels",
@@ -209,8 +327,20 @@
     }
   ],
   "social": [
-    { "id": "linkedin", "label": "LinkedIn", "url": "https://www.linkedin.com/school/edem-escuela-de-empresarios/" },
-    { "id": "instagram", "label": "Instagram", "url": "https://www.instagram.com/edemempresarios/" },
-    { "id": "youtube", "label": "YouTube", "url": "https://www.youtube.com/user/EDEMEmpresariosEs" }
+    {
+      "id": "linkedin",
+      "label": "LinkedIn",
+      "url": "https://www.linkedin.com/school/edem-escuela-de-empresarios/"
+    },
+    {
+      "id": "instagram",
+      "label": "Instagram",
+      "url": "https://www.instagram.com/edemempresarios/"
+    },
+    {
+      "id": "youtube",
+      "label": "YouTube",
+      "url": "https://www.youtube.com/user/EDEMEmpresariosEs"
+    }
   ]
 }

@@ -60,19 +60,20 @@ const DEFAULTS = {
     kicker: 'Conócenos',
     titleHtml: 'La revista<br>la haces tú<span class="pt">.</span>',
     lead: 'EDEM Times la escriben, la fotografían y la maquetan alumnos de EDEM. No hace falta experiencia previa: hace falta tener ganas de contar lo que pasa aquí dentro. Cada edición abre la redacción — y siempre queda sitio.',
-    note: 'Redacción abierta a todos los grados y másteres',
     cta: { label: 'Quiero participar', url: 'mailto:comunicacion@edem.es?subject=Quiero%20participar%20en%20EDEM%20Times' },
+    facts: ['Abierta a todos los grados y másteres', 'Sin experiencia previa', 'Cada número abre la redacción'],
+    staff: { label: 'Staff', title: 'Quién hace este número', slot: '¿tú?', stamp: '¡Se busca!',
+      foot: 'Pulsa un puesto y escribe a la redacción: el asunto ya va puesto.' },
     roles: [
-      { t: 'Escribe', d: 'Crónicas, entrevistas, columnas y hasta los pasatiempos. Si tienes algo que contar, tienes página.' },
-      { t: 'Fotografía', d: 'El campus, la Marina, los eventos. Una buena foto abre sección y se queda en el papel.' },
-      { t: 'Diseña', d: 'Maqueta, ilustra, inventa portadas. El papel admite cualquier idea que aguante la imprenta.' },
-      { t: 'Edita', d: 'Cierra temas, corrige, decide el sumario. Se aprende haciendo — y aquí se hace una revista de verdad.' }
-    ],
-    ticker: ['Escribe', 'Fotografía', 'Diseña', 'Edita', 'Difunde', 'Entrevista', 'Propón']
+      { area: 'Redacción', t: 'Escribe', d: 'Crónicas, entrevistas, columnas y hasta los pasatiempos. Si tienes algo que contar, tienes página.' },
+      { area: 'Imagen', t: 'Fotografía', d: 'El campus, la Marina, los eventos. Una buena foto abre sección y se queda en el papel.' },
+      { area: 'Diseño y maquetación', t: 'Diseña', d: 'Maqueta, ilustra, inventa portadas. El papel admite cualquier idea que aguante la imprenta.' },
+      { area: 'Edición', t: 'Edita', d: 'Cierra temas, corrige, decide el sumario. Se aprende haciendo — y aquí se hace una revista de verdad.' }
+    ]
   },
   ecosystem: [
-    { name: 'EDEM', role: 'Formar', color: 'edem', url: 'https://edem.eu/', logo: 'assets/edem-logo-white.png', desc: 'Escuela de empresarios y directivos en Valencia. Grados, másteres y alta dirección con una regla: se aprende haciendo.', img: 'assets/img/eco-edem.jpg', alt: 'Fachada de EDEM en la Marina de València, con la grúa del puerto al lado', meta: 'Aquí se hace esta revista' },
-    { name: 'Lanzadera', role: 'Acelerar', color: 'lanzadera', url: 'https://lanzadera.es/', logo: 'assets/logo-lanzadera-white.png', desc: 'La aceleradora que empuja startups desde el muelle de la Marina hasta el mercado. Su radar llena páginas de esta revista.', img: 'assets/img/eco-lanzadera.jpg', alt: 'Equipo de una startup trabajando en las oficinas de Lanzadera', meta: 'Sección «Radar Lanzadera»' },
+    { name: 'EDEM', role: 'Formar', color: 'edem', url: 'https://edem.eu/', logo: 'assets/edem-logo-white.png', desc: 'Escuela de empresarios y directivos en Valencia. Grados, másteres y alta dirección con una regla: se aprende haciendo.', img: 'assets/img/eco-edem.jpg', focus: '26% 50%', alt: 'Fachada de EDEM en la Marina de València, con la grúa del puerto al lado', meta: 'Aquí se hace esta revista' },
+    { name: 'Lanzadera', role: 'Acelerar', color: 'lanzadera', url: 'https://lanzadera.es/', logo: 'assets/logo-lanzadera-white.png', desc: 'La aceleradora que empuja startups desde el muelle de la Marina hasta el mercado. Su radar llena páginas de esta revista.', img: 'assets/img/eco-lanzadera.jpg', focus: '36% 50%', alt: 'Equipo de una startup trabajando en las oficinas de Lanzadera', meta: 'Sección «Radar Lanzadera»' },
     { name: 'Angels', role: 'Invertir', color: 'angels', url: 'https://www.angelscapital.es/', logo: 'assets/logo-angels-white.png', desc: 'La sociedad de inversión de Juan Roig. Capital y criterio para los líderes que eligen la opción difícil.', img: 'assets/img/eco-angels.jpg', alt: 'Público de inversores en el Investors Day de Angels', meta: 'Sección «Angels»' }
   ],
   social: [
@@ -109,9 +110,9 @@ let MAGS = DEFAULTS.issues;
    cuando de verdad pueden haber cambiado: al redimensionar, al llegar las
    webfonts, al retirarse la cortina de carga y al terminar de cargar la página.
 
-   Nota sobre `docTop`: vale para bloques en flujo normal. Los paneles sticky
-   (.epanel) NO se pueden cachear así —su rect.top lo clava el propio sticky—,
-   así que esos se siguen midiendo en vivo. */
+   Nota sobre `docTop`: vale para bloques en flujo normal. Un elemento sticky
+   NO se puede cachear así —su rect.top lo clava el propio sticky—: si alguno
+   lo necesita, hay que medirlo en vivo. */
 const scrollJobs = [];
 let busTick = false;
 function busFrame() { busTick = false; for (let i = 0; i < scrollJobs.length; i++) scrollJobs[i](); }
@@ -599,327 +600,113 @@ function bindKiosko() {
    portada del diario digital, que pinta js/news.js con data/noticias.json (o con
    el CMS headless). */
 
-/* ---------- Conócenos: la invitación a hacer la revista ----------
-   La sección se clava (.jstage sticky) y el scroll va encendiendo las formas de
-   participar, una a una, mientras la barra de la derecha marca el recorrido.
-   Mismo patrón de rendimiento que el resto de efectos: un rAF por frame y solo
-   clases y transform — nada que obligue a recalcular layout. */
-/* Fondos flat: una escena de formas planas por forma de participar. Sin
-   degradados ni desenfoques — círculos, rectángulos y triángulos de color
-   plano. Cada escena lleva su fondo y su acento, que también tiñe las cajas.
-   Si hay más formas que escenas, el ciclo se repite. */
-const JOIN_SCENES = [
-  /* 1 · ESCRIBE — la columna del periódico: el filete de sección, el renglonado
-     de una columna justificada y la comilla de apertura en el coral de la casa. */
-  { bg: '#06333f', acc: '#e8502d', art:
-    '<g class="sh" style="--d:.05s;--dx:40px">' +
-      '<rect x="880" y="150" width="470" height="3" fill="#e8502d"/>' +
-      '<rect x="880" y="150" width="120" height="9" fill="#e8502d"/>' +
-    '</g>' +
-    '<g class="sh" style="--d:.14s;--dx:30px" fill="#ffffff" opacity=".13">' +
-      '<rect x="880" y="196" width="470" height="13" rx="2"/>' +
-      '<rect x="880" y="224" width="470" height="13" rx="2"/>' +
-      '<rect x="880" y="252" width="392" height="13" rx="2"/>' +
-    '</g>' +
-    '<text class="sh" style="--d:.22s;--dy:40px" x="866" y="880" font-family="Bodoni Moda,Georgia,serif" font-weight="900" font-size="300" fill="#e8502d" opacity=".55">&#8220;</text>' +
-    '<g class="sh" style="--d:.3s;--dy:40px" fill="#ffffff" opacity=".11">' +
-      '<rect x="1060" y="672" width="290" height="12" rx="2"/>' +
-      '<rect x="1060" y="700" width="290" height="12" rx="2"/>' +
-      '<rect x="1060" y="728" width="290" height="12" rx="2"/>' +
-      '<rect x="1060" y="756" width="206" height="12" rx="2"/>' +
-    '</g>' +
-    '<rect class="sh" style="--d:.38s;--dy:40px" x="1324" y="672" width="26" height="26" fill="#e8502d" opacity=".85"/>' },
+/* ---------- Conócenos: la mancheta del próximo número ----------
+   La invitación a hacer la revista se presenta como lo que es: la página de
+   créditos (la mancheta, el «staff») del número que viene, con los puestos
+   abiertos y el hueco del nombre esperando a quien lo quiera. Cada puesto es un
+   enlace al correo de la redacción con el puesto ya escrito en el asunto.
+   Antes la sección se clavaba 3,4 pantallas para ir encendiendo las formas de
+   participar con el scroll, sobre un fondo de dibujos planos que competía con
+   el texto: mucho recorrido para cuatro frases. Ahora se lee de un vistazo y no
+   cuelga nada del bus de scroll. */
 
-  /* 2 · FOTOGRAFÍA — el visor: escuadras de encuadre, el diafragma abierto y la
-     retícula de enfoque. Todo hueco (solo trazo), que es como se ve un visor. */
-  { bg: '#0b2a38', acc: '#008aad', art:
-    '<g class="sh" style="--d:.05s;--dx:40px" fill="none" stroke="#ffffff" stroke-opacity=".26" stroke-width="4">' +
-      '<path d="M840 190 L840 140 L900 140"/><path d="M1400 190 L1400 140 L1340 140"/>' +
-      '<path d="M840 700 L840 750 L900 750"/><path d="M1400 700 L1400 750 L1340 750"/>' +
-    '</g>' +
-    '<circle class="sh" style="--d:.14s" cx="1120" cy="445" r="172" fill="none" stroke="#008aad" stroke-width="3" opacity=".85"/>' +
-    '<g class="sh" style="--d:.2s" fill="none" stroke="#ffffff" stroke-opacity=".18" stroke-width="2.5">' +
-      '<path d="M1120 273 L1269 359"/><path d="M1269 359 L1269 531"/><path d="M1269 531 L1120 617"/>' +
-      '<path d="M1120 617 L971 531"/><path d="M971 531 L971 359"/><path d="M971 359 L1120 273"/>' +
-    '</g>' +
-    '<circle class="sh" style="--d:.28s" cx="1120" cy="445" r="62" fill="#008aad" opacity=".55"/>' +
-    '<g class="sh" style="--d:.36s" stroke="#ffffff" stroke-opacity=".3" stroke-width="2.5">' +
-      '<path d="M1120 380 L1120 410"/><path d="M1120 480 L1120 510"/>' +
-      '<path d="M1055 445 L1085 445"/><path d="M1155 445 L1185 445"/>' +
-    '</g>' +
-    '<circle class="sh" style="--d:.44s;--dy:-30px" cx="1372" cy="196" r="11" fill="#e8502d" opacity=".9"/>' },
+// el correo de la redacción con el puesto añadido al asunto
+function roleMail(url, role) {
+  if (!/^mailto:/i.test(url || '')) return url || '';
+  const [base, query = ''] = url.split('?');
+  let found = false;
+  const parts = (query ? query.split('&') : []).map(p => {
+    const [k, v = ''] = p.split('=');
+    if (k.toLowerCase() !== 'subject') return p;
+    found = true;
+    let subj; try { subj = decodeURIComponent(v); } catch (_) { subj = v; }
+    return 'subject=' + encodeURIComponent(subj + ' · ' + role);
+  });
+  if (!found) parts.push('subject=' + encodeURIComponent(role));
+  return base + '?' + parts.join('&');
+}
 
-  /* 3 · DISEÑA — la retícula de maquetación: cajas de columna, una masa de color
-     colocada y el círculo de una imagen que se sale de su caja. */
-  { bg: '#132749', acc: '#e8502d', art:
-    '<g class="sh" style="--d:.05s;--dx:40px" fill="none" stroke="#ffffff" stroke-opacity=".2" stroke-width="2">' +
-      '<rect x="860" y="160" width="150" height="580"/><rect x="1030" y="160" width="150" height="580"/>' +
-      '<rect x="1200" y="160" width="150" height="580"/>' +
-    '</g>' +
-    '<rect class="sh" style="--d:.14s;--dy:40px" x="1030" y="430" width="150" height="310" fill="#e8502d" opacity=".78"/>' +
-    '<circle class="sh" style="--d:.22s" cx="1180" cy="330" r="128" fill="#74c1d5" opacity=".5"/>' +
-    '<g class="sh" style="--d:.3s;--dx:20px" fill="#ffffff" opacity=".14">' +
-      '<rect x="875" y="182" width="120" height="9" rx="2"/><rect x="875" y="202" width="120" height="9" rx="2"/>' +
-      '<rect x="875" y="222" width="120" height="9" rx="2"/><rect x="875" y="242" width="78" height="9" rx="2"/>' +
-    '</g>' +
-    '<g class="sh" style="--d:.38s;--dy:30px" fill="none" stroke="#ffffff" stroke-opacity=".22" stroke-width="2">' +
-      '<path d="M820 160 L820 740"/><path d="M1390 160 L1390 740"/>' +
-      '<path d="M820 160 L860 160"/><path d="M820 740 L860 740"/>' +
-      '<path d="M1350 160 L1390 160"/><path d="M1350 740 L1390 740"/>' +
-    '</g>' },
-
-  /* 4 · EDITA — las marcas de corrección sobre las galeradas: el calderón, un
-     par de líneas tachadas, el signo de intercalar y el visto del cierre. */
-  { bg: '#0e2129', acc: '#008aad', art:
-    '<text class="sh" style="--d:.05s;--dy:40px" x="1216" y="856" font-family="Bodoni Moda,Georgia,serif" font-weight="900" font-size="210" fill="#008aad" opacity=".6">&#182;</text>' +
-    '<g class="sh" style="--d:.14s;--dx:30px" fill="#ffffff" opacity=".12">' +
-      '<rect x="1010" y="176" width="340" height="12" rx="2"/><rect x="1010" y="206" width="340" height="12" rx="2"/>' +
-      '<rect x="1010" y="236" width="260" height="12" rx="2"/>' +
-    '</g>' +
-    '<path class="sh" style="--d:.22s" d="M1010 212 L1350 212" stroke="#e8502d" stroke-width="4" opacity=".9"/>' +
-    '<g class="sh" style="--d:.3s;--dy:40px" fill="#ffffff" opacity=".10">' +
-      '<rect x="866" y="430" width="484" height="12" rx="2"/><rect x="866" y="460" width="484" height="12" rx="2"/>' +
-      '<rect x="866" y="490" width="484" height="12" rx="2"/><rect x="866" y="520" width="360" height="12" rx="2"/>' +
-    '</g>' +
-    '<path class="sh" style="--d:.38s;--dy:30px" d="M1080 452 L1108 424 L1136 452" fill="none" stroke="#008aad" stroke-width="4" opacity=".9"/>' +
-    '<path class="sh" style="--d:.46s;--dy:40px" d="M880 660 L942 722 L1074 590" fill="none" stroke="#008aad" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity=".8"/>' }
-];
-
-function renderJoinScenes(n) {
-  const host = $('jscenes');
-  if (!host) return;
-  host.innerHTML = Array.from({ length: n }, (_, i) => {
-    const s = JOIN_SCENES[i % JOIN_SCENES.length];
-    return '<div class="jscene" data-jscene="' + i + '" data-bg="' + s.bg + '" data-acc="' + s.acc + '">' +
-      '<svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + s.art + '</svg></div>';
-  }).join('');
+// el número que viene: el de la última edición más uno (como la pinza libre del kiosko)
+function nextIssueLabel() {
+  const nr = /(\d+)/.exec(latestIssue().nr || '');
+  return nr ? 'Nº ' + (+nr[1] + 1) : 'Próximo número';
 }
 
 function renderJoin() {
-  const j = C.join || DEFAULTS.join;
+  const j = C.join || DEFAULTS.join, D = DEFAULTS.join;
   $('join-kicker').textContent = j.kicker || 'Conócenos';
-  $('join-title').innerHTML = j.titleHtml || '';
+  $('join-title').innerHTML = safeTitleHtml(j.titleHtml || D.titleHtml);
   $('join-lead').textContent = j.lead || '';
   const cta = j.cta || {};
   $('join-acts').innerHTML =
     (cta.url ? '<a class="btn pri" href="' + esc(cta.url) + '"><i data-lucide="mail" class="lu"></i> ' + esc(cta.label || 'Quiero participar') + '</a>' : '') +
-    '<button class="btn ghost lt" data-open-visor><i data-lucide="book-open" class="lu"></i> Leer</button>' +
-    (j.note ? '<span class="jnote">' + esc(j.note) + '</span>' : '');
-  $('jroles').innerHTML = (j.roles || []).map((r, i) =>
-    '<li><button class="jrole" type="button" data-jrole="' + i + '" aria-expanded="false">' +
-    '<span class="jn">' + String(i + 1).padStart(2, '0') + '</span>' +
-    '<span class="jt disp">' + esc(r.t) + '</span>' +
-    '<span class="jd"><span>' + esc(r.d) + '</span></span></button></li>').join('');
-  // el rótulo del pie va dos veces: así el bucle del carrusel no tiene costura
-  const words = (j.ticker && j.ticker.length ? j.ticker : (j.roles || []).map(r => r.t));
-  const strip = words.map(w => '<span>' + esc(w) + '</span>').join('');
-  $('jtrack').innerHTML = strip + strip;
-  renderJoinScenes((j.roles || []).length || 1);
-  observeJoin();
+    '<button class="btn ghost lt" data-open-visor><i data-lucide="book-open" class="lu"></i> Leer el último número</button>';
+  $('join-facts').innerHTML = (j.facts || D.facts || []).map(f =>
+    '<li><i data-lucide="check" class="lu"></i><span>' + esc(f) + '</span></li>').join('');
+
+  // la mancheta
+  const roles = j.roles || [], staff = j.staff || D.staff || {};
+  $('jstaff').innerHTML =
+    '<div class="jsheet">' +
+      '<span class="jstamp" aria-hidden="true">' + esc(staff.stamp || '¡Se busca!') + '</span>' +
+      '<div class="jsh-head">' +
+        '<span class="jsh-brand" aria-hidden="true"><img src="assets/edem-logo.png" alt="" width="800" height="188" loading="lazy" decoding="async"><span class="t">times<span class="pt">.</span></span></span>' +
+        '<span class="jsh-nr over">' + esc(nextIssueLabel()) + ' · ' + esc(staff.label || 'Staff') + '</span>' +
+      '</div>' +
+      '<p class="jsh-title disp">' + esc(staff.title || 'Quién hace este número') + '</p>' +
+      '<ol class="jsh-list">' + roles.map((r, i) =>
+        '<li><a class="jsh-row" href="' + esc(roleMail(cta.url, r.t)) + '" style="--i:' + i + '">' +
+          '<span class="jsh-n">' + String(i + 1).padStart(2, '0') + '</span>' +
+          '<span class="jsh-main">' +
+            (r.area ? '<span class="jsh-area over">' + esc(r.area) + '</span>' : '') +
+            '<span class="jsh-line"><span class="jsh-verb disp">' + esc(r.t) + '</span>' +
+              '<span class="jsh-dots" aria-hidden="true"></span>' +
+              '<span class="jsh-slot">' + esc(staff.slot || '¿tú?') + '</span></span>' +
+            '<span class="jsh-desc">' + esc(r.d) + '</span>' +
+          '</span></a></li>').join('') +
+      '</ol>' +
+      (staff.foot ? '<p class="jsh-foot">' + esc(staff.foot) + '</p>' : '') +
+    '</div>';
+
 }
 
-let joinBound = false, joinCards = [], joinScenes = [], joinCur = -1, joinLock = 0;
+/* ---------- Ecosistema: Marina de Empresas ----------
+   Tres fichas en fila, en el orden en que empujan a una persona (formar →
+   acelerar → invertir) y unidas por una línea con flecha. La foto va en
+   duotono del color de cada marca —el mismo con el que firma su sección en la
+   revista— y recupera su color al pasar por encima.
+   Antes era un mazo de fichas sticky que se montaban unas sobre otras: el raíl
+   repetía los tres nombres, entre ficha y ficha quedaba media pantalla vacía y
+   la de debajo asomaba recortada. Ahora no hay nada clavado ni medido con el
+   scroll: el fondo de señales que se desplazaba con --ecoP también se ha ido. */
+// las luces del duotono: el color de cada marca aclarado (las sombras son el
+// fondo de la sección, el mismo para las tres)
+const ECO_TONES = { edem: '#9ad6e6', lanzadera: '#ffb39b', angels: '#b3b1f2', neutral: '#cfd9dc' };
+const hostOf = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (_) { return ''; } };
 
-/* enciende la escena de fondo i y pasa su fondo y su acento a la sección:
-   el mismo color plano manda en el fondo, en la caja activa y en la barra */
-function setJoinScene(i) {
-  if (!joinScenes.length) return;
-  const k = Math.min(joinScenes.length - 1, Math.max(0, i));
-  joinScenes.forEach((s, n) => s.classList.toggle('on', n === k));
-  const sec = $('conocenos'), sc = joinScenes[k];
-  if (sec && sc) {
-    sec.style.setProperty('--jbg', sc.dataset.bg);
-    sec.style.setProperty('--jacc', sc.dataset.acc);
-  }
-}
-const JOIN_FLAT = matchMedia('(max-width:1020px)');
-// en móvil (y con movimiento reducido) no hay clavado: se abren todas
-const joinFlat = () => REDUCED.matches || JOIN_FLAT.matches;
-
-function setJoinRole(i) {
-  if (i === joinCur) return;
-  joinCur = i;
-  setJoinScene(i);
-  joinCards.forEach((b, k) => {
-    const on = k === i;
-    b.classList.toggle('on', on);
-    b.setAttribute('aria-expanded', String(on));
-  });
-}
-
-/* Las dos alturas de la sección (la del bloque y la del escenario clavado) NO
-   cambian al hacer scroll: se miden en measureAll() y aquí solo se lee scrollY.
-   Así el frame de scroll no vuelve a pedirle el layout al navegador. */
-let joinTop = 0, joinRange = 1;
-function joinRemeasure() {
-  const sec = $('conocenos'), stage = sec && sec.querySelector('.jstage');
-  if (!sec || !stage) return;
-  joinTop = docTop(sec);
-  joinRange = Math.max(1, sec.offsetHeight - stage.offsetHeight);
-}
-
-function joinMeasure() {
-  const sec = $('conocenos');
-  if (!sec || !joinCards.length) return;
-  if (joinFlat()) {
-    joinCur = -1;
-    setJoinScene(0);                                 // sin clavado, una sola escena
-    joinCards.forEach(b => { b.classList.add('on'); b.setAttribute('aria-expanded', 'true'); });
-    return;
-  }
-  const top = joinTop - window.scrollY;              // lo que daría getBoundingClientRect
-  if (top + sec.offsetHeight < 0 || top > viewH()) return;
-  const p = Math.min(1, Math.max(0, -top / joinRange));
-  const bar = $('jbar');
-  if (bar) bar.style.transform = 'scaleY(' + (0.05 + p * 0.95).toFixed(3) + ')';
-  if (Date.now() < joinLock) return;                 // un clic reciente manda sobre el scroll
-  setJoinRole(Math.min(joinCards.length - 1, Math.floor(p * joinCards.length)));
-}
-
-function observeJoin() {
-  joinCards = [...document.querySelectorAll('[data-jrole]')];
-  joinScenes = [...document.querySelectorAll('[data-jscene]')];
-  joinCur = -1;
-  setJoinScene(0);
-  if (!joinCards.length) return;
-  if (joinBound) { joinRemeasure(); joinMeasure(); return; }
-  joinBound = true;
-  onMeasure(joinRemeasure);
-  joinMeasure();
-  onScroll(joinMeasure);
-  onMQ(JOIN_FLAT, () => { joinCur = -1; joinRemeasure(); joinMeasure(); });
-  $('jroles').addEventListener('click', e => {
-    const b = e.target.closest('[data-jrole]');
-    if (!b || joinFlat()) return;
-    joinLock = Date.now() + 2600;
-    setJoinRole(+b.dataset.jrole);
-  });
-}
-
-/* Tríptico apilado: cada ficha es sticky y se queda clavada mientras la
-   siguiente sube a taparla, dejando asomar el borde superior de la anterior
-   (de ahí el desfase por --i). El raíl de la izquierda marca la activa. */
 function renderEcosystem() {
-  $('egrid').innerHTML = C.ecosystem.map((e, i) =>
-    '<article class="epanel" id="eco-' + i + '" style="--acc:' + color(e.color) + ';--i:' + i + '" data-eco="' + i + '">' +
-    '<div class="epanel-in">' +
-    '<figure class="ephoto"><img src="' + esc(e.img) + '" alt="' + esc(e.alt || '') + '" loading="lazy" decoding="async"></figure>' +
-    '<div class="ecopy">' +
-    '<div class="ehead"><span class="eidx">' + String(i + 1).padStart(2, '0') + '</span>' +
-    '<span class="role disp">' + esc(e.role) + '</span></div>' +
-    // la marca se firma con su logotipo en blanco, no con el nombre escrito
-    '<h3 class="elogoh">' + (e.logo
-      ? '<img class="elogo" src="' + esc(e.logo) + '" alt="' + esc(e.name) + '" loading="lazy" decoding="async">'
-      : '<span class="disp">' + esc(e.name) + '</span>') + '</h3>' +
-    '<p class="edesc">' + esc(e.desc) + '</p>' +
-    (e.meta ? '<p class="emeta">' + esc(e.meta) + '</p>' : '') +
-    '<a class="elink" href="' + esc(e.url) + '" target="_blank" rel="noopener">Visitar ' + esc(e.name) + ' <i data-lucide="arrow-up-right" class="lu"></i></a>' +
-    '</div></div></article>').join('');
-
-  $('econav').innerHTML = C.ecosystem.map((e, i) =>
-    '<li><a href="#eco-' + i + '" style="--acc:' + color(e.color) + '" data-econav="' + i + '">' +
-    '<span class="n">' + String(i + 1).padStart(2, '0') + '</span>' +
-    '<span class="v">' + esc(e.role) + '</span>' +
-    '<span class="b">' + (e.logo
-      ? '<img class="enavlogo" src="' + esc(e.logo) + '" alt="' + esc(e.name) + '" loading="lazy" decoding="async">'
-      : esc(e.name)) + '</span></a></li>').join('');
-
-  observeEcosystem();
-}
-
-/* La ficha activa es la última cuyo borde superior ya ha pasado la línea de
-   anclaje; así el raíl sigue al apilado y no a la visibilidad (con las fichas
-   montadas unas sobre otras, un IntersectionObserver se queda corto).
-   Solo se mide mientras la sección está cerca de pantalla, y con un rAF por
-   frame como el resto de efectos de scroll. */
-let ecoBound = false, ecoPanels = [], ecoLinks = [], ecoCur = -1;
-
-/* El raíl y las fichas se sueltan del sticky cuando su caja deja de caber en el
-   contenedor, así que solo se mueven juntos si miden lo mismo (el CSS les da a
-   ambos --eco-card-h y el mismo margen inferior). El alto base es un min-height:
-   si un texto largo estira una ficha por encima, aquí se propaga el alto real
-   para que el raíl lo siga y el titular no se quede clavado mientras el mazo ya
-   sube — que es lo que recortaba las esquinas superiores contra el borde. */
-function ecoSyncHeights() {
-  const wrap = document.querySelector('.ecowrap');
-  if (!wrap || !ecoPanels.length) return;
-  wrap.style.removeProperty('--eco-card-h');          // vuelve al valor del CSS...
-  const h = Math.max(...ecoPanels.map(p => p.offsetHeight));   // ...y se mide
-  wrap.style.setProperty('--eco-card-h', h + 'px');
-}
-
-let ecoPrev = -1;
-
-/* alto y posición de la sección: no cambian al hacer scroll */
-let ecoTop = 0, ecoH = 0;
-function ecoRemeasure() {
-  const sec = $('ecosistema');
-  if (!sec) return;
-  ecoTop = docTop(sec); ecoH = sec.offsetHeight;
-}
-
-function ecoMeasure() {
-  const sec = $('ecosistema');
-  if (!sec || !ecoPanels.length) return;
-  const vh = viewH();
-  const top = ecoTop - window.scrollY;
-  if (top + ecoH < 0 || top > vh) return;
-
-  /* PRIMERO SE LEE TODO Y DESPUÉS SE ESCRIBE. El orden importa: escribir
-     --ecoP y volver a leer el rect de las fichas obligaba al navegador a
-     recalcular el layout en mitad del frame (una vez por cada scroll). Los
-     paneles son sticky, así que su rect.top sí hay que pedirlo en vivo —el
-     sticky lo clava y no se puede deducir de scrollY—, pero ahora se piden
-     antes de tocar ningún estilo y el layout se calcula una sola vez. */
-  const line = vh * .34;
-  let act = 0;
-  for (let i = 0; i < ecoPanels.length; i++) {
-    if (ecoPanels[i].getBoundingClientRect().top <= line) act = i;
-  }
-
-  // --ecoP: 0 cuando la sección entra por abajo, 1 cuando acaba de salir por
-  // arriba. Mueve las dos tramas del fondo (ver .eweave/.esigns en el CSS).
-  // Se redondea a tres decimales y solo se escribe si cambia: una custom
-  // property nueva invalida el estilo de todo el subárbol.
-  const q = +Math.min(1, Math.max(0, -top / Math.max(1, ecoH - vh))).toFixed(3);
-  if (q !== ecoPrev) { ecoPrev = q; sec.style.setProperty('--ecoP', q); }
-
-  if (act === ecoCur) return;
-  ecoCur = act;
-  ecoLinks.forEach((a, j) => a.classList.toggle('on', j === act));
-}
-
-function observeEcosystem() {
-  // el render puede repetirse (recarga de content.json): se refrescan los nodos
-  ecoPanels = [...document.querySelectorAll('.epanel')];
-  ecoLinks = [...document.querySelectorAll('[data-econav]')];
-  ecoCur = -1;
-  if (!ecoPanels.length) return;
-
-  // sin sticky (movimiento reducido) no hay alturas que sincronizar
-  if (REDUCED.matches) { ecoCur = 0; ecoLinks.forEach((a, j) => a.classList.toggle('on', !j)); return; }
-  ecoSyncHeights();
-
-  /* Las dos tramas del fondo (.eweave/.esigns) se mueven con --ecoP, así que
-     llevan will-change:transform. Dejarlo puesto siempre significa dos capas de
-     compositor MÁS GRANDES QUE LA PANTALLA vivas en memoria de GPU desde que se
-     abre la página, aunque la sección esté cinco pantallas más abajo. La clase
-     .eco-live enciende el will-change solo mientras la sección ronda el
-     viewport (ver css/site.css) y lo apaga al salir. */
-  const sec = $('ecosistema');
-  if (sec && !ecoBound && 'IntersectionObserver' in window) {
-    new IntersectionObserver(es => sec.classList.toggle('eco-live', es[0].isIntersecting),
-      { rootMargin: '60% 0px' }).observe(sec);
-  }
-
-  if (ecoBound) { ecoRemeasure(); ecoMeasure(); return; }   // el listener se pone una sola vez
-  ecoBound = true;
-  // al cambiar el ancho las fichas se reflowean: hay que volver a igualar cajas
-  // antes de tomar las medidas (measureAll ya lo llama al redimensionar y
-  // cuando llegan las webfonts, que también estiran el texto).
-  onMeasure(() => { ecoSyncHeights(); ecoRemeasure(); });
-  ecoMeasure();
-  onScroll(ecoMeasure);
+  const list = C.ecosystem || [];
+  $('egrid').innerHTML = list.map((e, i) =>
+    '<article class="ecard rv" style="--acc:' + color(e.color) + ';--hi:' + (ECO_TONES[e.color] || ECO_TONES.neutral) + ';--d:' + (i * 0.12).toFixed(2) + 's">' +
+      '<div class="ecard-step" aria-hidden="true"><span class="n">' + String(i + 1).padStart(2, '0') + '</span><span class="ln"></span>' +
+        (i < list.length - 1 ? '<i class="ar"></i>' : '') + '</div>' +
+      '<figure class="ecard-ph">' +
+        (e.img ? '<img class="ecard-img" src="' + esc(e.img) + '" alt="' + esc(e.alt || '') + '" loading="lazy" decoding="async"' +
+          (e.focus ? ' style="object-position:' + esc(e.focus) + '"' : '') + '>' : '') +
+        // la marca firma con su logotipo en blanco, no con el nombre escrito
+        (e.logo
+          ? '<img class="ecard-logo" src="' + esc(e.logo) + '" alt="' + esc(e.name) + '" loading="lazy" decoding="async">'
+          : '<span class="ecard-logo disp">' + esc(e.name) + '</span>') +
+      '</figure>' +
+      '<div class="ecard-body">' +
+        '<h3 class="ecard-verb disp">' + esc(e.role) + '<span class="pt">.</span><span class="vh"> ' + esc(e.name) + '</span></h3>' +
+        '<p class="ecard-desc">' + esc(e.desc) + '</p>' +
+        (e.meta ? '<p class="ecard-meta">' + esc(e.meta) + '</p>' : '') +
+        (e.url ? '<a class="ecard-link" href="' + esc(e.url) + '" target="_blank" rel="noopener">' +
+          '<span>' + esc(hostOf(e.url) || 'Visitar ' + e.name) + '</span><i data-lucide="arrow-up-right" class="lu"></i>' +
+          '<span class="vh"> (web de ' + esc(e.name) + ', se abre en otra pestaña)</span></a>' : '') +
+      '</div>' +
+    '</article>').join('');
 }
 
 /* El pie (y los enlaces de la cabecera) los pinta js/shell.js, que es común a
@@ -1037,9 +824,9 @@ onMQ(matchMedia('(min-width:861px)'), e => { if (e.matches) closeMenu(); });
       hero, en cuanto el agua le llega al canto de abajo.
    2. DECIR DÓNDE ESTÁS. Seis secciones y ninguna pista. El enlace de la que
       ocupa la pantalla se queda subrayado.
-   3. CONTAR CUÁNTO QUEDA. Con tres tramos clavados (hero, «Conócenos» y el
-      apilado del ecosistema) el ascensor del navegador miente: se queda quieto
-      mientras el hero está pinado. El hilo de abajo va con el scroll real.
+   3. CONTAR CUÁNTO QUEDA. Con el hero clavado el ascensor del navegador
+      miente: se queda quieto mientras dura la inmersión. El hilo de abajo va
+      con el scroll real.
 
    Todo en el mismo bus de scroll que el resto (un rAF por frame) y escribiendo
    solo clases y una custom property: nada que obligue a recalcular layout. */
@@ -2216,12 +2003,15 @@ function abrirVisorPorURL() {
   // .bajada, hay que tocar esto.
   const ATOP = rgb('#062736'), ABOT = rgb('#062e3b');
   const KTOP = rgb('#062e3b'), KBOT = rgb('#06333f');
+  // «Conócenos» arranca en ese mismo #06333f y baja hasta el #0e2129 con el
+  // que sigue el ecosistema (ver #conocenos en css/site.css)
+  const JTOP = KBOT, JBOT = rgb('#0e2129');
   const PAPER = '#fbfaf6';
 
   // Secciones con fondo propio bajo el hero, en orden de documento. Un par de
   // colores en vez de uno significa degradado: se interpola según lo metido que
   // esté el borde inferior de la pantalla en la sección.
-  const zones = [['actualidad', [ATOP, ABOT]], ['kiosko', [KTOP, KBOT]], ['conocenos', '#0e2129'], ['ecosistema', '#0e2129'], ['suscribete', PAPER]]
+  const zones = [['actualidad', [ATOP, ABOT]], ['kiosko', [KTOP, KBOT]], ['conocenos', [JTOP, JBOT]], ['ecosistema', '#0e2129'], ['suscribete', PAPER]]
     .map(([id, color]) => ({ el: $(id), color }))
     .filter(z => z.el);
   const foot = document.querySelector('footer.site');
@@ -2230,7 +2020,13 @@ function abrirVisorPorURL() {
   // Dónde empieza y cuánto mide cada sección: fijo mientras no se redimensione.
   // Antes se pedía el rect de las seis EN CADA FRAME de scroll solo para saber
   // de qué color teñir una franja de 30px.
-  onMeasure(() => zones.forEach(z => { z.top = docTop(z.el); z.h = z.el.offsetHeight; }));
+  // El pie es la excepción: en cortina (html.pie-cortina) va pegado al fondo
+  // de la pantalla y su rect dice dónde SE VE, no dónde está. Es lo último del
+  // documento, así que su sitio de verdad empieza a su alto del final.
+  const zoneTop = el => el === foot
+    ? document.documentElement.scrollHeight - foot.offsetHeight
+    : docTop(el);
+  onMeasure(() => zones.forEach(z => { z.top = zoneTop(z.el); z.h = z.el.offsetHeight; }));
 
   let cur = '';
   function apply() {
