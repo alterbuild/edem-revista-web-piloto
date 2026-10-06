@@ -501,8 +501,10 @@ function updateDeckUI() {
    edición pasa de 20 páginas (lo dice su `meta`). */
 const K_TILT = [-1.7, 1.3, -0.9, 1.5, -1.2, 0.8];
 /* los colores de edición, aclarados para leerse a mano sobre el agua (el
-   índigo de Angels tal cual no se ve) */
-const K_HAND = { lanzadera: '#ff9f86', edem: '#8fd8ea', angels: '#c6c3ff', neutral: '#f3e6c4' };
+   índigo de Angels tal cual no se ve). Con el agua más clara del 06-10-2026
+   subieron otro punto: también tiñen el antetítulo de 10,5px (.nr b) y a ese
+   tamaño hacen falta ~4,5:1 sobre #126079. */
+const K_HAND = { lanzadera: '#ffc8b5', edem: '#b4e6f2', angels: '#d9d6ff', neutral: '#f3e6c4' };
 // la flecha de la nota: sube hacia la revista
 const K_ARROW = '<svg viewBox="0 0 30 24" aria-hidden="true" focusable="false"><path d="M27 21c-8.5.6-15.2-3.6-19-13.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3.6 11.2 7.5 5.4l4.7 4.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 // la de la cuenta del raíl: señala el tendedero (en una columna el CSS la gira hacia abajo)
@@ -1020,7 +1022,7 @@ function observeReveals() {
   // en reposo → el mar que sube (--seaP) → profundidad (--deepP), igual que el
   // color-mix de site.css, que queda como respaldo para no-JS/Chrome.
   const hx = h => [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16));
-  const CREAM = hx('3b8eab'), SEAC = hx('2f7e9b'), DEEPC = hx('052635');
+  const CREAM = hx('3b8eab'), SEAC = hx('2f7e9b'), DEEPC = hx('14677f');
   const lerp = (a, b, t) => Math.round(a + (b - a) * t);
   const q24 = v => Math.round(v * 24) / 24;   // cuantiza el color de la franja
   const heroCol = (seaP, deepP) => {
@@ -1986,24 +1988,23 @@ function abrirVisorPorURL() {
   // En el hero la barra de Chrome va ARRIBA, así que sigue lo que toca el borde de
   // arriba: el cielo (papel) en reposo, el agua cuando el mar llega hasta ahí y la
   // profundidad de la inmersión (.deepTint) después.
-  const SKY = rgb('#fbfaf6'), SURF = rgb('#62abc2'), DEEP = rgb('#052635');
+  const SKY = rgb('#fbfaf6'), SURF = rgb('#62abc2'), DEEP = rgb('#14677f');
   const mixA = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
   // «Actualidad» y el kiosko ya no pintan su propio fondo: comparten el de
-  // .bajada (ver css/site.css), una sola rampa de #062736 a #06333f —el tono
+  // .bajada (ver css/site.css), una sola rampa de #14677f a #126079 —el tono
   // con el que abre «Conócenos»—. Estos son los tramos de ESA rampa que le
   // tocan a cada una (la junta cae más o menos a la mitad). Si se toca
   // .bajada, hay que tocar esto.
-  const ATOP = rgb('#062736'), ABOT = rgb('#062e3b');
-  const KTOP = rgb('#062e3b'), KBOT = rgb('#06333f');
-  // «Conócenos» arranca en ese mismo #06333f y baja hasta el #0e2129
-  // (ver #conocenos en css/site.css)
-  const JTOP = KBOT, JBOT = rgb('#0e2129');
-  const PAPER = '#fbfaf6';
+  const ATOP = rgb('#14677f'), ABOT = rgb('#13647c');
+  const KTOP = rgb('#13647c'), KBOT = rgb('#126079');
+  // «Conócenos» arranca en ese mismo #126079 y baja hasta el #0e5165, el fondo
+  // plano de «Suscríbete» (ver #conocenos en css/site.css)
+  const JTOP = KBOT, JBOT = rgb('#0e5165');
 
   // Secciones con fondo propio bajo el hero, en orden de documento. Un par de
   // colores en vez de uno significa degradado: se interpola según lo metido que
   // esté el borde inferior de la pantalla en la sección.
-  const zones = [['actualidad', [ATOP, ABOT]], ['kiosko', [KTOP, KBOT]], ['conocenos', [JTOP, JBOT]], ['suscribete', PAPER]]
+  const zones = [['actualidad', [ATOP, ABOT]], ['kiosko', [KTOP, KBOT]], ['conocenos', [JTOP, JBOT]], ['suscribete', '#0e5165']]
     .map(([id, color]) => ({ el: $(id), color }))
     .filter(z => z.el);
   const foot = document.querySelector('footer.site');

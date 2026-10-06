@@ -125,7 +125,7 @@
    pintaba su trozo —y sus propios adornos—, se leían como bloques aparte.
    Ojo: nada de overflow:hidden aquí — anularía el sticky de .ksticky. */
 #actualidad{position:relative;padding:92px 0 104px}
-#actualidad .skick{color:var(--edem-teal-200)}
+#actualidad .skick{color:var(--edem-teal-100)}
 /* el titular de esta sección sí parte en varias líneas dentro del raíl (el del
    kiosko cabe en una): sin interlineado propio el hueco entre líneas se abría */
 #actualidad .shead h2{line-height:1.03}
@@ -157,7 +157,7 @@
    nada que se viera— y con las burbujas de la bajada pasando por debajo
    obligaría a Safari a volver a difuminar la ficha en cada fotograma. */
 #actualidad .ncard{background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.045));
-  border:1px solid rgba(255,255,255,.16);border-radius:3px;overflow:hidden;padding-top:0;
+  border:1px solid rgba(255,255,255,.22);border-radius:3px;overflow:hidden;padding-top:0;
   box-shadow:0 22px 48px rgba(3,26,36,.42);
   transition:transform var(--dur) var(--ease-standard),box-shadow var(--dur) var(--ease-standard),border-color var(--dur) var(--ease-standard)}
 #actualidad .ncard .nim{margin-bottom:0}
@@ -184,24 +184,27 @@
 /* en la columna estrecha del raíl el titular de apertura baja un punto: a 46px
    se comía cinco líneas y desnivelaba las dos columnas */
 #actualidad .ncard.lead h2{font-size:clamp(26px,2.5vw,36px)}
-#actualidad .ncard .nim{border-bottom:1px solid rgba(255,255,255,.16)}
+#actualidad .ncard .nim{border-bottom:1px solid rgba(255,255,255,.22)}
 #actualidad .ncard h2,#actualidad .ncard h3{color:#fff}
-#actualidad .ncard:hover h2,#actualidad .ncard:hover h3{color:var(--edem-teal-200)}
-#actualidad .ncard p,#actualidad .ncard .nlead{color:rgba(255,255,255,.7)}
-#actualidad .ncard .nfoot{border-top-color:rgba(255,255,255,.14)}
-#actualidad .ncard .nby{color:rgba(255,255,255,.82)}
-#actualidad .nmeta{color:rgba(255,255,255,.46)}
-#actualidad .ngo{color:var(--edem-teal-200)}
+#actualidad .ncard:hover h2,#actualidad .ncard:hover h3{color:var(--edem-teal-100)}
+/* Textos secundarios: con el agua aclarada (06-10-2026, ver .bajada en
+   site.css) el blanco al 46-70 % se quedaba en un gris sin contraste. Suben
+   todos: la entradilla casi blanca y los pies, al menos al 74 %. */
+#actualidad .ncard p,#actualidad .ncard .nlead{color:rgba(255,255,255,.88)}
+#actualidad .ncard .nfoot{border-top-color:rgba(255,255,255,.22)}
+#actualidad .ncard .nby{color:rgba(255,255,255,.94)}
+#actualidad .nmeta{color:rgba(255,255,255,.74)}
+#actualidad .ngo{color:var(--edem-teal-100)}
 /* los titulares del sumario: el antetítulo pierde el color de sección —sobre el
    agua el índigo de Angels no se leía— y se unifica en el teal claro del
    kiosko, igual que el «Nº 2 · 2026» de las fichas de portada */
-#actualidad .nrow{border-bottom-color:rgba(255,255,255,.14)}
+#actualidad .nrow{border-bottom-color:rgba(255,255,255,.22)}
 #actualidad .nrow h3{color:#fff}
-#actualidad .nrow:hover h3{color:var(--edem-teal-200)}
-#actualidad .nrow .nkick{color:var(--edem-teal-200)}
-#actualidad .nago{color:rgba(255,255,255,.46)}
+#actualidad .nrow:hover h3{color:var(--edem-teal-100)}
+#actualidad .nrow .nkick{color:var(--edem-teal-100)}
+#actualidad .nago{color:rgba(255,255,255,.74)}
 #actualidad .nthumb{border-radius:2px}
-#actualidad .dall{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);
+#actualidad .dall{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);
   border-radius:3px}
 #actualidad .dall:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.55)}
 

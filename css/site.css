@@ -240,14 +240,16 @@ nav.main a:hover::after{transform:scaleX(1)}
    tono de lo que pasa por detrás) y la cabecera se lee como parte de la sección
    en la que estás, no como una capa ajena. La clase la pone js/app.js
    (headerTheme) mirando qué sección toca el borde SUPERIOR del viewport. */
-header.site.on-dark{background:rgba(8,36,47,.82);border-bottom-color:rgba(255,255,255,.15)}
+/* 06-10-2026: del #08242f de antes al petróleo del agua aclarada (un punto más
+   hondo que ella, para que la barra se siga leyendo como barra) */
+header.site.on-dark{background:rgba(14,84,104,.86);border-bottom-color:rgba(255,255,255,.18)}
 header.site.on-dark .brand .t{color:#fff}
 header.site.on-dark .brand .t .pt{color:var(--edem-teal-300)}
 /* el logotipo de EDEM es tinta oscura: sobre el agua se cambia por el blanco.
    Se hace con filtro y no con otro <img> para no pedir un segundo fichero ni
    tener que tocar el marcado que comparten las tres páginas. */
 header.site.on-dark .brand img{filter:brightness(0) invert(1)}
-header.site.on-dark nav.main a{color:rgba(255,255,255,.74)}
+header.site.on-dark nav.main a{color:rgba(255,255,255,.84)}
 header.site.on-dark nav.main a:hover{color:#fff}
 header.site.on-dark nav.main a::after{background:var(--edem-teal-300)}
 header.site.on-dark .searchbtn{background:rgba(255,255,255,.08);color:rgba(255,255,255,.86);border-color:rgba(255,255,255,.22)}
@@ -260,11 +262,11 @@ header.site.on-dark .btn.pri{background:var(--edem-teal-500);box-shadow:0 6px 18
 header.site.on-dark .btn.pri:hover{background:var(--edem-teal-400)}
 /* el menú desplegable cuelga de la barra: se viste igual o se vería una
    lengua de papel saliendo de una cabecera oscura */
-header.site.on-dark .mnav{background:#0a2b37;border-top-color:rgba(255,255,255,.14)}
+header.site.on-dark .mnav{background:#0e5468;border-top-color:rgba(255,255,255,.14)}
 header.site.on-dark .mnav a,header.site.on-dark .mnav button{color:rgba(255,255,255,.82)}
 header.site.on-dark .mnav a:hover{background:rgba(255,255,255,.08);color:#fff}
 header.site.on-dark .mnav a .ic{color:var(--edem-teal-300)}
-header.site.on-dark .mnav a .ch{color:rgba(255,255,255,.38)}
+header.site.on-dark .mnav a .ch{color:rgba(255,255,255,.55)}
 
 /* --- dónde estás: el enlace de la sección en pantalla se queda subrayado ---
    Antes la barra no cantaba nada: seis secciones de scroll largo y ninguna
@@ -440,7 +442,7 @@ html.sbusca-on{overflow:hidden}
      Así que ese `background-color` tiene que IGUALAR en cada momento lo que hay
      justo encima, para que la franja no se vea («como si la barra no estuviera»):
        reposo: el agua de la dársena, que es lo que toca el borde de abajo
-       (#3b8eab) → el mar que sube (#2f7e9b, --seaP) → profundidad (#052635, --deepP).
+       (#3b8eab) → el mar que sube (#2f7e9b, --seaP) → profundidad (#14677f, --deepP).
      Este color no se ve en ningún otro sitio: .heroBg tapa el hero entero con el
      cielo y la escena. Lo mantiene al día js/app.js (en rgb plano: iOS no extiende
      a la franja un color-mix); el color-mix de aquí es el respaldo sin JS.
@@ -453,7 +455,7 @@ html.sbusca-on{overflow:hidden}
      negativo SECUESTRA la franja y la deja clara aunque el hero sea oscuro.) */
   background-color:#3b8eab;
   background-color:color-mix(in srgb,
-    #052635 calc(var(--deepP) * 100%),
+    #14677f calc(var(--deepP) * 100%),
     color-mix(in srgb,#2f7e9b calc(var(--seaP) * 100%),#3b8eab));
   height:calc(var(--heroH) + env(safe-area-inset-bottom, 0px));display:flex;align-items:center}
 /* Viewport GRANDE (barra de Safari plegada), como el 100vh clásico de iOS y las
@@ -634,11 +636,14 @@ html.sbusca-on{overflow:hidden}
    clip-path sí. */
 .deep{position:absolute;inset:0;z-index:5;overflow:hidden;clip-path:inset(0);pointer-events:none;display:grid;opacity:var(--deepP)}
 /* La última parada es OPACA y es exactamente el color con el que arranca la
-   bajada (#062736, ver .bajada). Antes era rgba(5,38,53,.99) y el 1% que se
+   bajada (#14677f, ver .bajada). Antes era rgba(5,38,53,.99) y el 1% que se
    transparentaba dependía de lo que hubiera debajo: medido, la costura quedaba
-   a un nivel de color de la bajada. Así casan al píxel pase lo que pase. */
+   a un nivel de color de la bajada. Así casan al píxel pase lo que pase.
+   06-10-2026: el fondo se aclaró (acababa en #062736, casi negro, y de aquí al
+   pie costaba leer); la parada intermedia sube con él para que el degradado
+   siga yendo de claro a oscuro sin un anillo más oscuro a media altura. */
 .deepTint{position:absolute;inset:-12%;background:
-  radial-gradient(120% 88% at 50% -12%,rgba(146,214,232,.5),rgba(13,74,96,.93) 52%,#062736 100%)}
+  radial-gradient(120% 88% at 50% -12%,rgba(146,214,232,.5),rgba(28,121,147,.93) 52%,#14677f 100%)}
 
 /* haces de luz que entran desde la superficie.
    Se apagan antes de tocar el fondo del hero. Los haces van girados 14°, así que
@@ -743,7 +748,7 @@ html.sbusca-on{overflow:hidden}
   /* sin desenfoque de fondo, el 82% de la barra oscura deja ver lo que pasa por
      detrás: en el simulador se leía un «A4» de una ficha del kiosko a través de
      la cabecera. Aquí va casi opaca. */
-  header.site.on-dark{background:rgb(8,36,47)}
+  header.site.on-dark{background:rgb(14,84,104)}
 }
 
 /* pila de portadas rotatoria */
@@ -880,15 +885,21 @@ html.sbusca-on{overflow:hidden}
    Antes el degradado subía a #0a4152 a media altura y esa panza de luz caía de
    lleno en el kiosko, que se leía como un panel con fondo propio —sobre todo
    cuando «Actualidad» no llegaba a pintarse y el kiosko salía justo detrás de
-   la inmersión—. Ahora es una sola rampa, de #062736 a #06333f, tan suave que
+   la inmersión—. Ahora es una sola rampa, de #14677f a #126079, tan suave que
    se lee como un único fondo; lo que distingue una sección de otra es el
    contenido, no el color.
 
+   AGUA A MEDIA PROFUNDIDAD, NO DE NOCHE (06-10-2026). Iba de #062736 a #06333f:
+   casi negro, y con los grises translúcidos de las entradillas y los pies la
+   lectura se apagaba de aquí al pie. Ahora es el petróleo de la marca con luz
+   (blanco sobre #14677f ≈ 6:1) y los textos secundarios suben de opacidad para
+   seguir leyéndose sobre un fondo más claro (ver «Actualidad» en news.css).
+
    Los dos extremos SÍ siguen atados a sus vecinos:
-   · arriba, #062736 es el color con el que acaba la inmersión del hero: la
+   · arriba, #14677f es el color con el que acaba la inmersión del hero: la
      última parada de .deepTint, que es opaca (el degradado radial llega a ella
      bastante antes del borde de abajo, así que ahí el color es plano);
-   · abajo, #06333f es el tono con el que arranca el fondo de «Conócenos».
+   · abajo, #126079 es el tono con el que arranca el fondo de «Conócenos».
    Además el degradado sale y entra plano en los dos extremos (mesetas del 0-6%
    y del 94-100%): sin cambio de pendiente en la costura, no hay raya.
    Si se toca un extremo hay que tocar el de al lado (.hero .deepTint /
@@ -901,7 +912,7 @@ html.sbusca-on{overflow:hidden}
    pelo de luz justo en la costura. Con el solape no hay fila que mezclar. El
    padding equivalente devuelve el contenido a su sitio. */
 .bajada{position:relative;margin-top:-2px;padding-top:2px;
-  background:linear-gradient(180deg,#062736 0,#062736 6%,#06333f 94%,#06333f 100%)}
+  background:linear-gradient(180deg,#14677f 0,#14677f 6%,#126079 94%,#126079 100%)}
 
 /* --- el agua sigue: las burbujas de la bajada ---
    Son las MISMAS de la inmersión: un campo fijo a la pantalla que esta capa
@@ -911,22 +922,24 @@ html.sbusca-on{overflow:hidden}
    mientras todo lo demás se mueve se leían como burbujas congeladas —y el hero
    no las tenía, así que marcaban justo dónde empezaba la sección—. Fuera.
    Abajo, antes de «Conócenos», las burbujas se funden con el fondo (::after):
-   el degradado acaba en el mismo #06333f, así que se van sin línea de corte.
+   el degradado acaba en el mismo #126079, así que se van sin línea de corte.
    Fuera de pantalla la capa se oculta (.bajada sin .live) pero el reloj de
    las burbujas sigue corriendo: al volver siguen casando con las del hero. */
 .bdeep{position:absolute;inset:0;pointer-events:none;overflow:hidden;clip-path:inset(0)}
 .bdeep::after{content:'';position:absolute;left:0;right:0;bottom:0;height:min(42vh,380px);
-  background:linear-gradient(180deg,rgba(6,51,63,0),#06333f 88%)}
+  background:linear-gradient(180deg,rgba(18,96,121,0),#126079 88%)}
 .bajada:not(.live) .bdeep{visibility:hidden}
 
 /* la retícula de las dos secciones: raíl clavado a la izquierda y el
    contenido desfilando al lado */
 #kiosko .kwrap,#actualidad .kwrap{position:relative;z-index:1;display:grid;grid-template-columns:minmax(230px,300px) 1fr;gap:56px;align-items:start}
 .ksticky{position:sticky;top:104px}
-#kiosko .shead,#actualidad .shead{border-top-color:rgba(255,255,255,.28);margin-bottom:18px}
+#kiosko .shead,#actualidad .shead{border-top-color:rgba(255,255,255,.4);margin-bottom:18px}
 #kiosko .shead h2,#actualidad .shead h2{color:#fff}
-#kiosko .skick{color:var(--edem-teal-200)}
-.knote{font-size:15.5px;line-height:1.6;color:rgba(255,255,255,.72)}
+/* sobre el agua clara el teal-200 de los antetítulos se quedaba justo: un
+   punto más de luz (lo mismo en «Actualidad» y «Conócenos») */
+#kiosko .skick{color:var(--edem-teal-100)}
+.knote{font-size:15.5px;line-height:1.6;color:rgba(255,255,255,.88)}
 /* Salida del raíl al portal de noticias. Es la única llamada a la acción de la
    columna, así que va como botón y no como enlace: sólido en el teal de la casa
    sobre el agua, esquina recta —la misma del papel y de las revistas— y la
@@ -1059,16 +1072,16 @@ html.sbusca-on{overflow:hidden}
 .kscrawl{display:flex;align-items:flex-start;gap:4px;margin:0 0 8px -6px;
   font-family:var(--font-hand);font-size:23px;line-height:1.05;color:var(--hand,#f3e6c4)}
 .kscrawl svg{flex:none;width:30px;height:24px;margin-top:-12px}
-.kinfo .nr{font-size:10.5px;letter-spacing:.24em;font-weight:800;color:var(--edem-teal-200);text-transform:uppercase}
-.kinfo .nr b{font-weight:800;color:var(--hand,var(--edem-teal-200))}
+.kinfo .nr{font-size:10.5px;letter-spacing:.24em;font-weight:800;color:var(--edem-teal-100);text-transform:uppercase}
+.kinfo .nr b{font-weight:800;color:var(--hand,var(--edem-teal-100))}
 .kinfo h3{font-size:26px;color:#fff;line-height:1.04}
-.kdesc{font-size:14px;line-height:1.55;color:rgba(255,255,255,.7)}
-.kmeta{align-self:stretch;font-size:12px;color:rgba(255,255,255,.48);font-weight:600;
-  padding-top:11px;margin-top:3px;border-top:1px solid rgba(255,255,255,.14)}
+.kdesc{font-size:14px;line-height:1.55;color:rgba(255,255,255,.86)}
+.kmeta{align-self:stretch;font-size:12px;color:rgba(255,255,255,.74);font-weight:600;
+  padding-top:11px;margin-top:3px;border-top:1px solid rgba(255,255,255,.22)}
 .kacts{display:flex;gap:9px;margin-top:10px}
 .kacts .btn{padding:10px 16px;font-size:13.5px;border-radius:2px}
 /* sobre el agua el botón secundario se dibuja en claro */
-#kiosko .kacts .btn.out{color:#fff;border-color:rgba(255,255,255,.34);background:transparent}
+#kiosko .kacts .btn.out{color:#fff;border-color:rgba(255,255,255,.5);background:transparent}
 #kiosko .kacts .btn.out:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.6)}
 
 /* ---------- fondo de papel de las secciones editoriales ----------
@@ -1107,13 +1120,21 @@ html.sbusca-on{overflow:hidden}
    sobre el agua —igual que las revistas colgadas del kiosko, con su misma
    sombra y su misma pegatina coral— y se lee de un vistazo: nada clavado ni
    colgado del scroll.
-   EL FONDO ENLAZA LAS DOS SECCIONES VECINAS. Arranca plano en #06333f, el tono
+   EL FONDO ENLAZA LAS DOS SECCIONES VECINAS. Arranca plano en #126079, el tono
    con el que acaba la bajada (sin raya en la costura: ver .bajada), y baja
-   hasta #0e2129 (antes enlazaba con el ecosistema, quitado el 04-10-2026; ahora
-   le sigue «Suscríbete», que es un bloque aparte). Si se toca un extremo hay
-   que tocar los tonos de barTint() en js/app.js. */
+   hasta #0e5165, el fondo plano de «Suscríbete», que le sigue (hasta el
+   06-10-2026 bajaba a #0e2129, casi negro: ver .bajada). Si se toca un extremo
+   hay que tocar #suscribete, .pezband y los tonos de barTint() en js/app.js.
+   SIN COSTURA CON «SUSCRÍBETE»: el degradado llega plano al borde (meseta del
+   90-100 %, como .bajada) y la sombra de la hoja ya no se corta en él. Con
+   overflow:hidden la sombra, que cae ~110px por debajo del papel, acababa en
+   seco en el canto de la sección y dibujaba una raya oscura justo encima de
+   «Suscríbete». Ahora solo se recorta en horizontal (la pegatina y la hoja de
+   detrás asoman por la derecha en pantallas estrechas) y en vertical la sombra
+   se apaga sobre «Suscríbete», que no está posicionado y se pinta debajo. */
 #conocenos{position:relative;overflow:hidden;color:#fff;padding:clamp(88px,9vw,124px) 0 clamp(56px,5.5vw,80px);
-  background:linear-gradient(180deg,#06333f 0,#06333f 6%,#0e2129 100%)}
+  background:linear-gradient(180deg,#126079 0,#126079 6%,#0e5165 90%,#0e5165 100%)}
+@supports (overflow:clip){#conocenos{overflow:visible;overflow-x:clip}}
 /* la luz que cae sobre la hoja: un halo suave detrás del papel */
 #conocenos::before{content:'';position:absolute;inset:0;pointer-events:none;
   background:radial-gradient(42% 46% at 76% 40%,rgba(52,163,192,.16),transparent 72%)}
@@ -1121,18 +1142,18 @@ html.sbusca-on{overflow:hidden}
 .jgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.04fr);gap:clamp(44px,6.4vw,104px);align-items:center}
 
 /* --- el texto --- */
-#conocenos .shead{border-top-color:rgba(255,255,255,.28);margin-bottom:24px}
-#conocenos .skick{color:var(--edem-teal-200)}
+#conocenos .shead{border-top-color:rgba(255,255,255,.4);margin-bottom:24px}
+#conocenos .skick{color:var(--edem-teal-100)}
 #conocenos .jtitle{font-size:clamp(44px,6vw,84px);line-height:.94;color:#fff;margin-top:8px;flex-basis:100%}
 .jtitle .pt{color:var(--lanzadera)}
-.jlead{font-size:17px;line-height:1.7;color:rgba(255,255,255,.76);max-width:46ch}
+.jlead{font-size:17px;line-height:1.7;color:rgba(255,255,255,.88);max-width:46ch}
 .jacts{display:flex;align-items:center;gap:12px;margin-top:30px;flex-wrap:wrap}
 /* las tres cosas que la gente pregunta antes de escribir, contestadas */
-.jfacts{list-style:none;margin-top:34px;max-width:440px;border-top:1px solid rgba(255,255,255,.12)}
-.jfacts li{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.12);
-  font-size:14.5px;font-weight:600;color:rgba(255,255,255,.8)}
+.jfacts{list-style:none;margin-top:34px;max-width:440px;border-top:1px solid rgba(255,255,255,.2)}
+.jfacts li{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.2);
+  font-size:14.5px;font-weight:600;color:rgba(255,255,255,.92)}
 .jfacts .lu{width:14px;height:14px;flex:none;padding:4px;box-sizing:content-box;border-radius:50%;
-  background:rgba(116,193,213,.14);color:var(--edem-teal-300);stroke-width:3}
+  background:rgba(255,255,255,.14);color:var(--edem-teal-100);stroke-width:3}
 
 /* --- la hoja ---
    Papel de la revista con la sombra de las colgadas del kiosko (.kmag) y,
@@ -1196,27 +1217,29 @@ html.sbusca-on{overflow:hidden}
 .jsheetwrap.in .jstamp{opacity:1;transform:rotate(12deg)}
 
 /* ---------- SUSCRÍBETE (novedades) ---------- */
-#suscribete{background:var(--surface-dark);color:var(--text-on-dark);padding:64px 0}
+/* el agua con la que acaba «Conócenos» (#0e5165): hasta el 06-10-2026 era el
+   teal-900 de la marca (#06333f), casi negro, y los grises de debajo no se leían */
+#suscribete{background:#0e5165;color:var(--text-on-dark);padding:64px 0}
 #suscribete .wrap.in{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
 #suscribete h2{font-size:clamp(30px,3.4vw,40px);color:#fff;max-width:520px}
-#suscribete .disp-i{color:var(--edem-teal-200)}
-#suscribete p.desc{color:#b4c9cf;font-size:15px;line-height:1.6;margin-top:10px;max-width:440px}
+#suscribete .disp-i{color:var(--edem-teal-100)}
+#suscribete p.desc{color:rgba(255,255,255,.86);font-size:15px;line-height:1.6;margin-top:10px;max-width:440px}
 #suscribete form{display:flex;gap:10px}
-#suscribete input[type=email]{flex:1;min-width:0;padding:14px 16px;border-radius:var(--radius-sm);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#fff;font:inherit;font-size:14px}
-#suscribete input::placeholder{color:#7d97a0}
+#suscribete input[type=email]{flex:1;min-width:0;padding:14px 16px;border-radius:var(--radius-sm);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.34);color:#fff;font:inherit;font-size:14px}
+#suscribete input::placeholder{color:rgba(255,255,255,.62)}
 #suscribete input:focus{outline:none;border-color:var(--edem-teal-200)}
 #suscribete .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 #sub-msg{font-size:13px;color:var(--edem-teal-200);margin-top:10px;min-height:18px}
 #sub-msg.err{color:#ffb4a0}
-#suscribete .legal{font-size:11.5px;color:#7d97a0;margin-top:6px}
-#suscribete .legal a{color:#9fb8bf;text-decoration:underline}
+#suscribete .legal{font-size:11.5px;color:rgba(255,255,255,.72);margin-top:6px}
+#suscribete .legal a{color:rgba(255,255,255,.9);text-decoration:underline}
 
 /* ---------- el pez ----------
    Como en edem.eu: centrado y asomando por encima del canto del pie. La banda
    prolonga el fondo de «Suscríbete» (así no hay costura) y el pez cuelga de
    ella con un margen negativo; el z-index es lo que le deja pasar por delante
    del fondo del pie, que en orden de documento se pinta después. */
-.pezband{position:relative;z-index:1;background:var(--surface-dark);
+.pezband{position:relative;z-index:1;background:#0e5165;
   display:flex;justify-content:center;padding-top:8px;line-height:0}
 .pezband img{width:clamp(122px,17vw,162px);height:auto;margin-bottom:-22px;
   filter:drop-shadow(0 12px 20px rgba(0,0,0,.45))}
