@@ -500,13 +500,17 @@ html.sbusca-on{overflow:hidden}
 
 /* ---------- el fondo: la Marina de Empresas vista desde la dársena ----------
    El cielo es el papel del landing arriba del todo —la cabecera flota encima y
-   tienen que ser el mismo color— y se va aclarando a azul hacia el horizonte,
-   que es donde los edificios blancos necesitan algo detrás para leerse.
+   tienen que ser el mismo color— y pasa a azul en cuanto deja la cabecera atrás,
+   más hondo hacia el horizonte, que es donde los edificios blancos necesitan algo
+   detrás para leerse. (Antes seguía siendo papel hasta media pantalla y el cielo
+   se leía como un hueco en blanco.) Las paradas van en fracciones de --sky, la
+   altura del horizonte: así el reparto es el mismo en cualquier pantalla.
    Va en .heroBg y NO en el background del propio hero: ese lo usa la franja de
    iOS (ver arriba). .heroBg se recorta en el viewport y se oculta con .sunk. */
 .heroBg{position:absolute;inset:0;pointer-events:none;overflow:hidden;
-  background:linear-gradient(180deg,#fbfaf6 0,#fbfaf6 calc(100% - var(--band) - var(--vbar) - 40vh),
-    #f1f6f5 calc(100% - var(--band) - var(--vbar) - 14vh),#e2eef2 calc(100% - var(--band) * .45 - var(--vbar)))}
+  --sky:calc(100% - var(--band) - var(--vbar));
+  background:linear-gradient(180deg,#fbfaf6 0,#fbfaf6 72px,#eff4f3 calc(var(--sky) * .3),
+    #e3eef1 calc(var(--sky) * .68),#d9e9ee calc(100% - var(--band) * .45 - var(--vbar)))}
 /* La escena: dos láminas <img> SVG (assets/hero/), la ciudad detrás y el muelle
    delante. Como IMAGEN y no como SVG en línea: el navegador las rasteriza una vez
    y ya. No añaden nodos al DOM ni recalculan estilo al hacer scroll, y lo único
@@ -522,18 +526,37 @@ html.sbusca-on{overflow:hidden}
 .hscape::after{content:'';position:absolute;left:0;right:0;top:100%;height:240px;background:#3b8eab}
 .hscape .hl{position:absolute;left:0;top:0;width:100%;height:100%;display:block;will-change:transform}
 
-/* nubes y gaviotas: piezas sueltas, cada una en su caja y animadas solo con
-   transform (las mueve el compositor, sin repintar nada) */
+/* EL CIELO: piezas sueltas, cada una en su caja. Los dibujos salen del mismo
+   script que la escena (scripts/escena-marina.mjs → assets/hero/cielo-*.svg) y
+   lo que se mueve lo mueve el compositor con transform, sin repintar nada.
+   Van colocadas en los huecos que deja el contenido: el avión y las nubes
+   pequeñas, entre la cabecera y el titular; la bandada y las gaviotas, en el
+   pasillo entre el texto y la pila; los jirones, pegados a los tejados. */
 .hsky{position:absolute;inset:0}
-.cloud{position:absolute;width:250px;height:58px;opacity:.9;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 70'%3E%3Cg fill='%23eaf2f5'%3E%3Ccircle cx='74' cy='46' r='22'/%3E%3Ccircle cx='116' cy='36' r='30'/%3E%3Ccircle cx='164' cy='40' r='25'/%3E%3Ccircle cx='208' cy='47' r='19'/%3E%3Ccircle cx='243' cy='52' r='13'/%3E%3Crect x='52' y='47' width='204' height='21' rx='10.5'/%3E%3C/g%3E%3Cg fill='%23fff'%3E%3Ccircle cx='74' cy='44' r='21'/%3E%3Ccircle cx='116' cy='34' r='29'/%3E%3Ccircle cx='163' cy='38' r='24'/%3E%3Ccircle cx='207' cy='45' r='18'/%3E%3Ccircle cx='242' cy='50' r='12'/%3E%3Crect x='53' y='45' width='201' height='19' rx='9.5'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;
-  animation:cloudDrift 80s ease-in-out infinite alternate}
-.cloud.c1{left:42%;top:14%}
-.cloud.c2{right:2%;top:10%;width:300px;height:70px;animation-duration:110s;animation-delay:-40s}
+/* :where() deja la base sin especificidad, para que cada pieza ponga su dibujo */
+:where(.hsky>i){position:absolute;background:center/contain no-repeat}
+/* el sol, bajo y detrás de la ciudad (la escena lo tapa por abajo): un disco
+   pálido con su halo cálido. Es lo único de color cálido del cielo y lo que le
+   quita el aire de papel en blanco. Quieto: un degradado se pinta una vez. */
+.sun{width:440px;height:440px;left:calc(57% - 220px);
+  bottom:calc(var(--band) + var(--vbar) - var(--sh) * .36 - 220px);
+  background:radial-gradient(circle closest-side,#fffaf1 0,#fffaf1 14.2%,rgba(255,246,230,.9) 15%,
+    rgba(255,240,218,.5) 30%,rgba(255,238,214,.2) 56%,rgba(255,238,214,0) 100%)}
+.cloud{animation:cloudDrift 80s ease-in-out infinite alternate}
+.cloud.c1{left:40%;top:13%;width:220px;height:63px;background-image:url("../assets/hero/cielo-nube.svg?v=20261006b")}
+.cloud.c2{right:1%;top:9%;width:320px;height:96px;background-image:url("../assets/hero/cielo-cumulo.svg?v=20261006b");animation-duration:110s;animation-delay:-40s}
+.cloud.c3{left:3%;top:19%;width:120px;height:40px;background-image:url("../assets/hero/cielo-borla.svg?v=20261006b");opacity:.9;animation-duration:96s;animation-delay:-22s}
+.streak{width:340px;height:26px;background-image:url("../assets/hero/cielo-jirones.svg?v=20261006b");opacity:.95;animation:cloudDrift 130s ease-in-out infinite alternate}
+.streak.s1{left:43%;bottom:calc(var(--band) + var(--vbar) - var(--sh) * .3)}
+.streak.s2{right:-4%;bottom:calc(var(--band) + var(--vbar) - var(--sh) * .19);width:400px;height:31px;animation-duration:150s;animation-delay:-60s}
+.plane{left:22%;top:10%;width:224px;height:32px;background-image:url("../assets/hero/cielo-avion.svg?v=20261006b");animation:planeDrift 70s linear infinite alternate}
+.flock{left:58%;top:22%;width:84px;height:24px;background-image:url("../assets/hero/cielo-bandada.svg?v=20261006b");opacity:.75;animation:cloudDrift 40s ease-in-out infinite alternate}
 @keyframes cloudDrift{from{transform:translate3d(-26px,0,0)}to{transform:translate3d(26px,0,0)}}
+@keyframes planeDrift{from{transform:translate3d(-30px,4px,0)}to{transform:translate3d(30px,-2px,0)}}
 /* La gaviota planea (la caja) y de vez en cuando bate las alas (el dibujo,
    ::before, que se aplasta en vertical un instante). Dos animaciones en dos
    elementos para que un transform no pise al otro. */
-.gull{position:absolute;width:30px;height:11px;animation:gullGlide 17s ease-in-out infinite}
+.gull{width:30px;height:11px;animation:gullGlide 17s ease-in-out infinite}
 .gull::before{content:'';position:absolute;inset:0;transform-origin:50% 60%;
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 16'%3E%3Cpath d='M1 9.5C7 3 13.5 2 20 8.2c.9.9 3.1.9 4 0C30.5 2 37 3 43 9.5c-6.4-3.2-12.6-2.6-18 2.6-1.4 1.4-4.6 1.4-6 0C13.6 6.9 7.4 6.3 1 9.5z' fill='%234f8394'/%3E%3C/svg%3E") center/contain no-repeat;
   animation:gullFlap 5.5s ease-in-out infinite}
@@ -546,7 +569,7 @@ html.sbusca-on{overflow:hidden}
 @keyframes gullFlap{0%,62%,100%{transform:none}68%{transform:scaleY(.45)}74%{transform:none}80%{transform:scaleY(.45)}86%{transform:none}}
 
 @media (prefers-reduced-motion:reduce){
-  .cloud,.gull,.gull::before{animation:none}
+  .hsky>i,.gull::before{animation:none}
 }
 
 /* el mar: tres capas de olas en bucle sin costuras.
@@ -694,7 +717,7 @@ html.sbusca-on{overflow:hidden}
 /* móvil en horizontal: la pantalla mide 320-430 de alto; nubes y gaviotas, a
    la escala de siempre, se comían el cielo que queda junto a la portada */
 @media (orientation:landscape) and (max-height:560px){
-  .cloud,.gull{display:none}
+  .cloud,.gull,.streak,.plane,.flock{display:none}
 }
 @media (prefers-reduced-motion:reduce),(orientation:landscape) and (max-height:560px){
   .heroPin{height:auto}
@@ -1430,6 +1453,9 @@ html.pie-cortina .pezband{border-radius:0 0 var(--pie-r) var(--pie-r);box-shadow
   .gull.g1{left:auto;right:12%;bottom:calc(var(--band) + var(--vbar) - var(--sh) * .18)}
   .gull.g2{left:auto;right:22%;bottom:calc(var(--band) + var(--vbar) - var(--sh) * .06)}
   .gull.g3{display:none}
+  /* apilado, el hueco entre la cabecera y la portada es una franja estrecha: el
+     avión y la bandada quedaban medio tapados por la pila */
+  .plane,.flock{display:none}
   .beat .kicker{margin-bottom:14px}
   /* Conócenos pasa a una columna. La hoja de la mancheta conserva un ancho
      de página (no se estira a lo ancho de la tableta). */
@@ -1492,7 +1518,7 @@ html.pie-cortina .pezband{border-radius:0 0 var(--pie-r) var(--pie-r);box-shadow
   .hero .sub{font-size:19px}
   .heroCopy .acts .btn.ghost{display:none}   /* una sola llamada a la acción: el kiosko ya está en el menú */
   .heroDeck{--deck-w:clamp(112px,calc((var(--heroH) - 80px - var(--padB) - var(--stackH)) / 1.414),190px)}
-  .cloud.c2{display:none}
+  .cloud.c2,.streak.s2{display:none}
   .cloud.c1{right:-50px;top:10%;width:200px;height:47px}
   /* en el teléfono no queda franja de agua donde poner la flecha sin tapar el
      rótulo de EDEM, y aquí el gesto de bajar no necesita pista */
@@ -1663,7 +1689,16 @@ html.pie-cortina .pezband{border-radius:0 0 var(--pie-r) var(--pie-r);box-shadow
    la pila encoge lo que haga falta para respetarlo (su ancho sale de --padT).
    Va al final para ganar a los cortes de arriba sin subir especificidad. */
 @media (min-width:1021px){
-  .hero{--padT:calc(69px + clamp(30px,6.2vh,58px))}
+  .hero{--padT:calc(69px + clamp(30px,6.2vh,58px));
+    /* EL BLOQUE, A LA ALTURA DEL CENTRO DE LA PANTALLA. Centrado solo en el
+       hueco entre la cabecera y la escena quedaba ~100px por encima del eje
+       horizontal de la pantalla. --dy lo baja hasta un pelo por encima de ese
+       eje sin pisar la escena; lo calcula centerHero() en js/app.js midiendo
+       el texto, la pila y la escena. Va como padding —arriba suma lo que abajo
+       resta— y no como transform: el alto disponible no cambia, así que la
+       portada conserva su tamaño, y el transform del bloque ya lo usa la
+       inmersión. Sin JS vale 0: el centrado de siempre. */
+    padding-top:calc(var(--padT) + var(--dy,0px));padding-bottom:calc(var(--padB) - var(--dy,0px))}
 }
 /* En las pantallas bajas el texto también cede: titular y subtítulo se atan al
    alto, la entradilla baja medio punto y los huecos se aprietan, para que todo

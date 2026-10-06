@@ -240,7 +240,43 @@ function fitHeroTitles() {
     s.style.whiteSpace = ''; s.style.width = '';
     if (W && need[i] > W) s.style.setProperty('--fit', Math.max(.55, (W - 2) / need[i]).toFixed(3));
   });
+  centerHero();   // el titular encogido cambia el alto del texto
 }
+
+/* --- el bloque del hero, a la altura del centro de la pantalla (ordenador) ---
+   La rejilla (texto + pila de portadas) se centraba en el hueco que deja la
+   escena por encima y, como la escena se lleva un tercio largo de la pantalla,
+   quedaba bastante por encima del centro (~100px en un portátil de 1470×873).
+   Aquí se calcula cuánto bajarla (--dy, lo aplica css/site.css como padding)
+   para que su eje caiga un pelo por encima del eje horizontal de la pantalla
+   (HERO_LIFT), con dos topes para no pisar el dibujo:
+     · la pila no baja de los tejados del lado derecho —la ciudad y el
+       Alinghi, al 30 % del alto de la escena—;
+     · el texto no baja de la punta de la pluma de la grúa —al 12,5 %, ver
+       JIB_TIP en scripts/escena-marina.mjs—, que cae justo bajo los botones.
+   Mide en layout (offsetTop/offsetHeight): ni el transform de la inmersión ni
+   la animación de entrada lo despistan. Por debajo de 1021px (pila y texto
+   apilados) no se toca nada. */
+const HERO_DESK = matchMedia('(min-width:1021px)');
+const HERO_LIFT = .035;
+let heroDy = 0;
+function centerHero() {
+  const hero = document.querySelector('.hero');
+  const grid = hero && hero.querySelector('.grid'), copy = hero && hero.querySelector('.heroCopy');
+  const deck = hero && hero.querySelector('.heroDeck'), scape = hero && hero.querySelector('.hscape');
+  if (!grid || !copy || !deck || !scape) return;
+  let dy = 0;
+  if (HERO_DESK.matches) {
+    const H = hero.clientHeight, Y0 = scape.offsetTop, sh = scape.offsetHeight;
+    const mid = grid.offsetTop - heroDy + grid.offsetHeight / 2;   // el eje del bloque con --dy a 0
+    const want = H / 2 - H * HERO_LIFT - mid;
+    const deckRoom = Y0 + sh * .30 - 18 - (mid + deck.offsetHeight / 2);
+    const copyRoom = Y0 + sh * .125 - 22 - (mid + copy.offsetHeight / 2);
+    dy = Math.max(0, Math.round(Math.min(want, deckRoom, copyRoom)));
+  }
+  if (dy !== heroDy) { heroDy = dy; hero.style.setProperty('--dy', dy + 'px'); }
+}
+onMeasure(centerHero);
 
 /* ---- pila de portadas del hero: rota entre ediciones ---- */
 let deckOrder = [], deckTimer = null, deckPaused = false, deckWake = null, flyJob = 0;
